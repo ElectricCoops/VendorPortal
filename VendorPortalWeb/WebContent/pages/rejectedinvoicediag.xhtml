@@ -1,0 +1,21 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:form id="rejectedInvoiceForm">
+	<p:panelGrid id="invRejGrid" columns="2" styleClass="ui-panelgrid-blank">
+		<p:outputLabel for="invoiceCommentId" value="Comment: " />
+		<p:inputTextarea id="invoiceCommentId" value="#{wfController.invoiceComment}" maxlength="255" autoResize="false" style="width: 99%;" 
+			required="true" requiredMessage="Rejected invoice comment is required."/>
+	</p:panelGrid>
+	<center>
+		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+			<p:commandButton id="okBtnDlg" value="OK"  action="#{wfController.submitInvoiceRejected}" update="invRejGrid,messages" ajax="true"/>
+			<p:commandButton id="cancelBtnDlg" value="Cancel" immediate="true" onclick="PF('rejectedInvoiceDlg').hide();" />			
+		</p:panelGrid>
+	</center>
+	</h:form>
+
+</ui:composition>

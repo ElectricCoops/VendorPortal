@@ -1,0 +1,44 @@
+/***************************************/
+/*  Common Vendor Portal CSS           */
+/*									   */
+/***************************************/
+.columnBgColor {
+	/* color: #ffffff; */
+	background-color: #7cb342;
+}
+
+.alignChart {
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+	text-align: center;
+}
+
+.panelGridCenter {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.ui-notificationbar {
+    border-bottom: 1px solid #F8F7F6;
+    border-bottom: 1px solid #0A2967;
+    opacity: 0.95;
+    filter: alpha(opacity = 95); /* For IE8 and earlier */
+    z-index: 9999 !important; 
+}
+.notificationbar {
+      border-bottom: 1px solid #F8F7F6;
+    border-bottom: 1px solid #0A2967;
+    opacity: 0.95;
+    filter: alpha(opacity = 95); /* For IE8 and earlier */
+    z-index: 9999 !important; 
+}
+
+.notificationbarCloseBtn {
+	background-image: url("#{resource['serenity-layout:images/close.png']}");
+	background-position: center;
+	background-repeat: no-repeat;
+}
+.ui-datatable-footer {
+   background: #607d8b !important;
+ }

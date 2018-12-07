@@ -1,0 +1,114 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/streetlightinvoicedetail">Street Light Invoice Summary</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		<h:form id="slsumform" prependId="false">
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<div class="card">
+					<p:growl id="messages" closable="true" />
+					<h:panelGrid id="page">
+					<p:panelGrid styleClass="ui-panelgrid-blank">
+							<p:button value="Back" icon="fa fa-arrow-circle-left" outcome="staking?index=2" style="float:left;" rendered="#{invController.renderBackToInvoiceTab}" />
+							<p:button value="Back" icon="fa fa-arrow-circle-left" outcome="invoicesearch?faces-redirect=true" style="float:left;" rendered="#{invController.renderBackToInvoiceSearch}" />
+							<p:commandButton value="Back" icon="fa fa-arrow-circle-left" action="#{streetLightVw.searchStreetLights}" style="float:left;" rendered="#{streetLightVw.renderBackToStreetLightBtn}" />
+					
+					<p:commandButton value="Print" type="button" icon="ui-icon-print" style="display:block;margin-bottom: 20px;float:right">
+    					<p:printer target="page" />
+					</p:commandButton>
+					</p:panelGrid>
+					<p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank">
+						<p:fieldset legend="Vendor Reference" style="font-weight:bold;text-align: center;">
+							<h:outputText id="vendorRefId" value="#{streetLightVw.invoice.vendorReference}" />
+						</p:fieldset>
+						<p:fieldset legend="LCEC Reference" style="font-weight:bold;text-align: center;">
+							<h:outputText id="lcecRefId" value="#{streetLightVw.invoice.invoiceId}" />
+						</p:fieldset>
+						<p:fieldset legend="Vendor" style="font-weight:bold;text-align: center;">
+							<h:outputText id="vendor" value="#{streetLightVw.invoice.vendor.name}" />
+						</p:fieldset>
+						<p:fieldset legend="Invoice Status" style="font-weight:bold;text-align: center;">
+							<h:outputText id="invStatus" value="#{streetLightVw.invoice.invoiceStatus.description}" />
+						</p:fieldset>
+						<p:fieldset legend="Invoice Amount" style="font-weight:bold;text-align: center;">
+							<h:outputText id="invAmtId" value="#{streetLightVw.invoice.invoiceAmount}">
+								<f:convertNumber type="currency" currencySymbol="$" />
+							</h:outputText>
+						</p:fieldset>
+						<p:fieldset legend="Approved/Rejected Comment" style="font-weight:bold;text-align: center;">
+							<h:outputText id="apprRejCommentId" value="#{streetLightVw.invoice.approvedComment}" />
+						</p:fieldset>					
+					</p:panelGrid>
+					<p:tabView id="slInvoiceSummaryTabContainer">
+					<p:tab title="LCEC" id="lcecSlInvSumTab" rendered="#{userMBean.currentUser.isPermitted('SL-INV:L-View')}">
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" layout="grid">
+							<p:dataTable id="slLCECInvDetTbl" var="detail" value="#{streetLightVw.invoiceDetail}" expandableRowGroups="true"
+									sortBy="#{detail.description}" rowKey="#{detail.invoiceDetailId}" draggableColumns="true">
+								<f:facet name="header">
+            						Street Light Invoice Details
+        						</f:facet>
+        						<p:headerRow>
+									<p:column colspan="3" >
+										<h:outputText value="#{detail.description}" />	
+									</p:column>
+								</p:headerRow>
+        						<p:column headerText="Description" style="text-align:center">
+									<h:outputText value="#{detail.description}" />
+								</p:column>					
+								<p:column headerText="GL Code" style="text-align:center">
+									<h:outputText value="#{detail.GL_Code}" />
+								</p:column>
+									<p:column headerText="Amount" style="text-align:center">
+									<h:outputText value="#{detail.amount}" >
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+					</h:panelGrid>
+						</p:tab>
+						<p:tab title="Vendor" id="vendorSlInvSumTab" rendered="#{userMBean.currentUser.isPermitted('SL-INV:V-View')}">
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank">
+							<p:dataTable id="slInvDetTbl" var="sum" value="#{streetLightVw.invSummary}" paginator="true" rows="50" rowsPerPageTemplate="50,75,100">
+								<f:facet name="header">
+									Summary
+								</f:facet>
+								<p:column headerText="Service Order"  style="text-align:center">
+									<h:outputText value="#{sum.serviceOrderId}" />
+								</p:column>
+								<p:column headerText="Work Order"  style="text-align:center">
+									<h:outputText value="#{sum.workOrderId}" />
+								</p:column>
+								<p:column headerText="Street Light No."  style="text-align:center">
+									<h:outputText value="#{sum.serviceMapLocation}" />
+								</p:column>
+								<p:column headerText="Type"  style="text-align:center">
+									<h:outputText value="#{sum.soTypeCode}" />
+								</p:column>
+								<p:column headerText="Price"  style="text-align:center">
+									<h:outputText value="$#{sum.fixedCost}" >
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+						</h:panelGrid>
+						</p:tab>
+					</p:tabView>
+					<!-- <h:panelGrid styleClass="ui-panelgrid-blank"  style="margin-top:10px">
+							<p:button value="Back" icon="fa fa-arrow-circle-left" outcome="staking?index=2" style="float:left;" rendered="#{invController.renderBackToInvoiceTab}" />
+							<p:button value="Back" icon="fa fa-arrow-circle-left" outcome="invoicesearch?faces-redirect=true" style="float:left;" rendered="#{invController.renderBackToInvoiceSearch}" />
+							<p:commandButton value="Back" icon="fa fa-arrow-circle-left" action="#{streetLightVw.searchStreetLights}" style="float:left;" rendered="#{streetLightVw.renderBackToStreetLightBtn}" />
+					</h:panelGrid> -->
+					</h:panelGrid>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank">
+		<p:fieldset legend="Units Passed" style="font-weight:bold;text-align: center;">
+			<h:outputText id="inspPassId" value="#{wfController.inspPassed}" />
+		</p:fieldset>
+		<p:fieldset legend="Units Rejected" style="font-weight:bold;text-align: center;">
+			<h:outputText id="unitRejId" value="#{wfController.unitsRejected}" />
+		</p:fieldset>
+		<p:fieldset legend="Units Not Inspected" style="font-weight:bold;text-align: center;">
+			<h:outputText id="notInspId" value="#{wfController.notInspected}" />
+		</p:fieldset>
+		<p:fieldset legend="Total Units" style="font-weight:bold;text-align: center;">
+			<h:outputText id="totUnitsId" value="#{wfController.totalUnits}" />
+		</p:fieldset>
+	</p:panelGrid>
+	<h:form>
+		<p:commandButton value="New Inspection" icon="fa fa-plus" style="float:left;display:inline-block;" 
+			action="#{wfController.findInspectionDetails}"  update="messages" rendered="#{userMBean.currentUser.isPermitted('S-INS:Edit')}">
+			<f:setPropertyActionListener target="#{wfController.renderBackToInspSearch}"  value="false" />
+    		<f:setPropertyActionListener target="#{wfController.renderBackToInspTab}" value="true" />
+		</p:commandButton>
+	</h:form>
+	<h:form id="inspFormId" style="display:inline-block;">
+		<p:dataTable id="inspTbl" var="insp" value="#{wfController.inspections}" reflow="true" style="margin-top:10px" draggableColumns="true">
+			<f:facet name="header">
+        		Search Result
+        		<p:panelGrid styleClass="ui-panelgrid-blank">
+        					<div style="float: right">
+        					<!-- <h:commandLink id="inspTblExpCSV">
+                				<p:graphicImage name="/images/icons/csv.png" width="24"/>
+                				<p:dataExporter type="csv" target="inspTbl" fileName="InspectionsCSV" />
+                				<p:tooltip id="csvToolTip" for="inspTblExpCSV" value="Export data table to CSV file" position="top"/>
+            				</h:commandLink>
+        					<h:commandLink id="inspTblExpPDF">
+                				<p:graphicImage name="/images/icons/pdf.png" width="24"/>
+                				<p:dataExporter type="pdf" target="inspTbl" fileName="InspectionsPDF" preProcessor="#{inspectionController.preProcessorPDF}" />
+                				<p:tooltip id="pdfTooltip" for="inspTblExpPDF" value="Export data table to PDF file" position="top"/>
+            				</h:commandLink> -->
+            				<p:commandButton id="toggler" type="button"  icon="fa fa-align-left" style="float: right" value="Columns" />
+        					<p:columnToggler datasource="inspTbl" trigger="toggler" />
+            				</div>
+            				</p:panelGrid>
+    					</f:facet>
+			<p:column headerText="Inspection Date" style="text-align:center" filterBy="#{insp.inspectionDt}" filterMatchMode="contains" sortBy="#{insp.inspectionDt}">
+				<h:commandLink action="#{wfController.findInspectionById}" >
+				<h:outputText value="#{insp.inspectionDt}">
+    				<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+    			</h:outputText>
+				<f:setPropertyActionListener target="#{wfController.inspectionId}" value="#{insp.inspectionId}" />
+				<f:setPropertyActionListener target="#{wfController.inspectionDt}" value="#{insp.inspectionDt}" />
+				<f:setPropertyActionListener target="#{wfController.renderBackToInspTab}" value="true" />
+				<f:setPropertyActionListener target="#{wfController.renderBackToInspSearch}"  value="false" />
+				</h:commandLink>
+			</p:column>
+			<p:column headerText="Inspector" style="text-align:center" filterBy="#{insp.resource.resourceName}" filterMatchMode="contains" sortBy="#{insp.resource.resourceName}">
+				<h:outputText value="#{insp.resource.resourceName}" />
+			</p:column>
+			<p:column headerText="Inspection Status" style="text-align:center" filterBy="#{insp.inspectionStatus.status}" filterMatchMode="contains" sortBy="#{insp.inspectionStatus.status}">
+				<h:outputText value="#{insp.inspectionStatus.status}" />
+			</p:column>
+			<p:column headerText="Comments" style="text-align:center" filterBy="#{insp.comments}" filterMatchMode="contains" sortBy="#{insp.comments}">
+				<h:outputText value="#{insp.comments}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+</ui:composition>

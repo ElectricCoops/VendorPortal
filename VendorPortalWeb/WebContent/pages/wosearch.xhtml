@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+    <ui:define name="breadcrumb">
+        <li><p:link outcome="/pages/wosearch">Staking Sheet Search</p:link></li>
+    </ui:define>
+
+    <ui:define name="content">
+    <h:form id="woForm" prependId="false">
+        <div class="ui-g ui-fluid">
+            <div class="ui-g-12">
+                <div class="card">
+					<p:growl id="messages" showDetail="true" closable="true"/>
+					<p:panel header="Search Criteria" style="margin-bottom:10px;">				
+							<p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank">
+								<p:outputLabel for="woId" value="Work Order" style="font-weight:bold" />
+								<p:inputText id="woId" value="#{wfController.tempWoId}" />
+								<p:outputLabel for="soId" value="Service Order" style="font-weight:bold" />
+								<p:inputText id="soId" value="#{wfController.tempSoId}" />
+								<p:outputLabel for="statusId" value="Work Order Status " style="font-weight:bold"/>
+									<p:selectOneMenu id="statusId" value="#{wfController.tempwoStatus}">
+										 <f:selectItem itemLabel="All" itemValue="" noSelectionOption="true" />
+										 <f:selectItems value="#{wfController.workEventStatus}" var="stat" itemLabel="#{stat.description}" itemValue="#{stat.workEventStatusId}"/>
+									</p:selectOneMenu>
+								<p:outputLabel for="inspectionStatusId" value="Inspection Status" style="font-weight:bold" />
+								<p:selectOneMenu id="inspectionStatusId" value="#{wfController.tempStakingInspectionStatus}">
+										<f:selectItem itemLabel="All" itemValue="" noSelectionOption="true" />
+										<f:selectItems value="#{inspectionController.inspStatuses}" var="stat" itemLabel="#{stat.status}" itemValue="#{stat.inspectionStatusId}"/>
+								</p:selectOneMenu>
+								<p:outputLabel for="invoiceStatusId" value="Invoice Status" style="font-weight:bold" />
+								<p:selectOneMenu id="invoiceStatusId" value="#{wfController.tempStakingInvoiceStatus}">
+									<f:selectItem itemLabel="All" itemValue="" noSelectionOption="true" />
+									<f:selectItems value="#{streetLightVw.invoiceStatus}" var="stat" itemLabel="#{stat.description}" itemValue="#{stat.invoiceStatusId}" />
+								</p:selectOneMenu>
+								<p:outputLabel for="vendorId" value="Vendor" style="font-weight:bold" />
+								<p:selectOneMenu id="vendorId" value="#{wfController.vendor}">
+									<f:selectItem itemLabel="All" itemValue="" noSelectionOption="true" />
+									<f:selectItems value="#{wfController.vendors}" var="vendor" itemLabel="#{vendor.name}" itemValue="#{vendor.name}" />
+								</p:selectOneMenu>
+								<p:commandButton value="Search" icon="ui-icon-check" update="messages,woForm,woSearchRsltTbl" action="#{wfController.findWorkFlows}" ajax="false"/>
+							</p:panelGrid>
+					</p:panel>
+				</div>
+            </div>
+            <div class="ui-g-12">
+            	<div class="card">
+            		<p:dataTable id="woSearchRsltTbl" var="wf" value="#{wfController.workflows}" reflow="true"
+            					filteredValue="#{wfController.filteredWorkflows}" paginator="true" rows="50" rowsPerPageTemplate="50,75,100"
+            					draggableColumns="true" multiViewState="true">
+            			<f:facet name="header">
+        					Search Result
+        					<p:panelGrid styleClass="ui-panelgrid-blank">
+        					<div style="float: right">
+            					<p:commandButton id="toggler" type="button"  icon="fa fa-align-left" style="float: right" value="Columns" />
+        						<p:columnToggler datasource="woSearchRsltTbl" trigger="toggler">
+        							<p:ajax event="toggle" listener="#{cpController.updateStakingSearchCol}" />
+        						</p:columnToggler>
+            				</div>
+            				</p:panelGrid>
+    					</f:facet>
+    					<p:column headerText="Work Order" style="text-align:center" filterBy="#{wf.workOrderId}" filterMatchMode="contains" sortBy="#{wf.workOrderId}">
+    					<h:commandLink action="#{wfController.findStakingDetailByWoId}" value="#{wf.workOrderId}">
+    					 	<f:setPropertyActionListener target="#{wfController.woId}" value="#{wf.workOrderId}" />
+        				</h:commandLink>
+    					</p:column>
+    					<p:column headerText="Work Order Name" style="text-align:center" filterBy="#{wf.workOrderName}" filterMatchMode="contains" sortBy="#{wf.workOrderName}">
+        					<h:outputText value="#{wf.workOrderName}" />
+    					</p:column>
+    					<p:column headerText="Work Order Status" style="text-align:center" filterBy="#{wf.workEventStatus}" filterMatchMode="contains" sortBy="#{wf.workEventStatus}">
+        					<h:outputText value="#{wf.workEventStatus}" />
+    					</p:column>
+    					<p:column headerText="Service Order" style="text-align:center" filterBy="#{wf.serviceOrderId}" filterMatchMode="contains" sortBy="#{wf.serviceOrderId}">
+        				<h:outputText value="#{wf.serviceOrderId}" />
+    					</p:column>
+    					<p:column headerText="Service Order Type" style="text-align:center" filterBy="#{wf.soTypeCodeDescription}" filterMatchMode="contains" sortBy="#{wf.soTypeCodeDescription}">
+        					<h:outputText value="#{wf.soTypeCodeDescription}" />
+    					</p:column>
+    					<p:column headerText="Work Order Open Date" style="text-align:center" filterBy="#{wf.openDt}" filterMatchMode="contains" sortBy="#{wf.openDt}">
+        					<h:outputText value="#{wf.openDt}" >
+        						<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+        					</h:outputText>
+    					</p:column>
+    					<p:column headerText="Work Order Creation" style="text-align:center" filterBy="#{wf.workEventDt}" filterMatchMode="contains" sortBy="#{wf.workEventDt}">
+        					<h:outputText value="#{wf.workEventDt}" >
+        						<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+        					</h:outputText>
+    					</p:column>
+    					<p:column headerText="Design Comments" style="text-align:center" filterBy="#{wf.LCECComments}" filterMatchMode="contains" sortBy="#{wf.LCECComments}">
+        					<h:outputText value="#{wf.LCECComments}" />
+    					</p:column>
+    					<p:column headerText="Overall As-Built Status" style="text-align:center" filterBy="#{wf.overallAsBuiltStatus}" filterMatchMode="contains" sortBy="#{wf.overallAsBuiltStatus}">
+        					<h:outputText value="#{wf.overallAsBuiltStatus}" />
+    					</p:column>			
+    					<p:column headerText="LCEC Overall Inspection Status" style="text-align:center" filterBy="#{wf.overallInspectionStatus}" filterMatchMode="contains" sortBy="#{wf.overallInspectionStatus}">
+        					<h:outputText value="#{wf.overallInspectionStatus}" />
+    					</p:column>
+    					<p:column headerText="Overall Invoice Status" style="text-align:center" filterBy="#{wf.overallInvoiceStatus}" filterMatchMode="contains" sortBy="#{wf.overallInvoiceStatus}">
+        					<h:outputText value="#{wf.overallInvoiceStatus}" />
+    					</p:column>
+    					<p:column headerText="Vendor" style="text-align:center" filterBy="#{wf.workGroup}" filterMatchMode="contains" sortBy="#{wf.workGroup}">
+        					<h:outputText value="#{wf.workGroup}" />
+    					</p:column>
+            		</p:dataTable>
+            	</div>
+            </div>
+           </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

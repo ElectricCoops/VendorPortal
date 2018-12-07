@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/admin/updateuser">Update User</p:link></li>
+	</ui:define>
+	<!--   <f:metadata>
+          <f:event type="preRenderView" listener="#{userReg.findUsers}"/>
+      </f:metadata> -->
+	<ui:define name="content">
+	
+		<div class="ui-g">
+			<div class="ui-g-12">
+				<div class="card card-w-title">
+					<h1>Update User Information</h1>
+					<p:growl id="messages" closable="true" />		
+					<h:form id="selectUserId" prependId="false">
+					<p:panel header="Select User" style="margin-bottom:10px;">
+					<center>
+						<p:outputLabel value="Please select a username from the drop-down menu to update." />
+						<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+							<p:outputLabel for="menu" value="User: " style="font-weight:bold" />
+							 <p:selectOneMenu id="menu" value="#{userReg.userUpdate}" converter="omnifaces.SelectItemsConverter">
+            					<f:selectItem itemLabel="Select User" itemValue="" noSelectionOption="true" />
+								<f:selectItems value="#{userReg.users}" var="user" itemLabel="#{user.userName}" itemValue="#{user}"/>
+            					<p:ajax event="change" listener="#{userReg.findRolesForUser}" update="selectUserId,messages" />
+        					 </p:selectOneMenu>
+						</p:panelGrid>
+						</center>
+					</p:panel>
+					<p:panel header="User Detail" style="margin-bottom:10px;">
+					<center>
+					<p:outputLabel value="* Indicates required field" style="color:red" />
+					<p:panelGrid columns="2" styleClass="ui-panelgrid-blank" >
+						<p:outputLabel for="fNameId" value="First Name: " style="font-weight:bold" />
+						<p:inputText id="fNameId" value="#{userReg.userUpdate.firstName}" />
+						<p:outputLabel for="lNameId" value="Last Name: " style="font-weight:bold" />
+						<p:inputText id="lNameId" value="#{userReg.userUpdate.lastName}" />
+						<p:outputLabel for="phoneId" value="Phone No: " style="font-weight:bold" />
+						<p:inputMask id="phoneId" value="#{userReg.userUpdate.phone}" mask="(999) 999-9999" required="true" />
+						<p:outputLabel for="phCarrierId" value="Phone Carrier: " style="font-weight:bold" />
+						<p:selectOneMenu id="phCarrierId" value="#{userReg.userUpdate.phoneCarrier}" style="width:125px">
+            						<f:selectItem itemLabel="Select One" itemValue="" />
+            						<f:selectItem itemLabel="Sprint" itemValue="Sprint" />
+            						<f:selectItem itemLabel="T-Mobile" itemValue="T-Mobile" />
+            						<f:selectItem itemLabel="AT&amp;T" itemValue="AT&amp;T" />
+            						<f:selectItem itemLabel="Verizon" itemValue="Verizon" />
+        				</p:selectOneMenu>
+						<p:outputLabel for="emailId" value="E-Mail: " style="font-weight:bold" />
+						<p:inputText id="emailId" value="#{userReg.userUpdate.email}" required="true"/>
+						<p:outputLabel for="roleId" value="Role" style="font-weight:bold" />
+        				<p:pickList id="roleId" converter="pfPickListConverter" value="#{userReg.updateRolesList}" var="role" itemLabel="#{role.roleName}" itemValue="#{role}">
+        					<f:facet name="sourceCaption">From</f:facet>
+							<f:facet name="targetCaption">Current</f:facet>
+        				</p:pickList>
+						<p:commandButton value="Update" action="#{userReg.updateUserInfo}" update="messages,selectUserId" />
+					</p:panelGrid>
+					</center>
+					</p:panel>
+                	</h:form>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

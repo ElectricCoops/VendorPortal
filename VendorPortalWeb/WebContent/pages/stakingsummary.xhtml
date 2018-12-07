@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:form id="sumFormId" style="display:inline-block;">
+		<p:dataTable id="summaryTbl" var="sum" value="#{wfController.asBuiltSummaryVw}" reflow="true" style="margin-top:10px" draggableColumns="true">
+			<f:facet name="header">
+            			As-Built Summary
+        	</f:facet>
+			<p:column headerText="Assembly Unit" style="text-align:center">
+				<h:outputText value="#{sum.assemblyGuid}" />
+			</p:column>
+			<p:column headerText="Assembly Description" style="text-align:center">
+				<h:outputText value="#{sum.assemblyDescription}" />
+			</p:column>
+			<p:column headerText="Design Quantity" style="text-align:center">
+				<h:outputText value="#{sum.designQuantity}" />
+			</p:column>
+			<p:column headerText="As-Built Quantity" style="text-align:center">
+				<h:outputText value="#{sum.asBuiltQuantity}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+</ui:composition>

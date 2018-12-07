@@ -1,0 +1,231 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/inspectiondetail">Inspection Detail</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+	<h:form id="inspectionForm">
+		<div class="ui-g">
+				<div class="ui-g-12">
+					<div class="card">
+					<h:panelGrid id="page">
+					<p:panelGrid styleClass="ui-panelgrid-blank">
+							<p:button value="Back" icon="fa fa-arrow-circle-left" outcome="staking?index=1" style="float:left;" rendered="#{wfController.renderBackToInspTab}"/>
+							<p:button value="Back" icon="fa fa-arrow-circle-left" outcome="inspectionsearch?faces-redirect=true" style="float:left;" rendered="#{wfController.renderBackToInspSearch}"/>
+							<!-- <p:commandButton value="Back" action="#{wfController.submitInspection}" style="float:right;" 
+											rendered="#{not wfController.showSubmitInspectionBtn}" update="messages" /> -->
+					
+					<p:commandButton value="Print" type="button" icon="ui-icon-print" style="display:block;margin-bottom: 20px;float:right">
+    					<p:printer target="page" />
+					</p:commandButton>
+					</p:panelGrid>
+						<p:growl id="messages" closable="true" />
+						<p:panelGrid columns="8" styleClass="ui-panelgrid-blank">
+							<p:fieldset legend="Work Order"
+								style="font-weight:bold;text-align: center;">
+								<h:outputText id="woId" value="#{wfController.woId}" />
+							</p:fieldset>
+							<p:fieldset legend="Work Order Name"
+								style="font-weight:bold;text-align: center;">
+								<h:outputText id="woNameId" value="#{wfController.woName}" />
+							</p:fieldset>
+							<p:fieldset legend="Inspected Date"
+								style="font-weight:bold;text-align: center;">
+								<h:outputText id="dtTmId" value="#{wfController.inspectionDt}" >
+									<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+								</h:outputText>
+							</p:fieldset>
+							<p:fieldset legend="Inspected By"
+								style="font-weight:bold;text-align: center;">
+								<h:outputText id="inspId"
+									value="#{wfController.inspectedBy}" />
+							</p:fieldset>
+							<p:fieldset legend="Inspection Status"
+								style="font-weight:bold;text-align: center;">
+								<h:outputText id="inspStat"
+									value="#{wfController.inspectionDetStatus}" />
+							</p:fieldset>
+						</p:panelGrid>
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank">
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.newInsp}">
+    							<p><i>Select Inspection Status and Comment in highlighted columns below.</i></p>
+    					</h:panelGrid>
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank">
+							<ui:include src="voucherinspection.xhtml" />
+						</h:panelGrid>
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.newInsp}">
+							
+							<p:dataTable var="stake" draggableColumns="true"
+								value="#{wfController.inspStakingSheetDetail}" id="inspTbl"
+								sortBy="#{stake.stationDescription}" editable="true"
+								expandableRowGroups="true" widgetVar="stakeSheetWidget"
+								rowKey="#{stake.stakingSheetDetailId}"
+								style="margin-bottom:20px">
+								<f:facet name="header">
+									Inspection
+									<p:panelGrid styleClass="ui-panelgrid-blank">
+        							<div style="float: right">
+            						<p:commandButton id="toggler" type="button"  icon="fa fa-align-left" style="float: right" value="Columns" />
+        							<p:columnToggler datasource="inspTbl" trigger="toggler" />
+            						</div>
+            						</p:panelGrid>
+								</f:facet>
+
+								<p:ajax event="rowEdit"
+									listener="#{wfController.onInspectionRowEdit}"
+									update=":inspectionForm:messages,inspTbl" />
+								<p:ajax event="rowEditCancel"
+									listener="#{wfController.onRowCancel}" />
+
+								<p:headerRow>
+									<p:column colspan="9">
+										<h:outputText value="Station - #{stake.stationDescription}" />
+									</p:column>
+								</p:headerRow>
+								<p:column headerText="C/R" style="text-align:center">
+									<h:outputText value="#{stake.assemblyActionCode}" />
+								</p:column>
+								<p:column headerText="Design Quantity" style="text-align:center">
+									<h:outputText value="#{stake.assemblyQuantity}" />
+								</p:column>
+								<p:column headerText="Unit" style="text-align:center">
+									<h:outputText value="#{stake.assemblyGuid}" />
+								</p:column>
+								<p:column headerText="Desc" style="text-align:center">
+									<h:outputText value="#{stake.assemblyDescription}" />
+								</p:column>
+								<p:column headerText="As-Built Quantity" style="text-align:center">
+									<h:outputText value="#{stake.asBuiltQuantity}" />
+								</p:column>
+								<p:column headerText="As-Built Comment" style="text-align:center">
+									<h:outputText value="#{stake.asBuiltComments}" />
+								</p:column>
+								<p:column headerText="As-Built Status" style="text-align:center">
+									<h:outputText value="#{stake.asBuiltStatus.description}" />
+								</p:column>
+								<p:column headerText="Inspection Status" style="text-align:center" styleClass="columnBgColor">
+									<p:selectOneMenu id="statusId" value="#{stake.currentInspectionDetailStatusId}" style="width: 99%;">
+										<p:ajax event="change" update="inpsectionCommentId"/>
+										<f:selectItems value="#{wfController.newInspStatuses}" var="stat" itemLabel="#{stat.status}" itemValue="#{stat.inspectionStatusId}" />
+									</p:selectOneMenu>
+								</p:column>
+								<p:column headerText="Inspection Comment" style="text-align:center" styleClass="columnBgColor">
+									<p:inputTextarea id="inpsectionCommentId"
+										value="#{stake.currentInspectorDetailComments}"
+										maxlength="255" autoResize="false" style="width: 99%;"
+										required="#{stake.currentInspectionDetailStatusId eq '5'}"
+										requiredMessage="Inspection comment is required if status is 'Rejected'." />
+								</p:column>
+							</p:dataTable>
+							<p:dialog header="Assembly Inspection" closable="false"
+								draggable="false" modal="true" resizable="false"
+								showHeader="true" widgetVar="inspUnitDlg">
+								<p:outputPanel id="inspUnitPnl" style="text-align:right;">
+									<p:panelGrid columns="2" styleClass="ui-panelgrid-blank"
+										rendered="#{not empty wfController.selectedStakingSheetDetail}">
+										<p:outputLabel for="stationId" value="Station: " />
+										<h:outputText id="stationId"
+											value="#{wfController.selectedStakingSheetDetail.stationDescription}" />
+										<p:outputLabel for="unitId" value="Assembly Unit: " />
+										<h:outputText id="unitId"
+											value="#{wfController.selectedStakingSheetDetail.assemblyGuid}" />
+										<p:outputLabel for="descId" value="Description: " />
+										<h:outputText id="descId"
+											value="#{wfController.selectedStakingSheetDetail.assemblyDescription}" />
+										<p:outputLabel for="statusId" value="Inspection Status: " />
+										<p:selectOneMenu id="statusId" value="#{wfController.inspectionStatus}">
+											<f:selectItems value="#{wfController.inspStatuses}" var="stat" itemLabel="#{stat.status}" itemValue="#{stat.inspectionStatusId}" />
+										</p:selectOneMenu>
+										<p:outputLabel for="commentId" value="Inspection Comment:" />
+										<p:inputTextarea id="commentId"
+											value="#{wfController.inspectionComment}"
+											required="#{wfController.inspectionStatus eq 'Failed'}"
+											requiredMessage="Inspection comment is required." />
+									</p:panelGrid>
+									<center>
+										<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+											<p:commandButton id="okBtnDlg" type="button" value="Update"
+												oncomplete="PF('inspUnitDlg').hide();" />
+											<p:commandButton id="cancelBtnDlg" type="button"
+												value="Cancel" onclick="PF('inspUnitDlg').hide();" />
+										</p:panelGrid>
+									</center>
+								</p:outputPanel>
+							</p:dialog>
+							<!-- </h:form> -->
+						</h:panelGrid>
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.inspHist}">
+							<p:dataTable var="stake"
+								value="#{wfController.inspectionDetailVw}" id="inspDetTbl"
+								sortBy="#{stake.stationDescription}" editable="true"
+								expandableRowGroups="true" widgetVar="stakeSheetWidget"
+								style="margin-bottom:20px">
+								<f:facet name="header">
+									Inspection
+									<p:panelGrid styleClass="ui-panelgrid-blank">
+        							<div style="float: right">
+            						<p:commandButton id="toggler" type="button"  icon="fa fa-align-left" style="float: right" value="Columns" />
+        							<p:columnToggler datasource="inspDetTbl" trigger="toggler" />
+            						</div>
+            						</p:panelGrid>
+								</f:facet>
+
+								<p:ajax event="rowEdit"
+									listener="#{wfController.onInspectionRowEdit}"
+									update=":inspectionForm:messages,inspDetTbl" />
+								<p:ajax event="rowEditCancel"
+									listener="#{wfController.onRowCancel}" />
+
+								<p:headerRow>
+									<p:column colspan="9">
+										<h:outputText value="Station - #{stake.stationDescription}" />
+									</p:column>
+								</p:headerRow>
+								<p:column headerText="C/R" style="text-align:center">
+									<h:outputText value="#{stake.assemblyActionCode}" />
+								</p:column>
+								<p:column headerText="Quantity" style="text-align:center">
+									<h:outputText value="#{stake.assemblyQuantity}" />
+								</p:column>
+								<p:column headerText="Unit" style="text-align:center">
+									<h:outputText value="#{stake.assemblyGuid}" />
+								</p:column>
+								<p:column headerText="Description" style="text-align:center">
+									<h:outputText value="#{stake.assemblyDescription}" />
+								</p:column>
+								<p:column headerText="As-Built Quantity" style="text-align:center">
+									<h:outputText value="#{stake.asBuiltQuantity}" />
+								</p:column>
+								<p:column headerText="As-Built Comment" style="text-align:center">
+									<h:outputText value="#{stake.asBuiltComments}" />
+								</p:column>
+								<p:column headerText="As-Built Status" style="text-align:center">
+									<h:outputText value="#{stake.asBuiltStatus.description}" />
+								</p:column>
+								<p:column headerText="Inspection Status" style="text-align:center">
+									<h:outputText value="#{stake.inspectionStatus.status}" />
+								</p:column>
+								<p:column headerText="Inspection Comment" style="text-align:center">
+								<h:outputText value="#{stake.comment}" />
+								</p:column>
+							</p:dataTable>
+						</h:panelGrid>
+						<p:panelGrid styleClass="ui-panelgrid-blank">
+							<!-- <p:button value="Inspections" icon="fa fa-arrow-circle-left" outcome="staking?index=1" style="float:left;" rendered="#{wfController.renderBackToInspTab}"/>
+							<p:button value="Inspections" icon="fa fa-arrow-circle-left" outcome="inspectionsearch?faces-redirect=true" style="float:left;" rendered="#{wfController.renderBackToInspSearch}"/> -->
+							<p:commandButton value="Submit Inspections" action="#{wfController.submitInspection}" style="float:right;" 
+											rendered="#{not wfController.showSubmitInspectionBtn}" update="messages" />
+						</p:panelGrid>
+						</h:panelGrid>
+						</h:panelGrid>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

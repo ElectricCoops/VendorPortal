@@ -1,0 +1,208 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" 
+	xmlns:pe="http://primefaces.org/ui/extensions"
+	template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/rategroup">Rate Group</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+	<style type="text/css">
+		.alignTop {
+			vertical-align: top;
+		}
+	</style>
+		<div class="ui-g">
+			<div class="ui-g-12">
+				<div class="card">
+					<p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
+						<p:outputLabel for="searchTypeId" value="Search Type: " />
+						<p:selectOneMenu id="searchTypeId" value="">
+							<f:selectItem itemLabel="Assembly Unit" itemValue=""
+								noSelectionOption="true" />
+							<f:selectItem itemValue="Type 1" itemLabel="Type 1" />
+							<f:selectItem itemValue="Type 2" itemLabel="Type 2" />
+						</p:selectOneMenu>
+						<p:inputText id="searchTypeInputId" value="" />
+						<p:button value="Search" icon="fa fa-binoculars"
+							style="display:inline-block;margin-top:5px" />
+					</p:panelGrid>
+					<p:panel id="assmbUnitPnl"
+						header="Assembly Unit: 40-5 - POLE, WOOD, 40', CLASS 5"
+						style="margin-bottom:20px;">
+						<p:dataTable id="assembUnitTbl" var="unit" value="">
+							<p:column headerText="Assembly Unit">
+								<h:outputText value="" />
+							</p:column>
+							<p:column headerText="Description">
+								<h:outputText value="" />
+							</p:column>
+							<p:column headerText="Category">
+								<h:outputText value="" />
+							</p:column>
+							<p:column headerText="Status">
+								<h:outputText value="" />
+							</p:column>
+							<p:column headerText="Require Pick List"
+								style="white-space:normal; text-align: center;">
+								<p:selectBooleanCheckbox value="" />
+							</p:column>
+						</p:dataTable>
+					</p:panel>
+					<p:panel id="rateGrpPnl">
+						<p:tabView>
+							<p:tab title="Rate Group">
+								<p:dataTable id="rateGrpTbl" var="rate" value="">
+									<p:column headerText="Rate Group">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Chg Cd">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Fixed Amount">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Constr Labor Rt">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Constr Labor...">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Constr Hrs">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Constr Ovhd R...">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Constr Ovhd Rt Grp Pct">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Constr Labor">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Constr Material">
+										<h:outputText value="" />
+									</p:column>
+									<p:column headerText="Constr Material...">
+										<h:outputText value="" />
+									</p:column>
+								</p:dataTable>
+							</p:tab>
+						</p:tabView>
+					</p:panel>
+					<p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group">
+						<p:outputLabel for="rateGrpDd" value="Rate Group: " />
+						<p:selectOneMenu id="rateGrpDd" value="" disabled="true">
+							<f:selectItem itemLabel="Assembly Unit" itemValue=""
+								noSelectionOption="true" />
+						</p:selectOneMenu>
+						<p:outputLabel for="chrgCodeId" value="Charge Code:" />
+						<p:outputLabel id="chrgCodeId" value="xxx - xxxx" />
+						<p:outputLabel for="fixAmntId" value="Fixed Amount:" />
+						<p:inputText id="fixAmntId" value="329.65" disabled="true" />
+					</p:panelGrid>
+					<h:panelGrid columns="2" columnClasses="alignTop,alignTop">
+						<p:panel header="Entry">
+							<h:panelGrid columns="2" columnClasses="alignTop,alignTop">
+								<p:panelGrid columns="1"
+									styleClass="ui-panelgrid-blank form-group"
+									style="border:0px none; background-color:transparent;">
+									<p:outputLabel id="entryPlcHldId" value="" />
+									<p:outputLabel id="entryPlcHldId2" value="" />
+									<p:outputLabel id="entryPlcHldId3" value="" />
+									<p:outputLabel id="entryLbRtId" value="Labor Rate: " />
+									<p:outputLabel id="entryLbAmtId" value="Labor Amount: " />
+									<p:outputLabel id="entryHrsId" value="Hours: " />
+									<p:outputLabel id="entryOvhdRtGrpId" value="Ovhd Rate Group: " />
+									<p:outputLabel id="entryOvhdRtGrpPerId"
+										value="Ovhd Rate Group Percent: " />
+								</p:panelGrid>
+								<h:panelGrid columns="2" columnClasses="alignTop,alignTop">
+									<p:panel header="Construction">
+										<p:panelGrid columns="1" layout="grid"
+											styleClass="ui-panelgrid-blank form-group"
+											style="border:0px none; background-color:transparent;">
+											<p:inputText id="constLbrRtId" value="0.00" disabled="true" />
+											<p:inputText id="constLbrAmntId" value="0.00" disabled="true" />
+											<p:inputText id="constHrsId" value="0.00" disabled="true" />
+											<p:inputText id="constOvhdRtGrpId" value="0.00"
+												disabled="true" />
+											<p:inputText id="constOvhdRtGrpPctId" value="0.00"
+												disabled="true" />
+										</p:panelGrid>
+									</p:panel>
+									<p:panel header="Retirement">
+										<p:panelGrid columns="1" layout="grid"
+											styleClass="ui-panelgrid-blank form-group"
+											style="border:0px none; background-color:transparent;">
+											<p:inputText id="EntRetLbrRtId" value="0.00" disabled="true" />
+											<p:inputText id="EntRetLbrAmntId" value="0.00"
+												disabled="true" />
+											<p:inputText id="EntRetHrsId" value="0.00" disabled="true" />
+											<p:inputText id="EntRetOvhdRtGrpId" value="0.00"
+												disabled="true" />
+											<p:inputText id="EntRetOvhdRtGrpPctId" value="0.00"
+												disabled="true" />
+										</p:panelGrid>
+									</p:panel>
+								</h:panelGrid>
+							</h:panelGrid>
+						</p:panel>
+						<p:panel header="Totals">
+							<h:panelGrid columns="2" columnClasses="alignTop,alignTop">
+								<p:panelGrid columns="1"
+									styleClass="ui-panelgrid-blank form-group"
+									style="border:0px none; background-color:transparent;">
+									<p:outputLabel id="totalPlcHldId" value="" />
+									<p:outputLabel id="totalPlcHldId2" value="" />
+									<p:outputLabel id="totalPlcHldId3" value="" />
+									<p:outputLabel id="totalLbId" value="Labor: " />
+									<p:outputLabel id="totalOvhdId" value="Overhead: " />
+									<p:outputLabel id="totalMtrId" value="Material: " />
+									<p:outputLabel id="totalMtrOvhdId" value="Material Ovhd: " />
+									<p:outputLabel id="totalId" value="Total: " />
+								</p:panelGrid>
+								<h:panelGrid columns="2" columnClasses="alignTop,alignTop">
+									<p:panel header="Construction">
+										<p:panelGrid columns="1" layout="grid"
+											styleClass="ui-panelgrid-blank form-group"
+											style="border:0px none; background-color:transparent;">
+											<p:inputText id="TotConstLbrRtId" value="0.00"
+												disabled="true" />
+											<p:inputText id="TotConstOvhdId" value="0.00" disabled="true" />
+											<p:inputText id="TotConstMatId" value="0.00" disabled="true" />
+											<p:inputText id="TotConstMatOvhdRtId" value="0.00"
+												disabled="true" />
+											<p:inputText id="TotConstTotId" value="0.00" disabled="true" />
+										</p:panelGrid>
+									</p:panel>
+									<p:panel header="Retirement">
+										<p:panelGrid columns="1" layout="grid"
+											styleClass="ui-panelgrid-blank form-group"
+											style="border:0px none; background-color:transparent;">
+											<p:inputText id="TotRetLbrRtId" value="0.00" disabled="true" />
+											<p:inputText id="TotRetOvhdId" value="0.00" disabled="true" />
+											<p:inputText id="TotRetMatId" value="0.00" disabled="true" />
+											<p:inputText id="TotRetMatOvhdRtId" value="0.00"
+												disabled="true" />
+											<p:inputText id="TotRetTotId" value="0.00" disabled="true" />
+										</p:panelGrid>
+									</p:panel>
+								</h:panelGrid>
+							</h:panelGrid>
+						</p:panel>
+					</h:panelGrid>
+					<p:button value="Save" style="display:inline-block;margin-top:5px;margin-right:5px" />
+					<p:button value="Reset" style="display:inline-block;margin-top:5px;margin-right:5px" />
+					<p:button value="Add" style="display:inline-block;margin-top:5px;margin-right:5px" />
+					<p:button value="Delete" style="display:inline-block;margin-top:5px" />
+				</div>
+			</div>
+		</div>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,90 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/admin/users">User Management</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12">
+				<div class="card">
+					<h2>User Management</h2>
+					<p:growl id="messages" closable="true" />
+					<h:form id="userListForm">
+						<!-- <div class="ui-g">
+        					<div class="ui-g-12">
+        						<p:commandButton title="Create New User" icon="fa fa-plus" style="float:right;display:inline-block;margin-top:5px" ajax="false"/>
+        					</div>
+        				</div> -->
+						<p:dataTable var="user" value="#{userReg.users}"
+							paginator="true"
+							paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							rowsPerPageTemplate="25,50,100">
+							<p:column headerText="Username" style="text-align:center">
+								<h:outputText value="#{user.userName}" />
+							</p:column>
+							<p:column headerText="First Name" style="text-align:center">
+								<h:outputText value="#{user.firstName}" />
+							</p:column>
+							<p:column headerText="Last Name" style="text-align:center">
+								<h:outputText value="#{user.lastName}" />
+							</p:column>
+							<p:column headerText="E-Mail" style="text-align:center">
+								<h:outputText value="#{user.email}" />
+							</p:column>
+							<p:column headerText="Start Date" style="text-align:center">
+								<h:outputText value="#{user.effectiveStartDate}">
+									<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="End Date" style="text-align:center">
+								<h:outputText value="#{user.effectiveEndDate}">
+									<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Last Logged In" style="text-align:center">
+								<h:outputText value="#{user.lastLogin}">
+									<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+								</h:outputText>
+							</p:column>
+							<!-- <p:column >
+                     			<p:commandLink update="userListForm" style="padding-left: 7pt;">
+                     				<i class="fa fa-wa fa-pencil fa-lg" />
+                     			</p:commandLink>
+                     
+                     			<p:commandLink update="userListForm"  style="padding-left: 7pt;">
+                     				<i class="fa fa-wa fa-copy fa-lg" />
+                     			</p:commandLink>
+                     
+                     			<p:commandLink  update="userListForm"  style="padding-left: 7pt;">
+                     				<i class="fa fa-wa fa-trash-o fa-lg" />
+                     			</p:commandLink>
+                     		</p:column> -->
+							<f:facet name="paginatorTopRight">
+								<p:commandLink id="newUserId" style="color:white" onclick="PF('createUserDlg').show();">
+                    				 <i class="fa fa-wa fa-plus fa-2x" />
+                    			</p:commandLink>
+                    			<p:tooltip id="newUserToolTip" for="newUserId" value="Create New User" position="top"/>
+							</f:facet>
+							<!-- <f:facet name="paginatorBottomRight">
+								<p:commandButton type="button" icon="pi pi-cloud-upload" />
+							</f:facet> -->
+						</p:dataTable>
+					</h:form>
+					<p:dialog header="Create New User" closable="false"
+								draggable="false" modal="true" resizable="false"
+								showHeader="true" widgetVar="createUserDlg"
+								minHeight="40">
+						<h:form id="createUserDlgForm">
+							<ui:include src="../createuser.xhtml" />
+						</h:form>
+					</p:dialog>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

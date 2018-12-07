@@ -1,0 +1,72 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/apexception">AP Exception</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<p:messages id="messages" closable="true" />
+			<div class="ui-g-12">
+				<div class="card">
+					<div style="text-align: center">
+						<!-- <h2>Invoice Reconciliation Exception Report</h2> -->
+						
+					</div>
+					<h:panelGrid columns="1" styleClass="ui-panelgrid-blank">
+						<h:form>
+							<p:commandButton value="Print" icon="fa fa-print" style="float:right;display:inline-block;" />
+						</h:form>
+						<p:dataTable var="" value="" style="margin-top:5px" reflow="true">
+						<f:facet name="header">
+							Invoice Reconciliation Exception Report
+						</f:facet>
+						<p:columnGroup type="header">
+							<p:row>
+								<p:column colspan="4" />
+								<p:column colspan="3" headerText="Invoice Amount" />
+							</p:row>
+							<p:row>
+								<p:column headerText="Work Order No." />
+								<p:column headerText="LCEC Reference No." />
+								<p:column headerText="Vendor Reference No." />
+								<p:column headerText="Invoice Date" />
+								<p:column headerText="Expected" />
+								<p:column headerText="Actual" />
+								<p:column headerText="Difference" />
+							</p:row>
+						</p:columnGroup>
+							<p:column>
+								<h:outputText value="" />
+							</p:column>
+							<p:column>
+								<h:outputText value="" />
+							</p:column>
+							<p:column>
+								<h:outputText value="" />
+							</p:column>
+							<p:column>
+								<h:outputText value="" />
+							</p:column>
+							<p:column>
+								<h:outputText value="" />
+							</p:column>
+							<p:column>
+								<h:outputText value="" />
+							</p:column>
+							<p:column>
+								<h:outputText value="" />
+							</p:column>
+						</p:dataTable>
+					</h:panelGrid>
+				</div>
+			</div>
+		</div>
+
+	</ui:define>
+
+</ui:composition>

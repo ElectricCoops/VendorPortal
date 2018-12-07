@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/about">Release Notes</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		<div class="ui-g ui-fluid">
+			<div class="ui-g-12">
+				<div class="card">
+					<h1>
+						<u>Release v1.0.1</u>
+					</h1>
+					<h4>November 19, 2018</h4>
+					<h4>Enhacement(s):</h4>
+					<ul>
+						<li><b>Staking</b></li>
+						<ul>
+							<li>Added Inspection Comments columnon As-Built edit table.</li>
+						</ul>
+					</ul>
+					<ul>
+						<li><b>Invoice</b></li>
+						<ul>
+							<li>Added Filters on Invoice History Data Table.</li>
+						</ul>
+					</ul>
+					<ul>
+						<li><b>Invoice Approval</b></li>
+						<ul>
+							<li>Added Inpector and Inspected Date Columns.</li>
+						</ul>
+					</ul>
+					<ul>
+						<li><b>Misc</b></li>
+						<ul>
+							<li>Moved "Back" button from bottom to top of page throughout the application.</li>
+						</ul>
+					</ul>
+					<h4>Bugs Fixed:</h4>
+					<ul>
+						<li><b>Staking</b></li>
+						<ul>
+							<li>Fixed Unable to save As-Built with Zero quantity.</li>
+						</ul>
+					</ul>
+				</div>
+				<div class="card">
+					<h1><u>Release v1.0.0</u></h1>
+					<h4>September 27, 2018</h4>
+					<h4>Features Added:</h4>
+					<ul>
+						<li><b>Dashboard</b></li>
+						<ul>
+							<li>Shows basic statistics on areas released in this version</li>
+						</ul>
+						<li><b>Staking Area</b></li>
+						<ul>
+							<li>Search</li>
+							<ul>
+								<li>Can search for work orders</li>
+							</ul>
+							<li>As-Built Tab</li>
+							<ul>
+								<li>LCEC can present a work order’s design to a vendor</li>
+								<li>Vendor can update the actual As-Built quantities and submit for inspection</li>
+							</ul>
+							<li>Inspection Tab</li>
+							<ul>
+								<li>LCEC can inspect assemble units</li>
+								<li>Vendor can review the results of those inspections</li>
+							</ul>
+							<li>Invoicing Tab</li>
+							<ul>
+								<li>Vendor can submit an invoice for payment to LCEC</li>
+								<li>LCEC can review invoice for approval or rejection</li>
+							</ul>
+							<li>Summary Tab</li>
+							<ul>
+								<li>Can see an aggregated view of all assemble units on the work order</li>
+							</ul>
+						</ul>
+						<li><b>Streetlights Area</b></li>
+						<ul>
+							<li>Search</li>
+							<ul>
+								<li>Can search for work orders</li>
+							</ul>
+							<li>Inspection Tab</li>
+							<ul>
+								<li>LCEC reviews vendor submitted paper forms and can mark the work order ready for invoicing</li>
+							</ul>
+							<li>Invoicing Tab</li>
+							<ul>
+								<li>Vendor can submit an invoice for payment to LCEC</li>
+								<li>LCEC can review invoice for approval or rejection</li>								
+							</ul>
+						</ul>
+						<li><b>Inspection Area</b></li>
+						<ul>
+							<li>Search</li>
+							<ul>
+								<li>Can look for inspections in staking and streetlights based upon the user’s criteria</li>
+								<li>Inspectors can use as centralized list of invoices to approve</li>
+							</ul>
+						</ul>
+						<li><b>Admin Area</b></li>
+							<ul>
+								<li>Used to create and manage users and their roles</li>
+							</ul>
+					</ul>
+					<h4>Known Issues:</h4>
+					<ul>
+						<li>Service orders for streetlights which require the entry of feet of cable is not supported in this release</li>
+						<li>No work order with less than 9 characters will be found in the VendorPortal</li>
+						<li>WorkOrder starting with the number “3” will not be found in VendorPortal</li>
+						<li>The Following Service Order Types will not be found in VendorPortal</li>
+						<ul>
+							<li>APT, CNMNR, CNTB, DCLAIM, DMTNC, ER, HP, PSC, OSP, TPOH</li>
+						</ul>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+
+</ui:composition>

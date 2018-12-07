@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/newinvoice">New Invoice</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<div class="card card-w-title">
+						<p:growl id="messages" closable="true" />
+						<p:button value="Cancel" icon="fa fa-arrow-circle-left" outcome="staking?index=2" style="float:left;" rendered="#{!invController.renderBackToInvoiceTab}" />
+						<p:button value="Invoices" icon="fa fa-arrow-circle-left" outcome="staking?index=2" style="float:left;" rendered="#{invController.renderBackToInvoiceTab}" />
+						<p:panelGrid columns="8" layout="grid"
+							styleClass="ui-panelgrid-blank">
+							<p:fieldset legend="Work Order #"
+								style="font-weight:bold;text-align: center;">
+								<h:outputText id="woId" value="#{wfController.woId}" />
+							</p:fieldset>
+							<p:fieldset legend="Service Order #"
+								style="font-weight:bold;text-align: center;">
+								<h:outputText id="soId" value="#{wfController.soId}" />
+							</p:fieldset>
+							<p:fieldset legend="Work Order Name"
+								style="font-weight:bold;text-align: center;">
+								<h:outputText id="woNameId" value="#{wfController.woName}" />
+							</p:fieldset>
+						</p:panelGrid>
+						<p:panelGrid styleClass="ui-panelgrid-blank" >
+    						<p><i>Select items to invoice by selecting the checkbox, enter a Vendor Reference Code below and Click Submit.</i></p>	
+    					</p:panelGrid>
+						<h:form id="newInvoiceForm">
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank">
+							<ui:include src="voucherinvoice.xhtml" />
+						</h:panelGrid>
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank">				
+							<p:dataTable id="newInvoiceTbl" var="stake" draggableColumns="true"
+								value="#{wfController.invoiceStakingSheetDetail}"
+								sortBy="#{stake.stationDescription}"
+								selection="#{wfController.selectedStakingSheetDetails}"
+								rowKey="#{stake.stakingSheetDetailId}" style="margin-bottom:0">
+								<f:facet name="header">
+            						Available for Invoice
+            						<p:panelGrid styleClass="ui-panelgrid-blank">
+										<div style="float: right">
+											<h:commandLink id="newInvoiceTblExpCSV" immediate="true">
+                								<p:graphicImage name="/images/icons/csv.png" width="24"/>
+                								<p:dataExporter type="csv" target="newInvoiceTbl" fileName="AvailableInvoiceCSV" />
+                								<p:tooltip id="csvToolTip" for="newInvoiceTblExpCSV" value="Export data table to CSV file" position="top"/>
+            								</h:commandLink>
+        									<h:commandLink id="newInvoiceTblExpPDF" immediate="true">
+                								<p:graphicImage name="/images/icons/pdf.png" width="24"/>
+                								<p:dataExporter type="pdf" target="newInvoiceTbl" fileName="AvailableInvoicePDF" preProcessor="#{wfController.preProcessorStakingSheetRsltPDF}" />
+                								<p:tooltip id="pdfTooltip" for="newInvoiceTblExpPDF" value="Export data table to PDF file" position="top"/>
+            								</h:commandLink>
+											<p:commandButton id="toggler" type="button"  icon="fa fa-align-left" style="float: right" value="Columns" />
+        									<p:columnToggler datasource="newInvoiceTbl" trigger="toggler" />
+        										<!-- <p:ajax event="toggle" listener="#{wfController.onAsBuiltToggle}" /> -->
+        								</div>
+        								</p:panelGrid>
+        						</f:facet>
+        
+        						<p:ajax event="rowSelectCheckbox" listener="#{wfController.auInvRowSelectCheckbox}" update="newInvoiceForm" />
+                				<p:ajax event="rowUnselectCheckbox" listener="#{wfController.auInvRowUnSelectCheckbox}" update="newInvoiceForm" />
+                				<p:ajax event="toggleSelect" listener="#{wfController.auInvAllRowSelectCheckbox}" update="newInvoiceForm" />
+                				<p:ajax event="rowSelect" listener="#{wfController.auInvRowSelectCheckbox}" update="newInvoiceForm" />
+                				<p:ajax event="rowUnselect" listener="#{wfController.auInvRowSelectCheckbox}" update="newInvoiceForm" />
+                
+        						
+								<p:column selectionMode="multiple" style="width:16px;text-align:center" />
+								<p:column headerText="C/R" style="text-align:center" filterBy="#{stake.assemblyActionCode}" filterMatchMode="contains" sortBy="#{stake.assemblyActionCode}">
+									<h:outputText value="#{stake.assemblyActionCode}" />
+								</p:column>
+								<p:column headerText="Design Quantity" style="text-align:center" filterBy="#{stake.assemblyQuantity}" filterMatchMode="contains" sortBy="#{stake.assemblyQuantity}">
+									<h:outputText value="#{stake.assemblyQuantity}" />
+								</p:column>
+								<p:column headerText="Unit" style="text-align:center" filterBy="#{stake.assemblyGuid}" filterMatchMode="contains" sortBy="#{stake.assemblyGuid}">
+									<h:outputText value="#{stake.assemblyGuid}" />
+								</p:column>
+								<p:column headerText="Description" style="text-align:center" filterBy="#{stake.assemblyDescription}" filterMatchMode="contains" sortBy="#{stake.assemblyDescription}">
+									<h:outputText value="#{stake.assemblyDescription}" />
+								</p:column>
+								<p:column headerText="As-Built Quantity" style="text-align:center" filterBy="#{stake.asBuiltQuantity}" filterMatchMode="contains" sortBy="#{stake.asBuiltQuantity}">
+									<h:outputText value="#{stake.asBuiltQuantity}" />
+								</p:column>
+								<p:columnGroup type="footer">
+									<p:row>
+										<p:column colspan="5" style="text-align:right"
+											footerText="Total:" />
+										<p:column style="text-align:center">
+											<f:facet name="footer">
+												<h:outputText id="subTotId"
+													value="#{wfController.auSubTotal}">
+													<f:convertNumber type="currency" currencySymbol="$" />
+												</h:outputText>
+											</f:facet>
+										</p:column>
+									</p:row>
+								</p:columnGroup>
+							</p:dataTable>
+							<p:panelGrid styleClass="ui-panelgrid-blank"  style="margin-bottom:20px">
+								<p:commandButton value="Submit Invoice" action="#{wfController.submitInvoice}" style="float:right;margin-left:10px;" update="newInvoiceForm,messages">
+									<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="true" />
+    								<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="false" />
+								</p:commandButton>
+								<p:inputText id="refId" value="#{wfController.vendorRefNo}" style="float:right;"
+									required="true" requiredMessage="Vendor Reference Number is required" />
+									<p:outputLabel for="refId" value="Vendor Reference Code:  " style="float:right;font-weight:bold;" />
+								
+							</p:panelGrid>
+						</h:panelGrid>
+						</h:form>
+					</div>
+				</div>
+			</div>
+	</ui:define>
+</ui:composition>

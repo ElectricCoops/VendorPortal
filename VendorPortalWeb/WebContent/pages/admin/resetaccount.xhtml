@@ -1,0 +1,64 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/admin/resetaccount">Reset Password</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+	<div class="ui-g">
+		<div class="ui-g-12">
+			<div class="card card-w-title">
+				<h1>Reset User Password</h1>
+				<p:growl id="messages" closable="true" />
+				<h:form id="selectUserId" prependId="false">
+					<p:panel header="Select User" style="margin-bottom:10px;">
+						<center>
+							<p:outputLabel value="* Please select a username from the drop-down menu to reset password." />
+							<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+								<p:outputLabel for="menu" value="Username: " style="font-weight:bold" />
+								<p:selectOneMenu id="menu" value="#{userReg.userUpdate}" converter="omnifaces.SelectItemsConverter" required="true"
+										requiredMessage="Please select a username from the drop-down menu to reset password.">
+									<f:selectItem itemLabel="Select User" itemValue="" noSelectionOption="true" />
+									<f:selectItems value="#{userReg.users}" var="user" itemLabel="#{user.userName}" itemValue="#{user}" />
+									<p:ajax event="change" update="selectUserId,messages" />
+								</p:selectOneMenu>
+							</p:panelGrid>
+						</center>
+					</p:panel>
+					<p:panel header="User Detail" style="margin-bottom:10px;">	
+					<center>
+						<p:outputLabel value="* Indicates required field" style="color:red" />
+						<h:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank" >
+							<p:outputLabel for="pwd1" value="Password: " style="font-weight:bold"/>
+        						<p:password id="pwd1" value="#{userReg.pwd}" match="pwd2" label="Password" required="true" feedback="true" inline="true"
+        									requiredMessage="Password is required." />
+        						<p:graphicImage id="helpId" name="/images/Helpbtn.png" style="width:25px; height:25px;"/>
+        						<p:tooltip for="helpId" value="There are 4 options for position" position="right">
+						 			<h3>Password Requirement</h3>
+									<h4>**Password length must be between 12 and 128 characters.</h4>
+									<h4>**Password must contain at least one upper-case character.</h4>
+									<h4>**Password must contain at least one lower-case character.</h4>
+									<h4>**Password must contain at least one digit character.</h4>
+									<h4>**Password must contain no whitespace.</h4>
+						 		</p:tooltip>
+        						<p:outputLabel for="pwd2" value="Confirm Password: " style="font-weight:bold"/>
+        						<p:password id="pwd2" value="#{userReg.pwd}" label="Confirm Password" required="true" feedback="true" inline="true" 
+        										requiredMessage="Confirm password is required." validatorMessage="password must match Confirm Password">
+        								<p:ajax event="blur" listener="#{userReg.isValidPassword}" update="messages" />	
+        						</p:password>
+						</h:panelGrid>
+						<p:panelGrid columns="1" styleClass="ui-panelgrid-blank" >	
+        						<p:commandButton value="Reset" action="#{userReg.resetUserPwd}" update="messages selectUserId" />
+        				</p:panelGrid>
+					</center>
+					</p:panel>
+				</h:form>
+			</div>
+		</div>
+	</div>
+</ui:define>
+</ui:composition>

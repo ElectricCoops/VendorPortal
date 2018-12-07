@@ -1,0 +1,54 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<!-- <h:form id="stationDiagForm"> -->
+		<p:panelGrid id="stationGrid" columns="2" styleClass="ui-panelgrid-blank">
+			<p:outputLabel for="stationDlgId" value="Station: " />
+			<p:inputText id="stationDlgId" value="#{adHocStaking.station}" required="true" requiredMessage="Please enter a station description" />
+			<p:outputLabel for="crId" value="Construct/Retire:" />
+			<p:selectOneRadio id="crId" value="#{adHocStaking.cr}" required="true" style="width: 99%;" requiredMessage="Please select Construct(C) or Retire(R).">
+				<f:selectItem itemLabel="C" itemValue="C" />
+				<f:selectItem itemLabel="R" itemValue="R" />
+			</p:selectOneRadio>
+			<p:outputLabel for="energId" value="Energized/De-Energized: " />
+			<p:selectOneRadio id="energId" value="#{adHocStaking.energized}" style="width: 99%;" required="true" requiredMessage="Please select Energized(E) or De-energized(D)." >
+				<f:selectItem itemLabel="E" itemValue="E" />
+				<f:selectItem itemLabel="D" itemValue="D" />
+				<!-- <p:ajax update="unitId" process="@this" listener="#{adHocStaking.energizedEvent}" /> -->
+				<p:ajax update="unitId" process="@this" listener="#{adHocStaking.findAssemblyUnits}" />
+			</p:selectOneRadio>
+			<p:outputLabel for="transferId" value="Transfer/Non-Transfer: " />
+			<p:selectOneRadio id="transferId" value="#{adHocStaking.transfer}" style="width: 99%;" required="true" requiredMessage="Please select Transfer(T) or Non-transfer(N).">
+				<f:selectItem itemLabel="T" itemValue="T" />
+				<f:selectItem itemLabel="N" itemValue="N" />
+				<p:ajax update="unitId" process="@this" listener="#{adHocStaking.findAssemblyUnits}" />
+			</p:selectOneRadio>
+			<p:outputLabel for="unitId" value="Assembly Unit: " />
+			<p:selectOneMenu id="unitId" value="#{adHocStaking.assemblyUnit}" style="width: 99%;" required="true" requiredMessage="Please select an assembly unit.">
+				<p:ajax event="change" update="unitDescId" listener="#{adHocStaking.findAssemblyUnitDesc}" />
+				<f:selectItem itemLabel="Select Unit" itemValue="" noSelectionOption="true" />
+				<f:selectItems value="#{adHocStaking.assemblyunits}" var="unit" itemLabel="#{unit.assemblyGuid}" itemValue="#{unit.assemblyGuid}" />
+			</p:selectOneMenu>
+			<p:outputLabel for="unitDescId" value="Unit Description: " />
+			<p:inputTextarea id="unitDescId" disabled="true" value="#{adHocStaking.assemblyUnitDesc}" maxlength="255" autoResize="false" style="width: 99%;" />
+			<p:outputLabel for="unitQtyId" value="As-Built Qty: " />
+			<p:inputNumber minValue="0" decimalPlaces="0" id="unitQtyId" value="#{adHocStaking.unitQty}" required="true"/>
+			<p:outputLabel for="asBuiltStatId" value="As-Built Status: " />
+			<p:selectOneMenu id="asBuiltStatId" value="#{adHocStaking.asBuiltStatus}" style="width: 99%;">
+				<f:selectItem itemLabel="Select Status" itemValue="" noSelectionOption="true" />
+				<f:selectItems value="#{wfController.addStationUnitAsBuiltStatuses}" var="stat" itemLabel="#{stat.description}" itemValue="#{stat.asBuiltStatusId}" />
+			</p:selectOneMenu>
+			<p:outputLabel for="asBuiltCommentId" value="As-Built Comment: " />
+			<p:inputTextarea id="asBuiltCommentId" value="#{adHocStaking.asBuiltComment}" maxlength="255" autoResize="false" style="width: 99%;" />
+		</p:panelGrid>
+		<center>
+		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+			<p:commandButton id="okBtnDlg" value="Add Station/Unit" action="#{adHocStaking.addStation}"  update="stationGrid,messages"/>
+			<p:commandButton id="cancelBtnDlg" value="Cancel" immediate="true" onclick="PF('addStationDlg').hide();" />			
+		</p:panelGrid>
+		</center>
+	<!-- </h:form> -->
+</ui:composition>

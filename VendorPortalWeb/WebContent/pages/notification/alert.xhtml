@@ -1,0 +1,44 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/notification/alert">Notification</p:link></li>
+	</ui:define>
+	<ui:define name="content">
+		<div class="ui-g dashboard">
+			<div class="ui-g-12">
+				<div class="card card-w-title">
+					<h1>Notification</h1>
+					<p:growl id="messages" closable="true" />
+					<h:form id="alertFormId" prependId="false">
+						<p:panel header="Alert" style="margin-bottom:10px;">
+							<p:panelGrid columns="2" styleClass="panelGridCenter ui-panelgrid-blank">
+								<p:outputLabel value="* Indicates required field" style="color:red" />
+							</p:panelGrid>
+							<p:panelGrid columns="2" styleClass="panelGridCenter ui-panelgrid-blank">
+									<p:outputLabel for="titleId" value="Title: " style="font-weight:bold" />
+									<p:inputText id="titleId" value="#{notificationController.title}" required="true" requiredMessage="Title is required." />
+									<p:outputLabel for="msgId" value="Message: " style="font-weight:bold" />
+									<p:inputTextarea id="msgId" value="#{notificationController.description}" style="width: 99%;" required="true" requiredMessage="Message is required." />
+									<p:outputLabel for="startDtId" value="Start Date: " style="font-weight:bold" />
+									<p:calendar id="startDtId" readonlyInput="true" value="#{notificationController.startDt}" pattern="MM/dd/yyyy hh:mm:ss a"
+										required="true" requiredMessage="Start Date is required.">
+										<p:ajax event="dateSelect" update="endDtId"/>
+									</p:calendar>
+									<p:outputLabel for="endDtId" value="End Date: " style="font-weight:bold" />
+									<p:calendar id="endDtId" readonlyInput="true" value="#{notificationController.endDt}"  mindate="#{notificationController.startDt}"  pattern="MM/dd/yyyy hh:mm:ss a"
+										required="true" requiredMessage="End Date is required."/>
+							</p:panelGrid>
+							<p:panelGrid columns="1" styleClass="panelGridCenter ui-panelgrid-blank">
+								<p:commandButton value="Ok" action="#{notificationController.addNotification}" update="messages alertFormId" />
+							</p:panelGrid>
+						</p:panel>
+					</h:form>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

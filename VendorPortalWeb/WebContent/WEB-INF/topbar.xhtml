@@ -1,0 +1,63 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:pa="http://primefaces.org/serenity">
+
+    <div class="layout-topbar">
+        <a href="pages/home.xhtml" class="topbar-logo">
+            <p:graphicImage name="images/logo-slim.png" library="serenity-layout" />
+            <span class="app-name">LCEC Vendor Portal</span>
+        </a>
+        <p:graphicImage name="images/logo-slim.png" library="serenity-layout" styleClass="mobile-logo" />
+        <a href="#" class="menu-btn">
+            <i class="material-icons">&#xE5D2;</i>
+        </a>
+        <a href="#" class="topbar-menu-btn">
+            <i class="material-icons">&#xE853;</i>
+        </a>
+        <div class="layout-topbar-menu-wrapper">
+            <div class="sidebar-logo">
+                <a href="dashboard.xhtml">
+                    <p:graphicImage name="images/logo-slim.png" library="serenity-layout" />
+                    <span class="app-name">LCEC Vendor Portal</span>
+                </a>
+                <a href="#" class="sidebar-anchor" title="Toggle Menu"></a>
+            </div>            
+            <ul class="topbar-menu fadeInDown animated">
+                <li class="profile-item" style="float:right;">
+                    <a href="#">
+              		   <span class="profile-name">#{userMBean.fullname}</span>
+                       <span class="profile-image-wrapper">                 
+                            <p:graphicImage name="1532.jpg" library="images" style="width:40px;border-radius: 50%;" />
+                        </span>
+                    </a>
+                   <ul class="animated">    
+                  <!--   <h:form id="aboutDiagForm">
+                   <p:dialog widgetVar="aboutDlg" appendToBody="true" showHeader="true"
+                   				draggable="false">
+						<ui:include src="/pages/info/about.xhtml" />
+					</p:dialog>        
+					</h:form>    --> 
+                        <h:form id="logoutId">
+							<!-- <li role="menuitem">
+							<p:commandLink oncomplete="PF('aboutDlg').show();">
+								<i class="material-icons">info</i>
+								<span>About</span>
+							</p:commandLink>							
+							</li> -->
+							<li role="menuitem">
+                            <h:commandLink action="#{userMBean.doLogout}">
+                                <i class="material-icons">&#xE8AC;</i>
+                                <span>Logout</span>
+                            </h:commandLink>
+                        </li>
+                        </h:form>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</ui:composition>

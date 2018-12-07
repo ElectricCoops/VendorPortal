@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="head">
+		<style type="text/css">
+			.top {
+				filter: alpha(opacity = 95); /* For IE8 and earlier */
+				z-index: 1000000 !important;
+				/* background-color: #ff9d9d !important; */
+			}
+		</style>
+	</ui:define>
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/home">Home</p:link></li>		
+	</ui:define>
+	<f:metadata>
+		<f:event type="preRenderView" listener="#{notificationController.showNotification}" />
+	</f:metadata>
+	<ui:define name="content">
+		<p:notificationBar position="top" effect="slide" styleClass="top" widgetVar="bar">
+		<p:commandButton styleClass="ui-icon ui-icon-close" onclick="PF('bar').hide()" type="button" style="float:right;margin-right:30px;background: transparent;border:none;"/>
+		<h:outputText value="#{notificationController.alert.title}" style="font-size:24px;" />
+		<br />
+		<br />
+		<h:outputText value="#{notificationController.alert.body}" style="font-size:18px;" />
+		</p:notificationBar>
+		<div class="ui-g ui-fluid">
+			<div class="ui-g-12">
+				<div class="card">
+					<p:chart type="bar" model="#{dashboardController.stakingBarModel}" responsive="true" />
+					<div class="task-box-footer">
+						<p:outputLabel id="myListId" value="#{dashboardController.pikeAGStakingSheet.lastSynced}" style="float: right;font-weight:bold">
+							<f:convertDateTime pattern="MM-dd-yyyy hh:mm:ss a" />
+						</p:outputLabel>
+						<p:outputLabel value="Last Updated:" style="float: right;" />
+					</div>
+				</div>
+			</div>
+			<div class="ui-g-12">
+				<div class="card">
+					<p:chart type="bar" model="#{dashboardController.streetlightBarModel}" responsive="true"/>
+				</div>
+			</div>
+			<div class="ui-g-12">
+				<div class="card">
+					<p:chart type="bar" model="#{dashboardController.inspectionBarModel}" responsive="true"/>
+				</div>
+			</div>
+			<div class="ui-g-12">
+				<div class="card">
+					<p:chart type="bar" model="#{dashboardController.invoiceBarModel}" responsive="true"/>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

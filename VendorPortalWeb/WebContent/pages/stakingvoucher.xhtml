@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<div class="ui-g">
+		<div class="ui-g-12">
+			<h:form id="addVoucherBtnForm">
+				<p:commandButton value="Add Voucher" onclick="PF('addVoucherDlg').show();" 
+					style="float:right;display:inline-block;margin-top:5px" rendered="#{userMBean.currentUser.isPermitted('S-AB:Edit')}" />
+			</h:form>
+		</div>
+	</div>
+	<h:form id="voucherForm" style="display:inline-block;">
+		<p:dataTable id="voucherTbl" var="voucher" value="#{wfController.vouchers}" paginator="true" rows="50" rowsPerPageTemplate="50,75,100" draggableColumns="true">
+			<f:facet name="header">
+           			Vouchers
+       		</f:facet>
+			<p:column headerText="Station" style="text-align:center">
+				<h:outputText value="#{voucher.stationDescription}" />
+			</p:column>
+			<p:column headerText="Description" style="text-align:center">
+				<h:outputText value="#{voucher.description}" />
+			</p:column>
+			<p:column headerText="Crew" style="text-align:center">
+				<h:outputText value="#{voucher.crew}" />
+			</p:column>
+			<p:column headerText="Amount" style="text-align:center">
+				<h:outputText value="#{voucher.amount}">
+					<f:convertNumber type="currency" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Requestor" style="text-align:center">
+				<h:outputText value="#{voucher.requestor}" />
+			</p:column>
+			<p:column headerText="Created Date" style="text-align:center">
+				<h:outputText value="#{voucher.createdDt}">
+					<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Inspection Status" style="text-align:center">
+				<h:outputText value="#{voucher.inspectionStatus.status}" />
+			</p:column>
+			<p:column headerText="Invoice Status" style="text-align:center">
+				<h:outputText value="#{voucher.invoiceStatus.description}" />
+			</p:column>
+		</p:dataTable>
+	</h:form>
+	<h:form id="addVoucherDlgForm">
+		<p:dialog header="Add New Voucher" closable="false"
+			draggable="false" modal="true" resizable="false" showHeader="true"
+			widgetVar="addVoucherDlg" minHeight="40">
+			<ui:include src="addvoucherdiag.xhtml" />
+		</p:dialog>
+	</h:form>
+</ui:composition>

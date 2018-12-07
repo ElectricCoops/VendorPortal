@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+			<h:form id="wfFormId" style="display:inline-block;" >
+				<p:dataTable id="wfTbl" var="wf" value="#{wfController.workFlowTasks}" reflow="true" style="margin-top:10px"
+							paginator="true" rows="50" rowsPerPageTemplate="50,75,100" selectionMode="single" 
+            				selection="#{wfController.selectedWorkFlowTask}" rowKey="#{wf.workFlowTaskId}" draggableColumns="true">
+				<!-- <p:column style="width:32px">
+					<p:rowEditor />
+				</p:column> -->
+				<p:column headerText="Sequence">
+					 <h:outputText value="#{wf.workFlowTaskSeq}" />
+				</p:column>
+				<p:column headerText="Task">
+					 <h:outputText value="#{wf.WFTaskDescription}" />
+				</p:column>
+				<p:column headerText="Date" >
+					<h:outputText value="#{wf.WFEventDt}" />
+				</p:column>
+				<p:column headerText="Person" >
+					<h:outputText value="" />
+				</p:column>
+				<p:column headerText="Status" >
+					<h:outputText value="#{wf.workEventStatus.description}" />
+				</p:column>
+				<p:column headerText="Workgroup">
+					<h:outputText value="#{wf.workGroup}" />
+				</p:column>
+				<p:column headerText="Notes">
+					<h:outputText value="" />
+				</p:column>
+			</p:dataTable>
+			</h:form>
+		<!-- </p:panelGrid> -->
+</ui:composition>

@@ -1,0 +1,100 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.newInsp}">
+		<p:dataTable id="voucherTbl" var="voucher" value="#{wfController.newInspVouchers}" rowKey="#{voucher.voucherId}">
+			<f:facet name="header">
+           			Vouchers
+           	<p:panelGrid styleClass="ui-panelgrid-blank">
+				<div style="float: right">
+					<p:commandButton id="toggler" type="button" icon="fa fa-align-left" style="float: right" value="Columns" />
+					<p:columnToggler datasource="voucherTbl" trigger="toggler" />
+				</div>
+			</p:panelGrid>
+		</f:facet>
+			<p:column headerText="Work Order" style="text-align:center">
+				<h:outputText value="#{voucher.workOrderId}" />
+			</p:column>
+			<p:column headerText="Service Order" style="text-align:center">
+				<h:outputText value="#{voucher.serviceOrderId}" />
+			</p:column>
+			<p:column headerText="Station" style="text-align:center">
+				<h:outputText value="#{voucher.stationDescription}" />
+			</p:column>
+			<p:column headerText="Description" style="text-align:center">
+				<h:outputText value="#{voucher.description}" />
+			</p:column>
+			<p:column headerText="Crew" style="text-align:center">
+				<h:outputText value="#{voucher.crew}" />
+			</p:column>
+			<p:column headerText="Amount" style="text-align:center">
+				<h:outputText value="#{voucher.amount}">
+					<f:convertNumber type="currency" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Requestor" style="text-align:center">
+				<h:outputText value="#{voucher.requestor}" />
+			</p:column>
+			<p:column headerText="Created Date" style="text-align:center">
+				<h:outputText value="#{voucher.createdDt}">
+					<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Inspection Status" styleClass="columnBgColor">
+					<p:selectOneMenu id="statusId" value="#{voucher.inspectionStatusId}" style="width: 99%;" required="true">
+						<p:ajax event="change" update="voucherInspCommentId"/>
+						<f:selectItems value="#{wfController.newInspStatuses}" var="stat" itemLabel="#{stat.status}" itemValue="#{stat.inspectionStatusId}" />
+					</p:selectOneMenu>
+			</p:column>
+			<p:column headerText="Inspection Comment" style="text-align:center" styleClass="columnBgColor">
+				<p:inputTextarea id="voucherInspCommentId" value="#{voucher.inspectionComment}" maxlength="255" autoResize="false" style="width: 99%;" 
+						required="#{voucher.inspectionStatusId eq '5'}"
+						requiredMessage="Inspection comment is required if status is 'Rejected'."/>
+			</p:column>
+		</p:dataTable>
+	</h:panelGrid>
+	<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.inspHist}">
+		<p:dataTable id="voucherHistTbl" var="voucher" value="#{wfController.inspectedVouchers}" draggableColumns="true">
+			<f:facet name="header">
+           			Vouchers
+           	<p:panelGrid styleClass="ui-panelgrid-blank">
+				<div style="float: right">
+					<p:commandButton id="toggler" type="button" icon="fa fa-align-left" style="float: right" value="Columns" />
+					<p:columnToggler datasource="voucherHistTbl" trigger="toggler" />
+				</div>
+			</p:panelGrid>
+       		</f:facet>
+			<p:column headerText="Station" style="text-align:center">
+				<h:outputText value="#{voucher.stationDescription}" />
+			</p:column>
+			<p:column headerText="Description" style="text-align:center">
+				<h:outputText value="#{voucher.description}" />
+			</p:column>
+			<p:column headerText="Crew" style="text-align:center">
+				<h:outputText value="#{voucher.crew}" />
+			</p:column>
+			<p:column headerText="Amount" style="text-align:center">
+				<h:outputText value="#{voucher.amount}">
+					<f:convertNumber type="currency" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Requestor" style="text-align:center">
+				<h:outputText value="#{voucher.requestor}" />
+			</p:column>
+			<p:column headerText="Created Date" style="text-align:center">
+				<h:outputText value="#{voucher.createdDt}">
+					<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+				</h:outputText>
+			</p:column>
+			<p:column headerText="Inspection Status" style="text-align:center">
+				<h:outputText value="#{voucher.inspectionStatus.status}" />
+			</p:column>
+			<p:column headerText="Inspection Comment" style="text-align:center">
+				<h:outputText value="#{voucher.inspectionComment}" />
+			</p:column>
+		</p:dataTable>
+	</h:panelGrid>
+</ui:composition>

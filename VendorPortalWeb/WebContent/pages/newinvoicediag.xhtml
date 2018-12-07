@@ -1,0 +1,21 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:form>
+		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+			<h4 style="margin-top:0px">Work Orders</h4>
+			 <p:selectManyCheckbox id="basic" value="#{invController.selectedInvWoId}" layout="grid" columns="3" >
+        		<f:selectItems value="#{invController.invWoId}" var="wo" itemLabel="#{wo}" itemValue="#{wo}" />
+    		</p:selectManyCheckbox>
+		</p:panelGrid>
+		<center>
+		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+			<p:commandButton id="okBtnDlg" type="button" value="Ok" oncomplete="PF('newInvoiceDlg').hide();" />
+			<p:commandButton id="cancelBtnDlg" type="button" value="Cancel" onclick="PF('newInvoiceDlg').hide();" />
+		</p:panelGrid>
+		</center>
+	</h:form>
+</ui:composition>

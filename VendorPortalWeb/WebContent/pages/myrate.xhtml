@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/myrate">My Rate</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		<h:form id="myRateForm" prependId="false">
+			<div class="ui-g ui-fluid">
+				<div class="ui-g-12">
+					<div class="card card-w-title">
+						<p:growl id="messages" closable="true" severity="info, error" />
+						<p:panel header="Rate Search Criteria" style="margin-bottom:10px;">
+							<p:panelGrid columns="8" styleClass="ui-panelgrid-blank" layout="grid">
+								<p:outputLabel for="startDtId" value="Effective Start Date: " style="font-weight:bold" />
+								<p:calendar id="startDtId" value="" />
+								<p:outputLabel for="endDtId" value="Effective End Date: " style="font-weight:bold" />
+								<p:calendar id="endDtId" value="" />
+								<p:outputLabel for="vendorId" value="Vendor: " style="font-weight:bold"/>
+									<p:selectOneMenu id="vendorId" value="">
+										 <f:selectItem itemLabel="Select vendor" itemValue="" noSelectionOption="true" />
+										 <f:selectItem itemLabel="Pike" itemValue="Pike" />
+										  <f:selectItem itemLabel="Mastec" itemValue="Mastec" />
+										   <f:selectItem itemLabel="LCEC" itemValue="LCEC" />
+										    <f:selectItem itemLabel="Generic" itemValue="Generic" />
+									</p:selectOneMenu>
+							</p:panelGrid>
+						</p:panel>
+					</div>
+				</div>
+			</div>
+
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<div class="card card-w-title">
+						<!-- <h2>My Rate Groups</h2> -->
+							<p:dataTable id="myRtGrpTbl" widgetVar="myRtGrpWidget" var="rate"
+								value="#{rateController.rateGroups}" reflow="true"
+								filteredValue="#{rateController.filteredRateGroups}"
+								style="margin-top:20px" paginator="true" rows="50"
+								rowsPerPageTemplate="50,75,100">
+								<f:facet name="header">
+							My Rate Groups
+								<p:outputPanel style="display:block; text-align:right">
+										<h:outputText value="Search all fields:" />
+										<p:inputText id="globalFilter"
+											onkeyup="PF('myRtGrpWidget').filter()" style="width:150px" />
+									</p:outputPanel>
+								</f:facet>
+								<p:column headerText="Assembly Unit">
+									<h:outputText value="#{rate.assemblyUnit}" />
+								</p:column>
+								<p:column headerText="GNDC">
+									<h:outputText value="#{rate.gndc}" >
+										<f:convertNumber currencySymbol="$" type="currency" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="GNDR">
+									<h:outputText value="#{rate.gndr}" />
+								</p:column>
+								<p:column headerText="GNEC">
+									<h:outputText value="#{rate.gnec}" />
+								</p:column>
+								<p:column headerText="GNER">
+									<h:outputText value="#{rate.gner}" />
+								</p:column>
+								<p:column headerText="MSDC">
+									<h:outputText value="#{rate.msdc}" />
+								</p:column>
+								<p:column headerText="MSDR">
+									<h:outputText value="#{rate.msdr}" />
+								</p:column>
+								<p:column headerText="MSEC">
+									<h:outputText value="#{rate.msec}" />
+								</p:column>
+								<p:column headerText="MSER">
+									<h:outputText value="#{rate.mser}" />
+								</p:column>
+								<p:column headerText="PKDC">
+									<h:outputText value="#{rate.pkdc}" />
+								</p:column>
+								<p:column headerText="PKDR">
+									<h:outputText value="#{rate.pkdr}" />
+								</p:column>
+								<p:column headerText="PKEC">
+									<h:outputText value="#{rate.pkec}" />
+								</p:column>
+								<p:column headerText="PKER">
+									<h:outputText value="#{rate.pker}" />
+								</p:column>
+							</p:dataTable>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

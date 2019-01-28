@@ -25,9 +25,9 @@ public class DashboardController implements Serializable {
 
 	private static final long serialVersionUID = 5883181727196152461L;
 
-	private final String PIKE = "PIKE";
-	private final String MASTEC = "MASTEC";
-	private final String LCEC = "LCEC";
+	private final static String PIKE = "PIKE";
+	private final static String MASTEC = "MASTEC";
+	private final static String LCEC = "LCEC";
 
 	@EJB
 	private DashboardServiceRemote dashboardService;

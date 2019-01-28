@@ -1,7 +1,7 @@
 package pwr.lcec.vendor.web.helper;
 
 public class Util {
-	
+
 	public static final String IMG_EXT = ".png";
 
 	public static final String MSG_PKG = "pwr.lcec.vendor.web.resource.messages";

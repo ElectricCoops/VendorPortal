@@ -1,6 +1,7 @@
 package pwr.lcec.vendorportal.interfaces;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.ejb.Remote;
@@ -118,8 +119,10 @@ public interface WorkFlowSessionRemote {
 	
 	public List<Vendor> getVendors();
 	
-	public BigDecimal getAssemblyAmount(String workgroup, String workType, String assemblyUnit) throws ProcessException;
+	public BigDecimal getAssemblyAmount(String workgroup, String workType, String assemblyUnit, Timestamp workEventDt) throws ProcessException;
 	
 	public Resource updateResource(Integer resourceId, Integer vpUserId) throws Exception;
+	
+	public Integer updateAsBuiltAmount(String stakingSheetDetailId) throws Exception;
 
 }

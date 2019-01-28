@@ -7,7 +7,6 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
 import org.apache.log4j.Logger;
 
 import com.lowagie.text.Document;
@@ -64,19 +63,11 @@ public class InspectionController implements Serializable{
 	}
 	
 	private void facesError(String message) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
-	
-	@SuppressWarnings("unused")
-	private void facesWarning(String message) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, message, null));
-	}
-	
-	@SuppressWarnings("unused")
-	private void facesInfo(String message) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
-	}
-	
+		
 	public void clearInputs() {
 		woId = null;
 		inspectionStatus = null;

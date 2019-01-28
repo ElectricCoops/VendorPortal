@@ -55,11 +55,17 @@
 						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.newInsp}">
     							<p><i>Select Inspection Status and Comment in highlighted columns below.</i></p>
     					</h:panelGrid>
+    					<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" style="display:block;margin-bottom: 20px;float:right" rendered="#{not wfController.showSubmitInspectionBtn}">
+    						<p:selectOneButton value="#{wfController.inspectionFilter}">
+                    			<f:selectItem itemLabel="Show All" itemValue="all" />
+                    			<f:selectItem itemLabel="Ready for Inspection" itemValue="ready" />
+                    			<p:ajax update="newInspGrid submitInspBtn" process="@this" listener="#{wfController.inspectionDetailFilter}" />
+                			</p:selectOneButton>
+                		</h:panelGrid>
 						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank">
 							<ui:include src="voucherinspection.xhtml" />
 						</h:panelGrid>
-						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.newInsp}">
-							
+						<h:panelGrid id="newInspGrid" columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.newInsp}">
 							<p:dataTable var="stake" draggableColumns="true"
 								value="#{wfController.inspStakingSheetDetail}" id="inspTbl"
 								sortBy="#{stake.stationDescription}" editable="true"
@@ -83,10 +89,13 @@
 									listener="#{wfController.onRowCancel}" />
 
 								<p:headerRow>
-									<p:column colspan="9">
+									<p:column colspan="13">
 										<h:outputText value="Station - #{stake.stationDescription}" />
 									</p:column>
 								</p:headerRow>
+								<p:column headerText="NULL" style="text-align:center;display:none;">
+									<h:outputText value="" />
+								</p:column>
 								<p:column headerText="C/R" style="text-align:center">
 									<h:outputText value="#{stake.assemblyActionCode}" />
 								</p:column>
@@ -109,18 +118,35 @@
 									<h:outputText value="#{stake.asBuiltStatus.description}" />
 								</p:column>
 								<p:column headerText="Inspection Status" style="text-align:center" styleClass="columnBgColor">
-									<p:selectOneMenu id="statusId" value="#{stake.currentInspectionDetailStatusId}" style="width: 99%;">
+									<p:selectOneMenu id="statusId" value="#{stake.currentInspectionDetailStatusId}" style="width: 99%;opacity: 1;filter: Alpha(Opacity=100);" disabled="#{wfController.inspectionFilter eq 'all'}">
 										<p:ajax event="change" update="inpsectionCommentId"/>
 										<f:selectItems value="#{wfController.newInspStatuses}" var="stat" itemLabel="#{stat.status}" itemValue="#{stat.inspectionStatusId}" />
 									</p:selectOneMenu>
 								</p:column>
-								<p:column headerText="Inspection Comment" style="text-align:center" styleClass="columnBgColor">
-									<p:inputTextarea id="inpsectionCommentId"
+								<p:column headerText="Inspection Comment" style="text-align:center;opacity: 1;filter: Alpha(Opacity=100);" styleClass="columnBgColor">
+									<p:inputTextarea id="inpsectionCommentId" 
 										value="#{stake.currentInspectorDetailComments}"
 										maxlength="255" autoResize="false" style="width: 99%;"
 										required="#{stake.currentInspectionDetailStatusId eq '5'}"
-										requiredMessage="Inspection comment is required if status is 'Rejected'." />
+										requiredMessage="Inspection comment is required if status is 'Rejected'." 
+										disabled="#{wfController.inspectionFilter eq 'all'}" />
 								</p:column>
+								<p:column headerText="Energize" style="text-align:center" filterBy="#{stake.energize}" filterMatchMode="contains" sortBy="#{stake.energize}" >
+											<h:outputText value="#{stake.energize}" />
+								</p:column>			
+								<p:column headerText="Trasnfer" style="text-align:center" filterBy="#{stake.transfer}" filterMatchMode="contains" sortBy="#{stake.transfer}" >
+											<h:outputText value="#{stake.transfer}" />
+								</p:column>
+								<p:column headerText="Design Amount" style="text-align:center">
+									<h:outputText value="#{stake.assemblyAmount}">
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>			
+								<p:column headerText="As-Built Amount" style="text-align:center">
+									<h:outputText value="#{stake.asBuiltAmount}">
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>	
 							</p:dataTable>
 							<p:dialog header="Assembly Inspection" closable="false"
 								draggable="false" modal="true" resizable="false"
@@ -159,7 +185,7 @@
 							</p:dialog>
 							<!-- </h:form> -->
 						</h:panelGrid>
-						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.inspHist}">
+						<h:panelGrid id="inspHistGrid" columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.inspHist}">
 							<p:dataTable var="stake"
 								value="#{wfController.inspectionDetailVw}" id="inspDetTbl"
 								sortBy="#{stake.stationDescription}" editable="true"
@@ -182,7 +208,7 @@
 									listener="#{wfController.onRowCancel}" />
 
 								<p:headerRow>
-									<p:column colspan="9">
+									<p:column colspan="13">
 										<h:outputText value="Station - #{stake.stationDescription}" />
 									</p:column>
 								</p:headerRow>
@@ -211,15 +237,32 @@
 									<h:outputText value="#{stake.inspectionStatus.status}" />
 								</p:column>
 								<p:column headerText="Inspection Comment" style="text-align:center">
-								<h:outputText value="#{stake.comment}" />
+									<h:outputText value="#{stake.comment}" />
 								</p:column>
+								<p:column headerText="Energize" style="text-align:center" >
+									<h:outputText value="#{stake.energize}" />
+								</p:column>			
+								<p:column headerText="Trasnfer" style="text-align:center" >
+									<h:outputText value="#{stake.transfer}" />
+								</p:column>
+								<p:column headerText="Design Amount" style="text-align:center">
+									<h:outputText value="#{stake.assemblyAmount}">
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>			
+								<p:column headerText="As-Built Amount" style="text-align:center">
+									<h:outputText value="#{stake.asBuiltAmount}">
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>		
 							</p:dataTable>
 						</h:panelGrid>
 						<p:panelGrid styleClass="ui-panelgrid-blank">
 							<!-- <p:button value="Inspections" icon="fa fa-arrow-circle-left" outcome="staking?index=1" style="float:left;" rendered="#{wfController.renderBackToInspTab}"/>
 							<p:button value="Inspections" icon="fa fa-arrow-circle-left" outcome="inspectionsearch?faces-redirect=true" style="float:left;" rendered="#{wfController.renderBackToInspSearch}"/> -->
-							<p:commandButton value="Submit Inspections" action="#{wfController.submitInspection}" style="float:right;" 
-											rendered="#{not wfController.showSubmitInspectionBtn}" update="messages" />
+							<p:commandButton id="submitInspBtn" value="Submit Inspections" action="#{wfController.submitInspection}" style="float:right;" 
+											rendered="#{not wfController.showSubmitInspectionBtn}" update="newInspGrid,inspHistGrid,messages" 
+											disabled="#{wfController.inspectionFilter eq 'all'}"/>
 						</p:panelGrid>
 						</h:panelGrid>
 						</h:panelGrid>

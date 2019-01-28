@@ -105,11 +105,6 @@ public class UserManagedBean implements Serializable {
 		SecurityUtils.getSubject().logout();
 		Faces.redirect(login_url);
 	}
-
-	private void facesError(String message) {
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
-	}
 	
 	public void updateLoginActivity(boolean succeed) {
 		LoginAttempt attempt = new LoginAttempt();
@@ -138,6 +133,12 @@ public class UserManagedBean implements Serializable {
 		} catch (ValidationException | ProcessException | NoResultException e) {
 			logger.error(e);
 		}
+	}
+	
+	private void facesError(String message) {
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 
 	public User getUser() {

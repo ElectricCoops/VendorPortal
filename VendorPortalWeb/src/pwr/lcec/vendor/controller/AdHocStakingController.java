@@ -10,8 +10,10 @@ import java.util.stream.Collectors;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
+
 import pwr.lcec.vendor.web.helper.ControllerUtil;
 import pwr.lcec.vendorportal.custom.entity.AssemblyAdhocVw;
 import pwr.lcec.vendorportal.custom.entity.StakingSheet;
@@ -64,7 +66,7 @@ public class AdHocStakingController implements Serializable {
 		return ADHOC_STAKING;
 	}
 
-	public void insertVoucher() {
+	public String insertVoucher() {
 		Voucher voucher = new Voucher();
 		String stakingSheetId = workflowService.getStatkingSheetId(util.getWoId());
 
@@ -89,7 +91,6 @@ public class AdHocStakingController implements Serializable {
 		
 		try {
 			voucher = workflowService.insertVoucher(voucher);
-			facesInfo("Voucher added successfully.");
 		} catch (ProcessException | ValidationException e) {
 			logger.error(e);
 			facesError(e.getMessage());
@@ -97,14 +98,14 @@ public class AdHocStakingController implements Serializable {
 		PrimeFaces.current().executeScript("PF('addVoucherDlg').hide()");  
 		facesInfo("Voucher added successfully.");
 		
-		//return updateStakingTbl();
+		return updateVouchers();
 	}
 	
-	public void addStation() {
+	public String addStation() {
 		for (String exist : existingStations()) {
 			if (exist.equals(station)) {
 				facesError("Station No. " + station + " already exisit. Please select a new station number.");
-				return;
+				return null;
 			}
 		}
 		try {
@@ -115,10 +116,10 @@ public class AdHocStakingController implements Serializable {
 		}
 		PrimeFaces.current().executeScript("PF('addStationDlg').hide()");  
 		facesInfo("Station added successfully.");
-		//return updateStakingTbl();
+		return updateStakingTbl();
 	}
 
-	public void addUnit() {
+	public String addUnit() {
 		try {
 			addStationOrUnit();
 			
@@ -128,7 +129,7 @@ public class AdHocStakingController implements Serializable {
 		}
 		PrimeFaces.current().executeScript("PF('addUnitDlg').hide()");   
 		facesInfo("Unit added successfully.");
-		//return updateStakingTbl();
+		return updateStakingTbl();
 	}
 
 	public void addStationOrUnit() throws ValidationException, NoResultException, ProcessException {
@@ -169,15 +170,27 @@ public class AdHocStakingController implements Serializable {
 		workflowService.insertSheetDetail(stakingSheetDetail);
 	}
 
-	public void updateStakingTbl() {
+	public String updateStakingTbl() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		WorkflowController stations = context.getApplication().evaluateExpressionGet(context, "#{wfController}",
+				WorkflowController.class);
+		stations.findStakingDetailByWoId();
+		stations.asBuiltEdit();
+
+		String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
+		return viewId + "?faces-redirect=true";
+	}
+	
+	public String updateVouchers() {
 		FacesContext context = FacesContext.getCurrentInstance();
 		WorkflowController stations = context.getApplication().evaluateExpressionGet(context, "#{wfController}",
 				WorkflowController.class);
 		stations.findStakingDetailByWoId();
 
 		String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
-		//return viewId + "?faces-redirect=true";
+		return viewId + "?faces-redirect=true";
 	}
+	
 	public void crEvent() {
 		setCr(cr);
 	}
@@ -242,13 +255,16 @@ public class AdHocStakingController implements Serializable {
 
 	private void facesError(String message) {
 
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 
 	private void facesInfo(String message) {
 
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 
 	public String getStation() {

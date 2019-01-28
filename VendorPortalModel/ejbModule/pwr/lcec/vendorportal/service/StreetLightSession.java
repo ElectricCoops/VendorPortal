@@ -153,7 +153,6 @@ public class StreetLightSession implements StreetLightServiceRemote {
 		}
 		try {
 			result = query.getResultList();
-			result.size();
 		} catch (Exception ex) {
 			logger.error("ProcessException: " + ex.getMessage());
 			throw new ProcessException(ex.getMessage());

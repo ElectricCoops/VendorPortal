@@ -3,6 +3,8 @@ package pwr.lcec.vendorportal.custom.entity;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * The persistent class for the AsBuiltSummaryVw database table.
@@ -36,6 +38,10 @@ public class AsBuiltSummaryVw implements Serializable {
 
 	@Column(name="StakingSheetId")
 	private int stakingSheetId;
+	
+	private transient String energize;
+	
+	private transient String transfer;
 
 	public AsBuiltSummaryVw() {
 	}
@@ -94,6 +100,37 @@ public class AsBuiltSummaryVw implements Serializable {
 
 	public void setStakingSheetId(int stakingSheetId) {
 		this.stakingSheetId = stakingSheetId;
+	}
+
+	public String getEnergize() {
+
+		int startPos = assemblyGuid.lastIndexOf("E");
+
+		if (StringUtils.substring(assemblyGuid, assemblyGuid.length() - 1).equals("E")) {
+			energize = "Energized";
+		} else if ((StringUtils.substring(assemblyGuid, startPos, startPos + 1).equals("E"))) {
+			energize = "Energized";
+		}else {
+			energize = "De-Energized";
+		}
+		return energize;
+	}
+
+	public void setEnergize(String energize) {
+		this.energize = energize;
+	}
+
+	public String getTransfer() {
+		if (StringUtils.substring(assemblyGuid, assemblyGuid.length() - 1).equals("T")) {
+			transfer = "Transfer";
+		}else {
+			transfer = "Non-Transfer";
+		}
+		return transfer;
+	}
+
+	public void setTransfer(String transfer) {
+		this.transfer = transfer;
 	}
 
 }

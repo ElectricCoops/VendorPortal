@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 
 import javax.persistence.*;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -33,7 +35,11 @@ import java.sql.Timestamp;
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_RATEGROUP"),
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_WORKTYPE"),
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_AssemblyUnit"),
+				@StoredProcedureParameter(mode = ParameterMode.IN, type = Timestamp.class, name = "IN_WorkEventDt"),
 				@StoredProcedureParameter(mode = ParameterMode.OUT, type = BigDecimal.class, name = "OUT_AMOUNT") }),
+		@NamedStoredProcedureQuery(name = "UPDATE_STAKING_ASBUILTAMOUNT", procedureName = "UPDATE_STAKING_ASBUILTAMOUNT", parameters = {
+				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_StakingSheetDetailID"),
+				@StoredProcedureParameter(mode = ParameterMode.OUT, type = Integer.class, name = "OUT_Response") }),
 		@NamedStoredProcedureQuery(name = "UPDATE_SUBMIT_INVOICE", procedureName = "UPDATE_SUBMIT_INVOICE", parameters = {
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_GUID"),
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_InvoiceType"),
@@ -169,6 +175,16 @@ public class StakingSheetDetail implements Serializable {
 	@OneToOne
 	@JoinColumn(name="InvoiceDetailId", insertable=false, updatable=false)
 	private InvoiceDetail invoiceDetail;
+	
+	@Column(name = "AssemblyAmount")
+	private BigDecimal assemblyAmount;
+	
+	@Column(name = "AsBuiltAmount")
+	private BigDecimal asBuiltAmount;
+	
+	private transient String energize;
+	
+	private transient String transfer;
 
 	public StakingSheetDetail() {
 	}
@@ -483,6 +499,53 @@ public class StakingSheetDetail implements Serializable {
 
 	public void setInvoiceDetail(InvoiceDetail invoiceDetail) {
 		this.invoiceDetail = invoiceDetail;
+	}
+
+	public String getEnergize() {
+
+		int startPos = assemblyGuid.lastIndexOf("E");
+
+		if (StringUtils.substring(assemblyGuid, assemblyGuid.length() - 1).equals("E")) {
+			energize = "Energized";
+		} else if ((StringUtils.substring(assemblyGuid, startPos, startPos + 1).equals("E"))) {
+			energize = "Energized";
+		}else {
+			energize = "De-Energized";
+		}
+		return energize;
+	}
+
+	public void setEnergize(String energize) {
+		this.energize = energize;
+	}
+
+	public String getTransfer() {
+		if (StringUtils.substring(assemblyGuid, assemblyGuid.length() - 1).equals("T")) {
+			transfer = "Transfer";
+		}else {
+			transfer = "Non-Transfer";
+		}
+		return transfer;
+	}
+
+	public void setTransfer(String transfer) {
+		this.transfer = transfer;
+	}
+
+	public BigDecimal getAssemblyAmount() {
+		return assemblyAmount;
+	}
+
+	public void setAssemblyAmount(BigDecimal assemblyAmount) {
+		this.assemblyAmount = assemblyAmount;
+	}
+
+	public BigDecimal getAsBuiltAmount() {
+		return asBuiltAmount;
+	}
+
+	public void setAsBuiltAmount(BigDecimal asBuiltAmount) {
+		this.asBuiltAmount = asBuiltAmount;
 	}
 
 }

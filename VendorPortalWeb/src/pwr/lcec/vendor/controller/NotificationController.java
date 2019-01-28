@@ -7,7 +7,6 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
 
@@ -76,13 +75,16 @@ public class NotificationController implements Serializable{
 	}
 	
 	private void facesInfo(String message) {
-
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 
 	private void facesError(String message) {
 
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 	
 	public String getTitle() {

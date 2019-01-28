@@ -5,25 +5,31 @@
 	xmlns:p="http://primefaces.org/ui">
 
 	<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank">
-		<p:fieldset legend="Units Passed" style="font-weight:bold;text-align: center;">
+		<p:fieldset legend="Unit Rows Passed" style="font-weight:bold;text-align: center;">
 			<h:outputText id="inspPassId" value="#{wfController.inspPassed}" />
 		</p:fieldset>
-		<p:fieldset legend="Units Rejected" style="font-weight:bold;text-align: center;">
+		<p:fieldset legend="Unit Rows Rejected" style="font-weight:bold;text-align: center;">
 			<h:outputText id="unitRejId" value="#{wfController.unitsRejected}" />
 		</p:fieldset>
-		<p:fieldset legend="Units Not Inspected" style="font-weight:bold;text-align: center;">
+		<p:fieldset legend="Unit Rows Not Inspected" style="font-weight:bold;text-align: center;">
 			<h:outputText id="notInspId" value="#{wfController.notInspected}" />
 		</p:fieldset>
-		<p:fieldset legend="Total Units" style="font-weight:bold;text-align: center;">
+		<p:fieldset legend="Total Unit Rows" style="font-weight:bold;text-align: center;">
 			<h:outputText id="totUnitsId" value="#{wfController.totalUnits}" />
 		</p:fieldset>
 	</p:panelGrid>
-	<h:form>
+	<h:form id="inspBtn">
 		<p:commandButton value="New Inspection" icon="fa fa-plus" style="float:left;display:inline-block;" 
 			action="#{wfController.findInspectionDetails}"  update="messages" rendered="#{userMBean.currentUser.isPermitted('S-INS:Edit')}">
 			<f:setPropertyActionListener target="#{wfController.renderBackToInspSearch}"  value="false" />
     		<f:setPropertyActionListener target="#{wfController.renderBackToInspTab}" value="true" />
 		</p:commandButton>
+	<!-- 	<p:commandButton id="rejectionReportXLS" value="Rejection Report" icon="fa fa-fw fa-file-excel-o" style="float:left;display:inline-block;" ajax="false">
+			<p:graphicImage name="/images/icons/xls.png" width="24"/>
+            <p:dataExporter type="xls" target=":stakingTabContainer:asBuiltForm:stakingsheetTbl" fileName="Rejection_Report" preProcessor="#{wfController.preProcessorRejectionRpt}" /> 
+            <p:tooltip for="rejectionReportXLS"  value="Export Rejection Report to Microsoft Excel" position="top"/>
+          </p:commandButton> -->
+		<!-- </p:commandButton> -->
 	</h:form>
 	<h:form id="inspFormId" style="display:inline-block;">
 		<p:dataTable id="inspTbl" var="insp" value="#{wfController.inspections}" reflow="true" style="margin-top:10px" draggableColumns="true">

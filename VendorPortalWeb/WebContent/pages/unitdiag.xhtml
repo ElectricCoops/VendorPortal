@@ -11,23 +11,23 @@
 				<f:selectItem itemLabel="Select Station" itemValue="" noSelectionOption="true" />
 				<f:selectItems value="#{wfController.distinctStation}" var="stake" itemLabel="#{stake}" itemValue="#{stake}" />
 			</p:selectOneMenu>
-			<p:outputLabel for="crId" value="Construct/Retire:" />
-			<p:selectOneRadio id="crId" value="#{adHocStaking.cr}" style="width: 99%;" required="true" requiredMessage="Please select Construct(C) or Retire(R).">
-				<f:selectItem itemLabel="C" itemValue="C" />
-				<f:selectItem itemLabel="R" itemValue="R" />
+			<p:outputLabel for="crId" value="Construct:" />
+			<p:selectOneRadio id="crId" value="#{adHocStaking.cr}"  required="true" requiredMessage="Please select Construct(C) or Retire(R).">
+				<f:selectItem itemLabel="Construct" itemValue="C" />
+				<f:selectItem itemLabel="Retire" itemValue="R" />
 				<!-- <f:ajax event="click" update="crId" listener="#{adHocStaking.crEvent}" /> -->
 			</p:selectOneRadio>
 			<p:outputLabel for="energId" value="Energized: " />
-			<p:selectOneRadio id="energId" value="#{adHocStaking.energized}" style="width: 99%;" required="true" requiredMessage="Please select Energized(E) or De-energized(D).">
-				<f:selectItem itemLabel="E" itemValue="E" />
-				<f:selectItem itemLabel="D" itemValue="D" />
+			<p:selectOneRadio id="energId" value="#{adHocStaking.energized}" required="true" requiredMessage="Please select Energized(E) or De-energized(D).">
+				<f:selectItem itemLabel="Energized" itemValue="E" />
+				<f:selectItem itemLabel="De-Energized" itemValue="D" />
 				<!-- <p:ajax update="unitId" process="@this" listener="#{adHocStaking.energizedEvent}" /> -->
 				<p:ajax update="unitId" process="@this" listener="#{adHocStaking.findAssemblyUnits}" />
 			</p:selectOneRadio>
 			<p:outputLabel for="transferId" value="Transfer: " />
-			<p:selectOneRadio id="transferId" value="#{adHocStaking.transfer}" style="width: 99%;" required="true" requiredMessage="Please select Transfer(T) or Non-transfer(N).">
-				<f:selectItem itemLabel="T" itemValue="T" />
-				<f:selectItem itemLabel="N" itemValue="N" />
+			<p:selectOneRadio id="transferId" value="#{adHocStaking.transfer}" required="true" requiredMessage="Please select Transfer(T) or Non-transfer(N).">
+				<f:selectItem itemLabel="Transfer" itemValue="T" />
+				<f:selectItem itemLabel="Non-Transfer" itemValue="N" />
 				<p:ajax update="unitId" process="@this" listener="#{adHocStaking.findAssemblyUnits}" />
 			</p:selectOneRadio>
 			<p:outputLabel for="unitId" value="Assembly Unit: " />
@@ -37,7 +37,7 @@
 				<f:selectItems value="#{adHocStaking.assemblyunits}" var="unit" itemLabel="#{unit.assemblyGuid}" itemValue="#{unit.assemblyGuid}" />
 			</p:selectOneMenu>
 			<p:outputLabel for="unitDescId" value="Unit Description: " />
-			<p:inputTextarea id="unitDescId" disabled="true" value="#{adHocStaking.assemblyUnitDesc}" maxlength="255" autoResize="false" style="width: 99%;" />
+			<p:inputTextarea id="unitDescId" disabled="true" value="#{adHocStaking.assemblyUnitDesc}" maxlength="255" autoResize="false" style="width: 99%;opacity: 1;filter: Alpha(Opacity=100);" />
 			<p:outputLabel for="unitQtyId" value="As-Built Qty: " />
 			<p:inputNumber minValue="0" decimalPlaces="0" id="unitQtyId" value="#{adHocStaking.unitQty}" required="true" requiredMessage="Please enter number of As-Built quantity."/>
 			<p:outputLabel value="As-Built Status: " />

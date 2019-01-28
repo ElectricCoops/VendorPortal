@@ -1,11 +1,12 @@
 package pwr.lcec.vendorportal.custom.entity;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
-@Generated(value="Dali", date="2018-06-29T11:50:59.646-0400")
+@Generated(value="Dali", date="2018-12-12T16:11:52.693-0500")
 @StaticMetamodel(InspectionDetailVw.class)
 public class InspectionDetailVw_ {
 	public static volatile SingularAttribute<InspectionDetailVw, String> asBuiltBy;
@@ -35,4 +36,6 @@ public class InspectionDetailVw_ {
 	public static volatile SingularAttribute<InspectionDetailVw, String> stationId;
 	public static volatile SingularAttribute<InspectionDetailVw, String> statusDescription;
 	public static volatile SingularAttribute<InspectionDetailVw, String> stStatusRefGuid;
+	public static volatile SingularAttribute<InspectionDetailVw, BigDecimal> assemblyAmount;
+	public static volatile SingularAttribute<InspectionDetailVw, BigDecimal> asBuiltAmount;
 }

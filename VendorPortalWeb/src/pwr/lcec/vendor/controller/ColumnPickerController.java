@@ -29,7 +29,7 @@ public class ColumnPickerController implements Serializable{
 	
 	ControllerUtil util = new ControllerUtil();
 	
-	@PostConstruct
+	/*@PostConstruct
 	void init() {
 		try {
 			stakingSearchCol = cps.getStakingColByUser(util.getCurrentUser());
@@ -37,7 +37,7 @@ public class ColumnPickerController implements Serializable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	public void updateStakingSearchCol(ToggleEvent event) {
 

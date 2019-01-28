@@ -5,9 +5,9 @@ import java.text.SimpleDateFormat;
 
 public class CurrentDateTime {
 
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
+	private final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH.mm.ss");
 
-	public static String getCurrentTimeStamp() {
+	public String getCurrentTimeStamp() {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		// System.out.println(timestamp);
 		return sdf.format(timestamp);

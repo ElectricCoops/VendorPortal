@@ -15,7 +15,6 @@ import javax.faces.context.FacesContext;
 
 import org.apache.log4j.Logger;
 import org.primefaces.PrimeFaces;
-import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleSelectEvent;
 import org.primefaces.event.UnselectEvent;
@@ -462,19 +461,16 @@ public class StreetLightController implements Serializable {
 
 	private void facesError(String message) {
 
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 	
 	private void facesInfo(String message) {
 
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
-	}
-	
-	@SuppressWarnings("unused")
-	public void onCellEdit(CellEditEvent event) {
-
-		Integer oldValue = (Integer) event.getOldValue();
-		Integer newValue = (Integer) event.getNewValue();
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 	
 	public String getWoNo() {

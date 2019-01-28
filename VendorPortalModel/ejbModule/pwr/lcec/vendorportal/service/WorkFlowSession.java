@@ -1,6 +1,7 @@
 package pwr.lcec.vendorportal.service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -864,7 +865,7 @@ public class WorkFlowSession implements WorkFlowSessionRemote {
 		return query.getResultList();
 	}
 
-	public BigDecimal getAssemblyAmount(String workgroup, String workType, String assemblyUnit) throws ProcessException {
+	public BigDecimal getAssemblyAmount(String workgroup, String workType, String assemblyUnit, Timestamp workEventDt) throws ProcessException {
 
 		StoredProcedureQuery query;
 		
@@ -873,6 +874,7 @@ public class WorkFlowSession implements WorkFlowSessionRemote {
 			query.setParameter("IN_RATEGROUP", workgroup);
 			query.setParameter("IN_WORKTYPE", workType);
 			query.setParameter("IN_AssemblyUnit", assemblyUnit);
+			query.setParameter("IN_WorkEventDt", workEventDt);
 			query.execute();
 		} catch (EJBException e) {
 			logger.error(e);
@@ -898,5 +900,18 @@ public class WorkFlowSession implements WorkFlowSessionRemote {
 			throw new Exception(e.getMessage());
 		}
 		return resource;
+	}
+
+	public Integer updateAsBuiltAmount(String stakingSheetDetailId) throws Exception {
+
+		StoredProcedureQuery query = this.em.createNamedStoredProcedureQuery("UPDATE_STAKING_ASBUILTAMOUNT");
+		try {
+			query.setParameter("IN_StakingSheetDetailID", stakingSheetDetailId);
+			query.execute();
+		} catch (Exception ex) {
+			logger.error(ex);
+		}
+
+		return (Integer) query.getOutputParameterValue("OUT_Response");
 	}
 }

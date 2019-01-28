@@ -139,7 +139,7 @@
         								</p:panelGrid>
         						</f:facet>
         						<p:headerRow>
-									<p:column colspan="8" >
+									<p:column colspan="10" >
 										<h:outputText value="Station - #{detail.stationDescription}" />	
 									</p:column>
 								</p:headerRow>
@@ -168,6 +168,12 @@
 									<h:outputText value="#{detail.extCost}">
 										<f:convertNumber type="currency" currencySymbol="$" />
 									</h:outputText>
+								</p:column>
+								<p:column headerText="Energize" style="text-align:center" filterBy="#{stake.energize}" filterMatchMode="contains" sortBy="#{stake.energize}" >
+									<h:outputText value="#{detail.energize}" />
+								</p:column>			
+								<p:column headerText="Trasnfer" style="text-align:center" filterBy="#{stake.transfer}" filterMatchMode="contains" sortBy="#{stake.transfer}" >
+									<h:outputText value="#{detail.transfer}" />
 								</p:column>
 							</p:dataTable>
 					</h:panelGrid>

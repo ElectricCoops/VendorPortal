@@ -13,18 +13,24 @@ import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.primefaces.PrimeFaces;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.event.RowEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.primefaces.event.ToggleEvent;
 import org.primefaces.event.ToggleSelectEvent;
 import org.primefaces.event.UnselectEvent;
+import org.primefaces.model.Visibility;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.PageSize;
@@ -202,11 +208,14 @@ public class WorkflowController implements Serializable {
 	private int unitsRejected;
 	private int notInspected;
 	private Timestamp inspectionDt;
+	private Timestamp workEventDt;
 	
 	private Integer asBuiltActiveTab;
 	
 	private int wfOutput;
 	private String invoiceComment;
+	
+	private String inspectionFilter;
 
 	@PostConstruct
 	public void init() {
@@ -255,18 +264,19 @@ public class WorkflowController implements Serializable {
 					//woName = wf.getWorkOrderName();
 					wfId = wf.getWorkFlowId();
 					soId = wf.getServiceOrderId();
+					workEventDt = wf.getWorkEventDt();
 				}
 			}
 			workOrderAggVw = workflowService.getByWorkflowId(wfId);
 			
 			stakingSheet = workflowService.getStakingShetByWoId(woId);
 			
-			if(stakingSheet != null) {
-				woName = stakingSheet.getWorkOrderDescription();
-			}else {
+			if(stakingSheet == null) {
 				facesError("No Stakingsheet available for selected Work Order.");
 				return null;
 			}
+			
+			woName = stakingSheet.getWorkOrderDescription();
 			
 			stakingSheetDetail = workflowService.getStakingSheetDetailById(woId);
 			
@@ -287,10 +297,15 @@ public class WorkflowController implements Serializable {
 			
 			setAsBuiltDisable(true);
 			showAsBuiltStatus = true;
-			colSpan = 19;
+			colSpan = 23;
 			editAsBuilt = true;
 			renderAsBuiltChkBox = false;
 			renderAddStationUnit = false;
+			//multiViewState = true;
+			
+			//sortStations(asBuiltStakingSheetDetail);
+			
+			PrimeFaces.current().clearTableStates();
 		} 
 		catch (ValidationException | NoResultException | ProcessException e) {
 			logger.error(e);
@@ -304,12 +319,13 @@ public class WorkflowController implements Serializable {
 
 		distinctStation = new ArrayList<String>();
 		
-		for (StakingSheetDetail det : getStakingSheetDetail()) {
-			distinctStation.add(det.getStationDescription());
+		if (getStakingSheetDetail() != null) {
+			for (StakingSheetDetail det : getStakingSheetDetail()) {
+				distinctStation.add(det.getStationDescription());
+			}
+			distinctStation = distinctStation.stream().distinct().collect(Collectors.toList());
+			Collections.sort(distinctStation, String.CASE_INSENSITIVE_ORDER);
 		}
-		distinctStation = distinctStation.stream().distinct().collect(Collectors.toList());
-		Collections.sort(distinctStation, String.CASE_INSENSITIVE_ORDER);
-
 		return distinctStation;
 	}
 
@@ -329,7 +345,7 @@ public class WorkflowController implements Serializable {
 					unitsRejected++;
 				}
 			}
-			if (detail.getInspectionStatus().getStatus().equals("Ready for Inspection")) {
+			if (detail.getInspectionStatus().getStatus().equals("Ready for Inspection") || detail.getInspectionStatus().getStatus().equals("Not Inspected")) {
 				notInspected++;
 			}
 		}
@@ -522,7 +538,7 @@ public class WorkflowController implements Serializable {
 		if (selectedStakingSheetDetails.size() > 0) {
 			for (StakingSheetDetail detail : selectedStakingSheetDetails) {
 				try {
-					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid());
+					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid(),workEventDt);
 					if(auAmount != null) {
 						auAmount = auAmount.multiply(new BigDecimal(detail.getAsBuiltQuantity()));
 					}
@@ -545,7 +561,7 @@ public class WorkflowController implements Serializable {
 		int asBuiltQty = ((StakingSheetDetail) event.getObject()).getAsBuiltQuantity();
 
 		try {
-			auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), actionCode, assemblyGuid);
+			auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), actionCode, assemblyGuid, workEventDt);
 			if(auAmount != null) {
 				auAmount = auAmount.multiply(new BigDecimal(asBuiltQty));
 			}
@@ -565,7 +581,7 @@ public class WorkflowController implements Serializable {
 		if (selectedStakingSheetDetails.size() > 0) {
 			for (StakingSheetDetail detail : selectedStakingSheetDetails) {
 				try {
-					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid());
+					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid(), workEventDt);
 					if(auAmount != null) {
 						auAmount = auAmount.multiply(new BigDecimal(detail.getAsBuiltQuantity()));
 					}
@@ -795,6 +811,22 @@ public class WorkflowController implements Serializable {
 			}
 		});
 	}
+	
+	public void sortStations(List<StakingSheetDetail> details) {
+		Collections.sort(details, new Comparator<StakingSheetDetail>() {
+			public int compare(StakingSheetDetail o1, StakingSheetDetail o2) {
+
+				int i1 = Integer.valueOf(o1.getStationDescription());
+				int i2 = Integer.valueOf(o2.getStationDescription());
+				if (i1 > i2) {
+					return -1;
+				} else {
+					return 0;
+				}
+
+			}
+		});
+	}
 
 	public void onStakingRowEdit(RowEditEvent event) {
 		StakingSheetDetail asBuiltStake = (StakingSheetDetail) event.getObject();
@@ -874,15 +906,19 @@ public class WorkflowController implements Serializable {
 	
 	public String asBuiltEdit() {
 
+		PrimeFaces.current().clearTableStates();
+
 		asBuiltStakingSheetDetail = stakingSheetDetail.stream().filter(item -> (item.getAsBuiltStatus() == null
-				|| (item.getAsBuiltStatusId() != 6 && item.getAsBuiltStatusId() != 3 && item.getAsBuiltStatusId() != 5))).collect(Collectors.toList());
+						|| (item.getAsBuiltStatus().getAsBuiltStatusId() == 3 && item.getInspectionStatus().getStatus().equals("Ready for Inspection"))
+						|| (item.getAsBuiltStatusId() != 6 && item.getAsBuiltStatusId() != 3 && item.getAsBuiltStatusId() != 5))).collect(Collectors.toList());
 
 		setAsBuiltDisable(false);
 		showAsBuiltStatus = false;
-		colSpan = 8;
+		colSpan = 12;
 		editAsBuilt = false;
 		renderAsBuiltChkBox = true;
 		renderAddStationUnit = true;
+		// multiViewState = true;
 
 		return STAKING;
 	}
@@ -896,8 +932,20 @@ public class WorkflowController implements Serializable {
 				staking.setCurrentInspectionDetailStatusId(2);
 				staking.setAsBuiltDt(util.currentDtTm());
 				staking.setAsBuiltBy(util.getCurrentUser());
+				staking.setAsBuiltComments(staking.getAsBuiltComments());
 
+				if(staking.getAsBuiltStatusId() == 6 && StringUtils.isBlank(staking.getAsBuiltComments())) {
+					facesError("As-Built comment required if status is 'Appealed'.");
+					return null;
+				}
 				workflowService.updateStakingSheetDetail(staking);
+				
+				try {
+					workflowService.updateAsBuiltAmount(staking.getStakingSheetDetailId());
+				} catch (Exception e) {
+					logger.error(e);
+					facesError(e.getMessage());
+				}
 			}
 		}
 		int wfTaskId = workflowService.updateOverallAsbuiltStatusId(woId);
@@ -907,9 +955,12 @@ public class WorkflowController implements Serializable {
 		}
 
 		asBuiltStakingSheetDetail = workflowService.getStakingSheetDetailById(woId);
-		asBuiltStakingSheetDetail = asBuiltStakingSheetDetail.stream()
+		/*asBuiltStakingSheetDetail = asBuiltStakingSheetDetail.stream()
 				.filter(item -> (item.getAsBuiltStatus() == null || (item.getAsBuiltStatusId() != 3) && (item.getAsBuiltStatusId() != 6)))
-				.collect(Collectors.toList());
+				.collect(Collectors.toList());*/
+		asBuiltStakingSheetDetail = asBuiltStakingSheetDetail.stream().filter(item -> (item.getAsBuiltStatus() == null
+				|| (item.getAsBuiltStatus().getAsBuiltStatusId() == 3 && item.getInspectionStatus().getStatus().equals("Ready for Inspection"))
+				|| (item.getAsBuiltStatusId() != 6 && item.getAsBuiltStatusId() != 3 && item.getAsBuiltStatusId() != 5))).collect(Collectors.toList());
 
 		facesInfo("Record(s) saved successful.");
 
@@ -936,7 +987,18 @@ public class WorkflowController implements Serializable {
 			facesError(e.getMessage());
 		}
 	}
-	
+
+	public void inspectionDetailFilter() {
+
+		if (StringUtils.isNotBlank(inspectionFilter)) {
+			if (inspectionFilter.equals("all")) {
+				this.inspStakingSheetDetail = asBuiltStakingSheetDetail;
+			} else if (inspectionFilter.equals("ready")) {
+				this.inspStakingSheetDetail = stakingSheetDetail.stream().filter(item -> item.getCurrentInspectionDetailStatusId() == 2).collect(Collectors.toList());
+			}
+		}
+	}
+
 	public void findVouchers() {
 		try {
 			vouchers = workflowService.getVouchers(woId);
@@ -953,6 +1015,15 @@ public class WorkflowController implements Serializable {
 		asBuiltActiveTab = ((TabView) event.getSource()).getChildren().indexOf(activeTab);
 	}
 	
+	public void onAsBuiltToggle(ToggleEvent event) {
+
+		if (event.getVisibility() == Visibility.VISIBLE) {
+			colSpan++;
+		} else if (event.getVisibility() == Visibility.HIDDEN) {
+			colSpan--;
+		}
+	}
+	
 	public void updateAssemblyUnitEnergized() {
 		
 		assemblyunits = assemblyunits.stream().filter(item -> item.getEnergized().equals(energized)).collect(Collectors.toList());
@@ -961,6 +1032,13 @@ public class WorkflowController implements Serializable {
 	public void preProcessorStakingSheetRsltPDF(Object document) {
 		Document doc = (Document) document;
 		doc.setPageSize(PageSize.A4.rotate());
+	}
+	
+	public void preProcessorRejectionRpt(Object document) {
+		HSSFWorkbook wb = (HSSFWorkbook) document;
+        HSSFSheet sheet = wb.getSheetAt(0);
+        
+        asBuiltStakingSheetDetail= asBuiltStakingSheetDetail.stream().filter(item -> item.getInspectionStatus().getStatus().equals("Rejected")).collect(Collectors.toList());
 	}
 	
 	public void findVendors() {
@@ -983,12 +1061,16 @@ public class WorkflowController implements Serializable {
 	
 	private void facesError(String message) {
 
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 	
 	private void facesInfo(String message) {
 
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
+		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 	
 	public void clearInputs() {
@@ -1840,5 +1922,21 @@ public class WorkflowController implements Serializable {
 
 	public void setVoucherAmount(BigDecimal voucherAmount) {
 		this.voucherAmount = voucherAmount;
+	}
+
+	public String getInspectionFilter() {
+		return inspectionFilter;
+	}
+
+	public void setInspectionFilter(String inspectionFilter) {
+		this.inspectionFilter = inspectionFilter;
+	}
+
+	public Timestamp getWorkEventDt() {
+		return workEventDt;
+	}
+
+	public void setWorkEventDt(Timestamp workEventDt) {
+		this.workEventDt = workEventDt;
 	}
 }

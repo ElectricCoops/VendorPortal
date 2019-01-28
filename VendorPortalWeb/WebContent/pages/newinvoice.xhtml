@@ -14,7 +14,7 @@
 				<div class="ui-g-12">
 					<div class="card card-w-title">
 						<p:growl id="messages" closable="true" />
-						<p:button value="Cancel" icon="fa fa-arrow-circle-left" outcome="staking?index=2" style="float:left;" rendered="#{!invController.renderBackToInvoiceTab}" />
+						<p:button value="Back" icon="fa fa-arrow-circle-left" outcome="staking?index=2" style="float:left;" rendered="#{!invController.renderBackToInvoiceTab}" />
 						<p:button value="Invoices" icon="fa fa-arrow-circle-left" outcome="staking?index=2" style="float:left;" rendered="#{invController.renderBackToInvoiceTab}" />
 						<p:panelGrid columns="8" layout="grid"
 							styleClass="ui-panelgrid-blank">
@@ -71,7 +71,6 @@
                 				<p:ajax event="rowSelect" listener="#{wfController.auInvRowSelectCheckbox}" update="newInvoiceForm" />
                 				<p:ajax event="rowUnselect" listener="#{wfController.auInvRowSelectCheckbox}" update="newInvoiceForm" />
                 
-        						
 								<p:column selectionMode="multiple" style="width:16px;text-align:center" />
 								<p:column headerText="C/R" style="text-align:center" filterBy="#{stake.assemblyActionCode}" filterMatchMode="contains" sortBy="#{stake.assemblyActionCode}">
 									<h:outputText value="#{stake.assemblyActionCode}" />
@@ -85,12 +84,28 @@
 								<p:column headerText="Description" style="text-align:center" filterBy="#{stake.assemblyDescription}" filterMatchMode="contains" sortBy="#{stake.assemblyDescription}">
 									<h:outputText value="#{stake.assemblyDescription}" />
 								</p:column>
+								<p:column headerText="Energize" style="text-align:center" filterBy="#{stake.energize}" filterMatchMode="contains" sortBy="#{stake.energize}" >
+									<h:outputText value="#{stake.energize}" />
+								</p:column>			
+								<p:column headerText="Trasnfer" style="text-align:center" filterBy="#{stake.transfer}" filterMatchMode="contains" sortBy="#{stake.transfer}" >
+									<h:outputText value="#{stake.transfer}" />
+								</p:column>
 								<p:column headerText="As-Built Quantity" style="text-align:center" filterBy="#{stake.asBuiltQuantity}" filterMatchMode="contains" sortBy="#{stake.asBuiltQuantity}">
 									<h:outputText value="#{stake.asBuiltQuantity}" />
 								</p:column>
+								<p:column headerText="Design Amount" style="text-align:center" filterBy="#{stake.assemblyAmount}" filterMatchMode="contains" sortBy="#{stake.assemblyAmount}" >
+									<h:outputText value="#{stake.assemblyAmount}">
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>		
+								<p:column headerText="As-Built Amount" style="text-align:center" filterBy="#{stake.asBuiltAmount}" filterMatchMode="contains" sortBy="#{stake.asBuiltAmount}" >
+									<h:outputText value="#{stake.asBuiltAmount}">
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>				
 								<p:columnGroup type="footer">
 									<p:row>
-										<p:column colspan="5" style="text-align:right"
+										<p:column colspan="9" style="text-align:right"
 											footerText="Total:" />
 										<p:column style="text-align:center">
 											<f:facet name="footer">

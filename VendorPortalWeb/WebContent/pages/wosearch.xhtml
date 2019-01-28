@@ -5,7 +5,7 @@
                 xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
 
     <ui:define name="breadcrumb">
-        <li><p:link outcome="/pages/wosearch">Staking Sheet Search</p:link></li>
+        <li><p:link outcome="/pages/wosearch">Unit-Based Jobs Search</p:link></li>
     </ui:define>
 
     <ui:define name="content">
@@ -55,9 +55,9 @@
         					<p:panelGrid styleClass="ui-panelgrid-blank">
         					<div style="float: right">
             					<p:commandButton id="toggler" type="button"  icon="fa fa-align-left" style="float: right" value="Columns" />
-        						<p:columnToggler datasource="woSearchRsltTbl" trigger="toggler">
-        							<p:ajax event="toggle" listener="#{cpController.updateStakingSearchCol}" />
-        						</p:columnToggler>
+        						<p:columnToggler datasource="woSearchRsltTbl" trigger="toggler" />
+        						<!-- 	<p:ajax event="toggle" listener="#{cpController.updateStakingSearchCol}" />
+        						</p:columnToggler> -->
             				</div>
             				</p:panelGrid>
     					</f:facet>

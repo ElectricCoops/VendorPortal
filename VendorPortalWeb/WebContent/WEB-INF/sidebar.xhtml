@@ -21,7 +21,7 @@
                         <pm:menu>
                             <p:menuitem id="sr_dashboard" value="Home" icon="fa fa-fw fa-home" outcome="/pages/home"/>
                          <!--    <p:submenu id="sm_searchgrp" label="Search" icon="fa fa-fw fa-search"> -->
-                            	<p:menuitem id="sr_wosearch" value="Staking" icon="fa fa-fw fa-map-marker" outcome="/pages/wosearch" rendered="#{userMBean.currentUser.isPermitted('S-AB:View')}"/>  
+                            	<p:menuitem id="sr_wosearch" value="Unit-Based Jobs" icon="fa fa-fw fa-map-marker" outcome="/pages/wosearch" rendered="#{userMBean.currentUser.isPermitted('S-AB:View')}"/>  
                             	<p:menuitem id="sr_stlightsearch" value="Street Lights" icon="fa fa-fw fa-lightbulb-o" outcome="/pages/streetlightsearch" rendered="#{userMBean.currentUser.isPermitted('SL:View')}"/>    
                             	<p:menuitem id="sr_inspections" value="Inspection History" icon="fa fa-fw fa-clipboard" outcome="/pages/inspectionsearch" rendered="#{userMBean.currentUser.isPermitted('INS:View')}"/>    
                             	<p:menuitem id="sr_invsearch" value="Invoices" icon="fa fa-fw fa-dollar" outcome="/pages/invoicesearch" rendered="#{userMBean.currentUser.isPermitted('INV:View')}"/>                	              

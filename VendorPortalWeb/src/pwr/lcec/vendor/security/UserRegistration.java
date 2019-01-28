@@ -279,7 +279,7 @@ public class UserRegistration implements Serializable {
 				// no whitespace
 				new WhitespaceRule()));
 
-		RuleResult result = validator.validate(new PasswordData(new String(pwd)));
+		RuleResult result = validator.validate(new PasswordData(pwd));
 		if (result.isValid()) {
 			return true;
 		} else {

@@ -1,7 +1,12 @@
 package pwr.lcec.vendorportal.custom.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+
 import javax.persistence.*;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.sql.Timestamp;
 
 /**
@@ -97,6 +102,16 @@ public class InspectionDetailVw implements Serializable {
 
 	@Column(name = "StStatusRefGuid")
 	private String stStatusRefGuid;
+	
+	@Column(name = "AssemblyAmount")
+	private BigDecimal assemblyAmount;
+	
+	@Column(name = "AsBuiltAmount")
+	private BigDecimal asBuiltAmount;
+	
+	private transient String energize;
+	
+	private transient String transfer;
 
 	public InspectionDetailVw() {
 	}
@@ -315,6 +330,53 @@ public class InspectionDetailVw implements Serializable {
 
 	public void setInspectionStatus(InspectionStatus inspectionStatus) {
 		this.inspectionStatus = inspectionStatus;
+	}
+
+	public String getEnergize() {
+
+		int startPos = assemblyGuid.lastIndexOf("E");
+
+		if (StringUtils.substring(assemblyGuid, assemblyGuid.length() - 1).equals("E")) {
+			energize = "Energized";
+		} else if ((StringUtils.substring(assemblyGuid, startPos, startPos + 1).equals("E"))) {
+			energize = "Energized";
+		}else {
+			energize = "De-Energized";
+		}
+		return energize;
+	}
+
+	public void setEnergize(String energize) {
+		this.energize = energize;
+	}
+
+	public String getTransfer() {
+		if (StringUtils.substring(assemblyGuid, assemblyGuid.length() - 1).equals("T")) {
+			transfer = "Transfer";
+		}else {
+			transfer = "Non-Transfer";
+		}
+		return transfer;
+	}
+
+	public void setTransfer(String transfer) {
+		this.transfer = transfer;
+	}
+
+	public BigDecimal getAssemblyAmount() {
+		return assemblyAmount;
+	}
+
+	public void setAssemblyAmount(BigDecimal assemblyAmount) {
+		this.assemblyAmount = assemblyAmount;
+	}
+
+	public BigDecimal getAsBuiltAmount() {
+		return asBuiltAmount;
+	}
+
+	public void setAsBuiltAmount(BigDecimal asBuiltAmount) {
+		this.asBuiltAmount = asBuiltAmount;
 	}
 
 }

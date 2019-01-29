@@ -35,7 +35,7 @@ import java.sql.Timestamp;
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_RATEGROUP"),
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_WORKTYPE"),
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_AssemblyUnit"),
-				@StoredProcedureParameter(mode = ParameterMode.IN, type = Timestamp.class, name = "IN_WorkEventDt"),
+				//@StoredProcedureParameter(mode = ParameterMode.IN, type = Timestamp.class, name = "IN_WorkEventDt"),
 				@StoredProcedureParameter(mode = ParameterMode.OUT, type = BigDecimal.class, name = "OUT_AMOUNT") }),
 		@NamedStoredProcedureQuery(name = "UPDATE_STAKING_ASBUILTAMOUNT", procedureName = "UPDATE_STAKING_ASBUILTAMOUNT", parameters = {
 				@StoredProcedureParameter(mode = ParameterMode.IN, type = String.class, name = "IN_StakingSheetDetailID"),
@@ -520,7 +520,7 @@ public class StakingSheetDetail implements Serializable {
 	}
 
 	public String getTransfer() {
-		if (StringUtils.substring(assemblyGuid, assemblyGuid.length() - 1).equals("T")) {
+		if (StringUtils.substring(assemblyGuid, assemblyGuid.length() - 2).equals(".T")) {
 			transfer = "Transfer";
 		}else {
 			transfer = "Non-Transfer";

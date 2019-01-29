@@ -168,6 +168,13 @@ public class AdHocStakingController implements Serializable {
 		stakingSheetDetail.setInvoiceStatusId(1);
 
 		workflowService.insertSheetDetail(stakingSheetDetail);
+		
+		try {
+			workflowService.updateAsBuiltAmount(stakingSheetDetail.getStakingSheetDetailId());
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e);
+		}
 	}
 
 	public String updateStakingTbl() {

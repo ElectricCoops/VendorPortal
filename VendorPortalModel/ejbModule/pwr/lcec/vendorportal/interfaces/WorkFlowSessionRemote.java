@@ -119,7 +119,7 @@ public interface WorkFlowSessionRemote {
 	
 	public List<Vendor> getVendors();
 	
-	public BigDecimal getAssemblyAmount(String workgroup, String workType, String assemblyUnit, Timestamp workEventDt) throws ProcessException;
+	public BigDecimal getAssemblyAmount(String workgroup, String workType, String assemblyUnit) throws ProcessException;
 	
 	public Resource updateResource(Integer resourceId, Integer vpUserId) throws Exception;
 	

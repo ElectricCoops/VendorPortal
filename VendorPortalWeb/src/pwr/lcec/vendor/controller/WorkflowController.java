@@ -208,7 +208,7 @@ public class WorkflowController implements Serializable {
 	private int unitsRejected;
 	private int notInspected;
 	private Timestamp inspectionDt;
-	private Timestamp workEventDt;
+	//private Timestamp workEventDt;
 	
 	private Integer asBuiltActiveTab;
 	
@@ -264,7 +264,7 @@ public class WorkflowController implements Serializable {
 					//woName = wf.getWorkOrderName();
 					wfId = wf.getWorkFlowId();
 					soId = wf.getServiceOrderId();
-					workEventDt = wf.getWorkEventDt();
+					//workEventDt = wf.getWorkEventDt();
 				}
 			}
 			workOrderAggVw = workflowService.getByWorkflowId(wfId);
@@ -538,7 +538,8 @@ public class WorkflowController implements Serializable {
 		if (selectedStakingSheetDetails.size() > 0) {
 			for (StakingSheetDetail detail : selectedStakingSheetDetails) {
 				try {
-					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid(),workEventDt);
+					//auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid(),workEventDt);
+					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid());
 					if(auAmount != null) {
 						auAmount = auAmount.multiply(new BigDecimal(detail.getAsBuiltQuantity()));
 					}
@@ -561,7 +562,8 @@ public class WorkflowController implements Serializable {
 		int asBuiltQty = ((StakingSheetDetail) event.getObject()).getAsBuiltQuantity();
 
 		try {
-			auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), actionCode, assemblyGuid, workEventDt);
+			//auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), actionCode, assemblyGuid, workEventDt);
+			auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), actionCode, assemblyGuid);
 			if(auAmount != null) {
 				auAmount = auAmount.multiply(new BigDecimal(asBuiltQty));
 			}
@@ -581,7 +583,8 @@ public class WorkflowController implements Serializable {
 		if (selectedStakingSheetDetails.size() > 0) {
 			for (StakingSheetDetail detail : selectedStakingSheetDetails) {
 				try {
-					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid(), workEventDt);
+					//auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid(), workEventDt);
+					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid());
 					if(auAmount != null) {
 						auAmount = auAmount.multiply(new BigDecimal(detail.getAsBuiltQuantity()));
 					}
@@ -1932,11 +1935,11 @@ public class WorkflowController implements Serializable {
 		this.inspectionFilter = inspectionFilter;
 	}
 
-	public Timestamp getWorkEventDt() {
+	/*public Timestamp getWorkEventDt() {
 		return workEventDt;
 	}
 
 	public void setWorkEventDt(Timestamp workEventDt) {
 		this.workEventDt = workEventDt;
-	}
+	}*/
 }

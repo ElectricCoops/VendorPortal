@@ -865,7 +865,7 @@ public class WorkFlowSession implements WorkFlowSessionRemote {
 		return query.getResultList();
 	}
 
-	public BigDecimal getAssemblyAmount(String workgroup, String workType, String assemblyUnit, Timestamp workEventDt) throws ProcessException {
+	public BigDecimal getAssemblyAmount(String workgroup, String workType, String assemblyUnit) throws ProcessException {
 
 		StoredProcedureQuery query;
 		
@@ -874,7 +874,7 @@ public class WorkFlowSession implements WorkFlowSessionRemote {
 			query.setParameter("IN_RATEGROUP", workgroup);
 			query.setParameter("IN_WORKTYPE", workType);
 			query.setParameter("IN_AssemblyUnit", assemblyUnit);
-			query.setParameter("IN_WorkEventDt", workEventDt);
+			//query.setParameter("IN_WorkEventDt", workEventDt);
 			query.execute();
 		} catch (EJBException e) {
 			logger.error(e);

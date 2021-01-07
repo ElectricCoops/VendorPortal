@@ -1,0 +1,101 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	 <f:metadata>
+	    	<f:event listener="#{userPrefController.findUserPrefInspectionHistDetail}" type="preRenderView" />
+	</f:metadata>
+
+	<p:dataTable id="INSPECTION_HISTORY_TABLE" widgetVar="stakeSheetWidget" value="#{wfController.inspectionDetailVw}"  var="stake"
+				 paginator="true" rows="100" rowsPerPageTemplate="100,200,300" paginatorPosition="bottom" paginatorAlwaysVisible="false"
+				 rendered="#{wfController.inspHist}">
+		<f:facet name="header">
+			<span >Inspection(s)</span>
+			
+      						<p:commandLink id="toggler" style="margin-right:10px;margin-top:-3px;float: right;">
+				<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+				<p:tooltip for="toggler" value="Columns" position="top"/>
+			</p:commandLink>
+  							<p:columnToggler datasource="INSPECTION_HISTORY_TABLE" trigger="toggler">
+  								<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+  							</p:columnToggler>
+      						
+		</f:facet>
+
+		<p:column id="stationDescription" headerText="Station" style="text-align:center" sortBy="#{stake.stationDescription}" filterBy="#{stake.stationDescription}" filterMatchMode="contains"
+				  visible="#{userPrefController.stakingDet.stationDescription}">
+			<h:outputText value="#{stake.stationDescription}" />
+		</p:column>
+		<p:column id="assemblyActionCode" headerText="C/R" style="text-align:center" sortBy="#{stake.assemblyActionCode}" filterBy="#{stake.assemblyActionCode}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.assemblyActionCode}">
+			<h:outputText value="#{stake.assemblyActionCode}" />
+		</p:column>
+		<p:column id="assemblyQuantity" headerText="Quantity" style="text-align:center" sortBy="#{stake.assemblyQuantity}" filterBy="#{stake.assemblyQuantity}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.assemblyQuantity}">
+			<h:outputText value="#{stake.assemblyQuantity}" />
+		</p:column>
+		<p:column id="assemblyGuid" headerText="Unit" style="text-align:center" sortBy="#{stake.assemblyGuid}" filterBy="#{stake.assemblyGuid}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.assemblyGuid}">
+			<h:outputText value="#{stake.assemblyGuid}" />
+		</p:column>
+		<p:column id="assemblyDescription" headerText="Description" style="text-align:center" sortBy="#{stake.assemblyDescription}" filterBy="#{stake.assemblyDescription}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.assemblyDescription}" colspan="2">
+			<h:outputText value="#{stake.assemblyDescription}" />
+		</p:column>
+		<p:column id="asBuiltQuantity" headerText="As-Built Quantity" style="text-align:center" sortBy="#{stake.asBuiltQuantity}" filterBy="#{stake.asBuiltQuantity}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.asBuiltQuantity}">
+			<h:outputText value="#{stake.asBuiltQuantity}" />
+		</p:column>
+		<p:column id="asBuiltComments" headerText="As-Built Comment" style="text-align:center" sortBy="#{stake.asBuiltComments}" filterBy="#{stake.asBuiltComments}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.asBuiltComments}">
+			<h:outputText value="#{stake.asBuiltComments}" />
+		</p:column>
+		<p:column id="asBuiltStatusId" headerText="As-Built Status" style="text-align:center" sortBy="#{stake.asBuiltStatus.description}" filterBy="#{stake.asBuiltStatus.description}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.asBuiltStatusId}">
+			<h:outputText value="#{stake.asBuiltStatus.description}" />
+		</p:column>
+		<p:column id="currentInspectionDetailStatusId" visible="#{userPrefController.stakingDet.currentInspectionDetailStatusId}" 
+				   headerText="Inspection Status" style="text-align:center" sortBy="#{stake.inspectionStatus.status}" filterBy="#{stake.inspectionStatus.status}" filterMatchMode="contains">
+			<h:outputText value="#{stake.inspectionStatus.status}" />
+		</p:column>
+		<p:column id="currentInspectorDetailComments" headerText="Inspection Comment" style="text-align:center" sortBy="#{stake.comment}" filterBy="#{stake.comment}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.currentInspectorDetailComments}">
+			<h:outputText value="#{stake.comment}" />
+		</p:column>
+		<p:column id="energize" headerText="Energize" style="text-align:center" sortBy="#{stake.energize}" filterBy="#{stake.energize}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.energize}">
+			<h:outputText value="#{stake.energize}" />
+		</p:column>			
+		<p:column id="transfer" headerText="Trasnfer" style="text-align:center" sortBy="#{stake.transfer}" filterBy="#{stake.transfer}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.transfer}">
+			<h:outputText value="#{stake.transfer}" />
+		</p:column>
+		<p:column id="assemblyAmount" headerText="Design Amount" style="text-align:center" sortBy="#{stake.assemblyAmount}" filterBy="#{stake.assemblyAmount}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.assemblyAmount}">
+			<h:outputText value="#{stake.assemblyAmount}">
+				<f:convertNumber type="currency" currencySymbol="$" />
+			</h:outputText>
+		</p:column>			
+		<p:column id="asBuiltAmount" headerText="As-Built Amount" style="text-align:center" sortBy="#{stake.asBuiltAmount}" filterBy="#{stake.asBuiltAmount}" filterMatchMode="contains"
+					visible="#{userPrefController.stakingDet.asBuiltAmount}">
+			<h:outputText value="#{stake.asBuiltAmount}">
+				<f:convertNumber type="currency" currencySymbol="$" />
+			</h:outputText>
+		</p:column>	
+		<p:column id="adminEdit" style="text-align:center;width:30px;" rendered="#{userMBean.currentUser.isPermitted('Admin-Inspection:Edit')}" >
+			<p:commandLink action="#{wfController.unlockInspectionDetail}" style="padding-left: 10px;" title="Edit" rendered="#{userMBean.currentUser.isPermitted('Admin-Inspection:Edit')}">
+                <i class="fa fa-wa fa-unlock fa-lg" />
+            	<f:setPropertyActionListener value="#{stake}" target="#{wfController.selectedInspectionDetailVw}" />
+            	<p:confirm header="Confirmation" message="Are you sure you want to unlock this AU for the inspectors?" />
+            </p:commandLink>
+		</p:column>	
+	</p:dataTable>
+	
+	<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+    </p:confirmDialog>
+						
+</ui:composition>

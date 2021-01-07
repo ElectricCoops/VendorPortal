@@ -1,5 +1,6 @@
 package pwr.lcec.vendor.web.helper;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Enumeration;
@@ -10,31 +11,40 @@ import java.util.UUID;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 
 import pwr.lcec.vendor.controller.InvoiceController;
+//import pwr.lcec.vendor.controller.InvoiceController;
 import pwr.lcec.vendor.controller.UserManagedBean;
 import pwr.lcec.vendor.controller.WorkflowController;
+/*import pwr.lcec.vendor.controller.WorkflowController;
 import pwr.lcec.vendorportal.exception.NoResultException;
 import pwr.lcec.vendorportal.exception.ProcessException;
-import pwr.lcec.vendorportal.exception.ValidationException;
+import pwr.lcec.vendorportal.exception.ValidationException;*/
 
-public class ControllerUtil {
+public class ControllerUtil implements Serializable{
 	
-	private static Logger logger = Logger.getLogger(ControllerUtil.class);
+	private static final long serialVersionUID = 1L;
+
+	private static Logger logger = LogManager.getLogger(ControllerUtil.class);
 
 	private final String MBEAN = "#{userMBean}";
 	private final String WFCONTROLLER = "#{wfController}";
 	private final String INVCONTROLLER = "#{invController}";
+	
+	//private @Inject UserManagedBean umbean;
 
 	public String getWrkGrp() {
 
 		FacesContext context = FacesContext.getCurrentInstance();
-		UserManagedBean umbean = context.getApplication().evaluateExpressionGet(context, MBEAN, UserManagedBean.class);
+		UserManagedBean umbean = (UserManagedBean) context.getApplication().evaluateExpressionGet(context, MBEAN, UserManagedBean.class);
+		
 
 		String workgroup = umbean.getVendor();
+		
 
 		return workgroup;
 	}
@@ -42,8 +52,7 @@ public class ControllerUtil {
 	public String getWoId() {
 
 		FacesContext context = FacesContext.getCurrentInstance();
-		WorkflowController umbean = context.getApplication().evaluateExpressionGet(context, WFCONTROLLER,
-				WorkflowController.class);
+		WorkflowController umbean = context.getApplication().evaluateExpressionGet(context, WFCONTROLLER, WorkflowController.class);
 
 		return umbean.getWoId();
 	}
@@ -60,6 +69,13 @@ public class ControllerUtil {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 
 		return now;
+	}
+	
+	public Timestamp workEventDt() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		WorkflowController wkEvtDt = context.getApplication().evaluateExpressionGet(context, WFCONTROLLER, WorkflowController.class);
+
+		return wkEvtDt.getWorkEventDt();
 	}
 	
 	public Timestamp convertDtTm(Date date) {
@@ -81,7 +97,7 @@ public class ControllerUtil {
 		return currentUser;
 	}
 
-	public String refreshInvoiceSearch() throws NoResultException, ProcessException {
+	public String refreshInvoiceSearch() {
 		FacesContext context = FacesContext.getCurrentInstance();
 		InvoiceController inv = context.getApplication().evaluateExpressionGet(context, INVCONTROLLER, InvoiceController.class);
 		inv.findInvoices();
@@ -90,13 +106,13 @@ public class ControllerUtil {
 		return viewId + "?faces-redirect=true";
 	}
 	
-	public void refreshInvoiceDetails(Integer invoiceId) throws NoResultException, ProcessException, ValidationException {
+	public String refreshInvoiceDetails(Integer invoiceId) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		WorkflowController workflowController = context.getApplication().evaluateExpressionGet(context, WFCONTROLLER, WorkflowController.class);
 		workflowController.findInvoiceDetail(invoiceId);
 		
-		/*String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
-		return viewId + "?faces-redirect=true";*/
+		String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
+		return viewId + "?faces-redirect=true";
 	}
 	
 	public String refreshVouchersTab() {

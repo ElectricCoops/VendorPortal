@@ -24,7 +24,7 @@ PrimeFaces.widget.Serenity = PrimeFaces.widget.BaseWidget.extend({
         this.sidebar = this.wrapper.children('.layout-sidebar');
         this.menu = this.sidebar.find('.layout-menu');
         this.menulinks = this.menu.find('a');
-        this.topbar = this.contentWrapper.children('.layout-topbar');
+        this.topbar = this.contentWrapper.find('.layout-topbar');
         this.menuButton = this.topbar.children('.menu-btn');
         this.topbarMenu = this.topbar.find('> .layout-topbar-menu-wrapper > .topbar-menu');
         this.topbarItems = this.topbarMenu.children('li');
@@ -32,13 +32,14 @@ PrimeFaces.widget.Serenity = PrimeFaces.widget.BaseWidget.extend({
         this.topbarMenuButton = this.topbar.find('> .topbar-menu-btn');
         this.anchorButton = this.sidebar.find('> .sidebar-logo > .sidebar-anchor');
         this.nano = this.sidebar.find('.nano');
+        this.isRTL = this.wrapper.hasClass('layout-rtl');
         this.bindEvents();
     },
     
     bindEvents: function() {
         var $this = this;
         
-        $('.nano').nanoScroller({flash: true});
+        $('.nano').nanoScroller({flash: true, isRTL: $this.isRTL});
         
         this.sidebar.on('mouseenter', function(e) {
         
@@ -225,7 +226,7 @@ PrimeFaces.widget.Serenity = PrimeFaces.widget.BaseWidget.extend({
             $(document.body).removeClass('hidden-overflow');
         });
         
-        $(document.body).on('click', function() {
+        $(document.body).off('click').on('click', function() {
             if($this.isHorizontal() && !$this.horizontalMenuClick && $this.isDesktop()) {
                 $this.menu.find('.active-menuitem').removeClass('active-menuitem');
                 $this.menu.find('ul:visible').hide();
@@ -515,14 +516,18 @@ if(PrimeFaces.widget.InputSwitch) {
          toggle: function() {
              var $this = this;
 
-             if(this.input.prop('checked'))
-                 this.uncheck();    
-             else
-                 this.check();    
-             
-             setTimeout(function() {
-                 $this.jq.toggleClass('ui-inputswitch-checked');
-             }, 100);
+             if(this.input.prop('checked')) {
+                 this.uncheck(); 
+                 setTimeout(function() {
+                    $this.jq.removeClass('ui-inputswitch-checked');
+                 }, 100);
+             }
+             else {
+                 this.check();
+                 setTimeout(function() {
+                    $this.jq.addClass('ui-inputswitch-checked');
+                 }, 100);
+             }
          }
     });
 }
@@ -740,6 +745,44 @@ if(window['PrimeFaces'] && window['PrimeFaces'].widget.Schedule) {
 
                 PrimeFaces.ajax.Request.handle(options);
             }
+        }
+    });
+}
+
+if(PrimeFaces.widget.SelectOneMenu) {
+    PrimeFaces.widget.SelectOneMenu = PrimeFaces.widget.SelectOneMenu.extend({
+        init: function(cfg) {
+            this._super(cfg);
+
+            var $this = this;
+            if(!this.disabled && this.jq.parent().hasClass('md-inputfield')) {
+                this.itemsContainer.children('.ui-selectonemenu-item:first').css({'display': 'none'});
+                if (this.input.val() != "") {
+                    this.jq.addClass("ui-state-filled");
+                }
+
+                this.input.off('change').on('change', function() {
+                    $this.inputValueControl($(this));
+                });
+                
+                if(this.cfg.editable) {
+                    this.label.on('input', function(e) {
+                        $this.inputValueControl($(this));
+                    }).on('focus', function() {
+                        $this.jq.addClass('ui-state-focus');
+                    }).on('blur', function() {
+                        $this.jq.removeClass('ui-state-focus');
+                        $this.inputValueControl($(this));
+                    });
+                }
+            }
+        },
+        
+        inputValueControl: function(input) {
+            if (input.val() != "")
+                this.jq.addClass("ui-state-filled"); 
+            else
+                this.jq.removeClass("ui-state-filled");
         }
     });
 }

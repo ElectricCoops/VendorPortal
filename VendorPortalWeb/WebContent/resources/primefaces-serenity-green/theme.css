@@ -3,6 +3,7 @@
 /*           Common           */
 /******************************/
 /* Predefined Colors */
+/* Add your variable customizations of theme here */
 body .ui-widget,
 body .ui-widget .ui-widget {
   font-family: "Roboto", "Helvetica Neue", sans-serif;
@@ -30,37 +31,37 @@ body .ui-state-disabled {
   filter: Alpha(Opacity=35);
   background-image: none; }
 body .ui-corner-all {
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px; }
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px; }
 body .ui-corner-top {
-  -moz-border-radius-topleft: 3px;
-  -webkit-border-top-left-radius: 3px;
-  border-top-left-radius: 3px;
-  -moz-border-radius-topright: 3px;
-  -webkit-border-top-right-radius: 3px;
-  border-top-right-radius: 3px; }
+  -moz-border-radius-topleft: 0px;
+  -webkit-border-top-left-radius: 0px;
+  border-top-left-radius: 0px;
+  -moz-border-radius-topright: 0px;
+  -webkit-border-top-right-radius: 0px;
+  border-top-right-radius: 0px; }
 body .ui-corner-bottom {
-  -moz-border-radius-bottomleft: 3px;
-  -webkit-border-bottom-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-  -moz-border-radius-bottomright: 3px;
-  -webkit-border-bottom-right-radius: 3px;
-  border-bottom-right-radius: 3px; }
+  -moz-border-radius-bottomleft: 0px;
+  -webkit-border-bottom-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  -moz-border-radius-bottomright: 0px;
+  -webkit-border-bottom-right-radius: 0px;
+  border-bottom-right-radius: 0px; }
 body .ui-corner-left {
-  -moz-border-radius-topleft: 3px;
-  -webkit-border-top-left-radius: 3px;
-  border-top-left-radius: 3px;
-  -moz-border-radius-bottomleft: 3px;
-  -webkit-border-bottom-left-radius: 3px;
-  border-bottom-left-radius: 3px; }
+  -moz-border-radius-topleft: 0px;
+  -webkit-border-top-left-radius: 0px;
+  border-top-left-radius: 0px;
+  -moz-border-radius-bottomleft: 0px;
+  -webkit-border-bottom-left-radius: 0px;
+  border-bottom-left-radius: 0px; }
 body .ui-corner-right {
-  -moz-border-radius-topright: 3px;
-  -webkit-border-top-right-radius: 3px;
-  border-top-right-radius: 3px;
-  -moz-border-radius-bottomright: 3px;
-  -webkit-border-bottom-right-radius: 3px;
-  border-bottom-right-radius: 3px; }
+  -moz-border-radius-topright: 0px;
+  -webkit-border-top-right-radius: 0px;
+  border-top-right-radius: 0px;
+  -moz-border-radius-bottomright: 0px;
+  -webkit-border-bottom-right-radius: 0px;
+  border-bottom-right-radius: 0px; }
 body .ui-widget-overlay {
   background-color: #58575c;
   opacity: 0.8;
@@ -119,29 +120,40 @@ body a {
   text-decoration: none; }
 
 body .ui-inputfield {
-  background: transparent;
-  border-width: 0 0 1px 0;
-  padding: 2px 2px 1px 2px;
-  border-color: #bdbdbd;
-  border-style: solid;
+  background: transparent no-repeat;
+  background-image: linear-gradient(to bottom, #4CAF50, #4CAF50), linear-gradient(to bottom, #bdbdbd, #bdbdbd);
+  background-size: 0 2px, 100% 1px;
+  background-position: 50% 100%, 50% 100%;
+  transition: background-size 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  border-width: 0;
+  padding: 2px 2px 2px 2px;
   font-size: 14px;
-  -moz-transition: border-color 0.3s;
-  -o-transition: border-color 0.3s;
-  -webkit-transition: border-color 0.3s;
-  transition: border-color 0.3s;
   -moz-border-radius: 0px;
   -webkit-border-radius: 0px;
   border-radius: 0px; }
   body .ui-inputfield.ui-state-focus {
-    border-width: 0 0 2px 0;
-    border-color: #4CAF50;
-    padding-bottom: 0; }
+    border-width: 0;
+    background-size: 100% 2px, 100% 1px;
+    outline: none;
+    padding-bottom: 2px; }
   body .ui-inputfield.ui-state-disabled {
     border-bottom: 1px dotted; }
   body .ui-inputfield.ui-widget-content {
-    border-width: 1px; }
+    border-width: 1px;
+    background: transparent;
+    background-image: none; }
   body .ui-inputfield.ui-state-error {
-    border-color: #e62a10; }
+    border-color: #e62a10;
+    background-image: linear-gradient(to bottom, #e62a10, #e62a10), linear-gradient(to bottom, #e62a10, #e62a10); }
+body .ui-widget-header .ui-inputfield, body .ui-selectlistbox-filter-container .ui-inputfield {
+  background-image: linear-gradient(to bottom, #ffffff, #ffffff), linear-gradient(to bottom, #b4c7b5, #b4c7b5);
+  padding-bottom: 2px; }
+body .ui-inputfield:-webkit-autofill {
+  border-color: #bdbdbd;
+  border-style: solid;
+  border-width: 0px 0px 1px 0px; }
+  body .ui-inputfield:-webkit-autofill.ui-state-focus {
+    padding-bottom: 0px; }
 body .md-inputfield {
   display: block;
   position: relative; }
@@ -149,6 +161,8 @@ body .md-inputfield {
   body .md-inputfield input.ui-state-filled ~ label,
   body .md-inputfield textarea:focus ~ label,
   body .md-inputfield textarea.ui-state-filled ~ label,
+  body .md-inputfield .ui-selectonemenu.ui-state-focus ~ label,
+  body .md-inputfield .ui-selectonemenu.ui-state-filled ~ label,
   body .md-inputfield .md-inputwrapper-focus ~ label,
   body .md-inputfield .md-inputwrapper-filled ~ label {
     top: -20px;
@@ -158,7 +172,7 @@ body .md-inputfield {
     top: -20px;
     font-size: 12px;
     color: #4CAF50; }
-  body .md-inputfield label {
+  body .md-inputfield label:not(.ui-selectonemenu-label) {
     color: #999;
     font-weight: normal;
     position: absolute;
@@ -168,14 +182,64 @@ body .md-inputfield {
     transition: 0.3s ease all;
     -moz-transition: 0.3s ease all;
     -webkit-transition: 0.3s ease all; }
-  body .md-inputfield input.ui-state-error ~ label {
+  body .md-inputfield input.ui-state-error ~ label,
+  body .md-inputfield .ui-selectonemenu.ui-state-focus.ui-state-error ~ label,
+  body .md-inputfield .ui-selectonemenu.ui-state-filled.ui-state-error ~ label {
     color: #e62a10; }
+  body .md-inputfield .ui-message.ui-message-error {
+    background-color: transparent;
+    border: 0 none;
+    margin: 0px;
+    color: #e62a10;
+    font-size: 11px; }
+    body .md-inputfield .ui-message.ui-message-error .ui-message-error-icon {
+      color: #e62a10;
+      font-size: 13px;
+      top: 2px; }
+  body .md-inputfield.md-inputfield-fill input {
+    background-color: #f7f7f7;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 4px; }
+  body .md-inputfield.md-inputfield-fill label {
+    top: 2px; }
+  body .md-inputfield.md-inputfield-fill input:focus ~ label,
+  body .md-inputfield.md-inputfield-fill input.ui-state-filled ~ label,
+  body .md-inputfield.md-inputfield-fill textarea:focus ~ label,
+  body .md-inputfield.md-inputfield-fill textarea.ui-state-filled ~ label,
+  body .md-inputfield.md-inputfield-fill .ui-selectonemenu.ui-state-focus ~ label,
+  body .md-inputfield.md-inputfield-fill .ui-selectonemenu.ui-state-filled ~ label,
+  body .md-inputfield.md-inputfield-fill .md-inputwrapper-focus ~ label,
+  body .md-inputfield.md-inputfield-fill .md-inputwrapper-filled ~ label {
+    top: -20px;
+    font-size: 12px;
+    color: #4CAF50; }
+  body .md-inputfield.md-inputfield-box {
+    background-color: #f7f7f7;
+    height: 44px; }
+    body .md-inputfield.md-inputfield-box > *:not(label) {
+      bottom: 0px;
+      position: absolute;
+      background-color: #f7f7f7; }
+    body .md-inputfield.md-inputfield-box > label {
+      top: 23px; }
+    body .md-inputfield.md-inputfield-box input:focus ~ label,
+    body .md-inputfield.md-inputfield-box input.ui-state-filled ~ label,
+    body .md-inputfield.md-inputfield-box textarea:focus ~ label,
+    body .md-inputfield.md-inputfield-box textarea.ui-state-filled ~ label,
+    body .md-inputfield.md-inputfield-box .ui-selectonemenu.ui-state-focus ~ label,
+    body .md-inputfield.md-inputfield-box .ui-selectonemenu.ui-state-filled ~ label,
+    body .md-inputfield.md-inputfield-box .md-inputwrapper-focus ~ label,
+    body .md-inputfield.md-inputfield-box .md-inputwrapper-filled ~ label {
+      top: 1px; }
+    body .md-inputfield.md-inputfield-box .input:-webkit-autofill ~ label {
+      top: 1px; }
 body .ui-selectonelistbox {
   background-color: #ffffff;
   border: 0 none;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px; }
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px; }
   body .ui-selectonelistbox.ui-inputfield {
     padding: 0; }
   body .ui-selectonelistbox .ui-selectlistbox-list {
@@ -201,12 +265,12 @@ body .ui-selectonelistbox {
     margin: 0;
     padding: 6px 10px;
     background-color: #4CAF50;
-    -moz-border-radius-topleft: 3px;
-    -webkit-border-top-left-radius: 3px;
-    border-top-left-radius: 3px;
-    -moz-border-radius-topright: 3px;
-    -webkit-border-top-right-radius: 3px;
-    border-top-right-radius: 3px; }
+    -moz-border-radius-topleft: 0px;
+    -webkit-border-top-left-radius: 0px;
+    border-top-left-radius: 0px;
+    -moz-border-radius-topright: 0px;
+    -webkit-border-top-right-radius: 0px;
+    border-top-right-radius: 0px; }
     body .ui-selectonelistbox .ui-selectlistbox-filter-container .ui-inputfield {
       border-color: #d9d9d9;
       color: #ffffff;
@@ -380,9 +444,9 @@ body .ui-buttonset .ui-state-active {
   background-color: #795548;
   color: #ffffff; }
 body .ui-splitbutton {
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
   -moz-box-shadow: 0 1px 2.5px 0 rgba(0, 0, 0, 0.26), 0 1px 5px 0 rgba(0, 0, 0, 0.16);
   -webkit-box-shadow: 0 1px 2.5px 0 rgba(0, 0, 0, 0.26), 0 1px 5px 0 rgba(0, 0, 0, 0.16);
   box-shadow: 0 1px 2.5px 0 rgba(0, 0, 0, 0.26), 0 1px 5px 0 rgba(0, 0, 0, 0.16); }
@@ -406,11 +470,15 @@ body .ui-splitbutton {
     -moz-border-radius-bottomright: 3px;
     -webkit-border-bottom-right-radius: 3px;
     border-bottom-right-radius: 3px; }
-body .ui-selectbooleanbutton.ui-state-active {
-  background-color: #795548;
-  color: #ffffff; }
-  body .ui-selectbooleanbutton.ui-state-active .ui-icon {
+body .ui-selectbooleanbutton {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
+  body .ui-selectbooleanbutton.ui-state-active {
+    background-color: #795548;
     color: #ffffff; }
+    body .ui-selectbooleanbutton.ui-state-active .ui-icon {
+      color: #ffffff; }
 body .ui-chkbox {
   display: inline-block;
   vertical-align: middle;
@@ -559,16 +627,24 @@ body .ui-autocomplete.ui-autocomplete-multiple .ui-autocomplete-token {
   body .ui-autocomplete.ui-autocomplete-multiple .ui-autocomplete-token .ui-autocomplete-token-icon {
     margin-top: -10px; }
 body .ui-selectonemenu {
-  border-bottom: 1px solid #bdbdbd;
+  border-width: 0;
+  background: transparent no-repeat;
+  background-image: linear-gradient(to bottom, #4CAF50, #4CAF50), linear-gradient(to bottom, #bdbdbd, #bdbdbd);
+  background-size: 0 2px, 100% 1px;
+  background-position: 50% 100%, 50% 100%;
+  transition: background-size 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  padding-bottom: 2px;
   box-sizing: border-box;
-  padding-bottom: 1px;
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
   border-radius: 0; }
   body .ui-selectonemenu.ui-state-focus {
-    border-width: 0 0 2px 0;
-    border-color: #4CAF50;
-    padding-bottom: 0; }
+    border-width: 0;
+    background-size: 100% 2px, 100% 1px;
+    outline: none;
+    padding-bottom: 2px; }
+    body .ui-selectonemenu.ui-state-focus.ui-state-error .ui-selectonemenu-trigger .ui-icon {
+      color: #e62a10; }
   body .ui-selectonemenu .ui-selectonemenu-trigger {
     height: 20px;
     width: 20px;
@@ -583,7 +659,10 @@ body .ui-selectonemenu {
       margin-top: 0;
       color: #757575; }
   body .ui-selectonemenu .ui-selectonemenu-label.ui-inputfield {
+    background: none;
     font-family: "Roboto", "Helvetica Neue", sans-serif; }
+  body .ui-selectonemenu.ui-state-error {
+    background-image: linear-gradient(to bottom, #e62a10, #e62a10), linear-gradient(to bottom, #e62a10, #e62a10); }
 body .ui-selectonemenu-panel {
   padding: 0;
   -moz-border-radius: 0;
@@ -614,7 +693,13 @@ body .ui-selectonemenu-panel {
     top: 5px;
     right: 8px; }
 body .ui-selectcheckboxmenu {
-  border-bottom: 1px solid #bdbdbd;
+  border-width: 0;
+  background: transparent no-repeat;
+  background-image: linear-gradient(to bottom, #4CAF50, #4CAF50), linear-gradient(to bottom, #bdbdbd, #bdbdbd);
+  background-size: 0 2px, 100% 1px;
+  background-position: 50% 100%, 50% 100%;
+  transition: background-size 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  padding-bottom: 2px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -624,9 +709,16 @@ body .ui-selectcheckboxmenu {
   body .ui-selectcheckboxmenu .ui-selectcheckboxmenu-label-container {
     display: block; }
     body .ui-selectcheckboxmenu .ui-selectcheckboxmenu-label-container .ui-selectcheckboxmenu-label {
-      padding-top: 2px;
-      padding-bottom: 1px;
-      padding-left: 2px; }
+      padding: 2px; }
+  body .ui-selectcheckboxmenu.ui-state-focus {
+    border-width: 0;
+    background-size: 100% 2px, 100% 1px;
+    outline: none;
+    padding-bottom: 2px; }
+  body .ui-selectcheckboxmenu.ui-state-error {
+    background-image: linear-gradient(to bottom, #e62a10, #e62a10), linear-gradient(to bottom, #e62a10, #e62a10); }
+    body .ui-selectcheckboxmenu.ui-state-error .ui-selectcheckboxmenu-trigger .ui-icon {
+      color: #e62a10; }
   body .ui-selectcheckboxmenu .ui-selectcheckboxmenu-trigger {
     height: 20px;
     width: 20px;
@@ -677,15 +769,12 @@ body .ui-selectcheckboxmenu-panel {
         right: 0px;
         color: #ffffff; }
       body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header .ui-selectcheckboxmenu-filter-container .ui-inputfield {
-        border-color: #d9d9d9;
         padding-right: 30px;
         width: 100%;
-        border-color: #ffffff;
+        color: #ffffff;
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box; }
-        body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header .ui-selectcheckboxmenu-filter-container .ui-inputfield:focus {
-          border-color: #ffffff; }
     body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header .ui-selectcheckboxmenu-close {
       margin-right: -6px; }
       body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header .ui-selectcheckboxmenu-close span {
@@ -712,11 +801,15 @@ body .ui-selectcheckboxmenu-panel {
 body .ui-fluid .ui-selectonemenu .ui-selectonemenu-trigger {
   width: 20px;
   padding: 0; }
-body #keypad-div {
+body #keypad-div,
+body .keypad-popup {
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
   border-radius: 0; }
-  body #keypad-div .keypad-key {
+  body #keypad-div .keypad-key,
+  body #keypad-div .keypad-special,
+  body .keypad-popup .keypad-key,
+  body .keypad-popup .keypad-special {
     border: 0 none;
     background-color: #ffffff;
     font-size: 14px;
@@ -728,28 +821,44 @@ body #keypad-div {
     -o-transition: background-color 0.3s;
     -webkit-transition: background-color 0.3s;
     transition: background-color 0.3s; }
-    body #keypad-div .keypad-key.ui-state-hover {
+    body #keypad-div .keypad-key.ui-state-hover,
+    body #keypad-div .keypad-special.ui-state-hover,
+    body .keypad-popup .keypad-key.ui-state-hover,
+    body .keypad-popup .keypad-special.ui-state-hover {
       background-color: #e8e8e8;
       color: #000000; }
-  body #keypad-div .keypad-shift, body #keypad-div .keypad-enter, body #keypad-div .keypad-spacebar, body #keypad-div .keypad-back, body #keypad-div .keypad-close, body #keypad-div .keypad-clear {
+  body #keypad-div .keypad-shift, body #keypad-div .keypad-enter, body #keypad-div .keypad-spacebar, body #keypad-div .keypad-back, body #keypad-div .keypad-close, body #keypad-div .keypad-clear,
+  body .keypad-popup .keypad-shift,
+  body .keypad-popup .keypad-enter,
+  body .keypad-popup .keypad-spacebar,
+  body .keypad-popup .keypad-back,
+  body .keypad-popup .keypad-close,
+  body .keypad-popup .keypad-clear {
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
     border-radius: 0;
     background-color: #4CAF50;
     color: #ffffff; }
-    body #keypad-div .keypad-shift.ui-state-hover, body #keypad-div .keypad-enter.ui-state-hover, body #keypad-div .keypad-spacebar.ui-state-hover, body #keypad-div .keypad-back.ui-state-hover, body #keypad-div .keypad-close.ui-state-hover, body #keypad-div .keypad-clear.ui-state-hover {
+    body #keypad-div .keypad-shift.ui-state-hover, body #keypad-div .keypad-enter.ui-state-hover, body #keypad-div .keypad-spacebar.ui-state-hover, body #keypad-div .keypad-back.ui-state-hover, body #keypad-div .keypad-close.ui-state-hover, body #keypad-div .keypad-clear.ui-state-hover,
+    body .keypad-popup .keypad-shift.ui-state-hover,
+    body .keypad-popup .keypad-enter.ui-state-hover,
+    body .keypad-popup .keypad-spacebar.ui-state-hover,
+    body .keypad-popup .keypad-back.ui-state-hover,
+    body .keypad-popup .keypad-close.ui-state-hover,
+    body .keypad-popup .keypad-clear.ui-state-hover {
       background-color: #388E3C;
       color: #ffffff; }
-  body #keypad-div.ui-shadow {
+  body #keypad-div.ui-shadow,
+  body .keypad-popup.ui-shadow {
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24); }
 body .ui-selectmanymenu {
   padding: 0;
   background-color: #ffffff;
-  -moz-border-radius: 3px;
-  -webkit-border-radius: 3px;
-  border-radius: 3px; }
+  -moz-border-radius: 0px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px; }
   body .ui-selectmanymenu .ui-selectlistbox-item {
     padding: 6px 10px;
     margin: 0;
@@ -771,12 +880,12 @@ body .ui-selectmanymenu {
     margin: 0;
     padding: 6px 10px;
     background-color: #4CAF50;
-    -moz-border-radius-topleft: 3px;
-    -webkit-border-top-left-radius: 3px;
-    border-top-left-radius: 3px;
-    -moz-border-radius-topright: 3px;
-    -webkit-border-top-right-radius: 3px;
-    border-top-right-radius: 3px; }
+    -moz-border-radius-topleft: 0px;
+    -webkit-border-top-left-radius: 0px;
+    border-top-left-radius: 0px;
+    -moz-border-radius-topright: 0px;
+    -webkit-border-top-right-radius: 0px;
+    border-top-right-radius: 0px; }
     body .ui-selectmanymenu .ui-selectlistbox-filter-container .ui-inputfield {
       border-color: #d9d9d9;
       color: #ffffff;
@@ -846,9 +955,9 @@ body .ui-inputswitch {
     transition: background-color 0.3s;
     width: 20px !important;
     height: 20px !important;
-    -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.13725) 0px 1px 1px 0px, rgba(0, 0, 0, 0.11765) 0px 2px 1px -1px;
-    -moz-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.13725) 0px 1px 1px 0px, rgba(0, 0, 0, 0.11765) 0px 2px 1px -1px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.13725) 0px 1px 1px 0px, rgba(0, 0, 0, 0.11765) 0px 2px 1px -1px; }
+    -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
+    -moz-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px; }
   body .ui-inputswitch .ui-inputswitch-on {
     visibility: hidden; }
   body .ui-inputswitch .ui-inputswitch-off span, body .ui-inputswitch .ui-inputswitch-on span {
@@ -859,6 +968,46 @@ body .ui-inputswitch {
     body .ui-inputswitch.ui-inputswitch-checked .ui-inputswitch-handle {
       background-color: #795548;
       color: #ffffff; }
+body .ui-toggleswitch {
+  height: 16px;
+  width: 36px !important; }
+  body .ui-toggleswitch .ui-toggleswitch-slider {
+    -moz-transition: background-color 0.3s;
+    -o-transition: background-color 0.3s;
+    -webkit-transition: background-color 0.3s;
+    transition: background-color 0.3s;
+    background-color: #9e9e9e;
+    border: 1px solid #9e9e9e;
+    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
+    border-radius: 8px; }
+    body .ui-toggleswitch .ui-toggleswitch-slider:before {
+      background-color: #ffffff;
+      -moz-border-radius: 50%;
+      -webkit-border-radius: 50%;
+      border-radius: 50%;
+      -moz-transition: 0.3s;
+      -o-transition: 0.3s;
+      -webkit-transition: 0.3s;
+      transition: 0.3s;
+      width: 20px !important;
+      height: 20px !important;
+      -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
+      -moz-box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 1px 3px 0px, rgba(0, 0, 0, 0.137255) 0px 1px 1px 0px, rgba(0, 0, 0, 0.117647) 0px 2px 1px -1px;
+      left: auto;
+      bottom: -3px; }
+  body .ui-toggleswitch.ui-toggleswitch-checked .ui-toggleswitch-slider {
+    background-color: #A1887F;
+    border-color: #A1887F; }
+    body .ui-toggleswitch.ui-toggleswitch-checked .ui-toggleswitch-slider:before {
+      background-color: #795548;
+      color: #ffffff;
+      -webkit-transform: translateX(14px);
+      -moz-transform: translateX(14px);
+      -o-transform: translateX(14px);
+      -ms-transform: translateX(14px);
+      transform: translateX(14px); }
 body .ui-slider {
   padding: 0; }
   body .ui-slider .ui-slider-handle {
@@ -1074,6 +1223,136 @@ body .ui-datepicker {
 body .ui-fluid .ui-calendar .ui-datepicker-trigger.ui-button {
   top: -4px;
   width: 24px; }
+body .p-datepicker-panel {
+  border: 0 none; }
+  body .p-datepicker-panel .ui-datepicker-group {
+    padding: 0; }
+  body .p-datepicker-panel table td a:hover {
+    background-color: #e8e8e8;
+    color: #000000; }
+  body .p-datepicker-panel table td a.ui-state-active {
+    color: #ffffff;
+    background-color: #795548;
+    color: #ffffff; }
+  body .p-datepicker-panel.ui-datepicker-multiple-month .ui-datepicker-group {
+    width: 17em;
+    border: 0 none; }
+    body .p-datepicker-panel.ui-datepicker-multiple-month .ui-datepicker-group .ui-datepicker-header {
+      -moz-border-radius: 0;
+      -webkit-border-radius: 0;
+      border-radius: 0; }
+    body .p-datepicker-panel.ui-datepicker-multiple-month .ui-datepicker-group .ui-datepicker-calendar-container {
+      padding: 0 .1em; }
+    body .p-datepicker-panel.ui-datepicker-multiple-month .ui-datepicker-group:first-child .ui-datepicker-calendar-container {
+      padding-left: 0; }
+    body .p-datepicker-panel.ui-datepicker-multiple-month .ui-datepicker-group:last-child .ui-datepicker-calendar-container {
+      padding-right: 0; }
+  body .p-datepicker-panel.ui-datepicker-monthpicker .ui-monthpicker .ui-monthpicker-month {
+    color: #212121;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box; }
+    body .p-datepicker-panel.ui-datepicker-monthpicker .ui-monthpicker .ui-monthpicker-month:hover {
+      background-color: #e8e8e8;
+      color: #000000; }
+    body .p-datepicker-panel.ui-datepicker-monthpicker .ui-monthpicker .ui-monthpicker-month.ui-state-active {
+      color: #ffffff;
+      background-color: #795548;
+      color: #ffffff; }
+  body .p-datepicker-panel .ui-timepicker {
+    font-weight: normal;
+    border-top: 0 none; }
+    body .p-datepicker-panel .ui-timepicker .ui-picker-up {
+      cursor: pointer;
+      font-size: 20px;
+      color: #ffffff;
+      font-family: 'Material Icons';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      /* Preferred icon size */
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      /* Support for all WebKit browsers. */
+      -webkit-font-smoothing: antialiased;
+      /* Support for Safari and Chrome. */
+      text-rendering: optimizeLegibility;
+      /* Support for Firefox. */
+      -moz-osx-font-smoothing: grayscale;
+      /* Support for IE. */
+      font-feature-settings: 'liga';
+      display: block;
+      margin-bottom: .2em; }
+      body .p-datepicker-panel .ui-timepicker .ui-picker-up:before {
+        content: ""; }
+      body .p-datepicker-panel .ui-timepicker .ui-picker-up:hover {
+        background-color: #81C784;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        -moz-transition: background-color 0.3s;
+        -o-transition: background-color 0.3s;
+        -webkit-transition: background-color 0.3s;
+        transition: background-color 0.3s; }
+      body .p-datepicker-panel .ui-timepicker .ui-picker-up span {
+        display: none; }
+    body .p-datepicker-panel .ui-timepicker .ui-picker-down {
+      cursor: pointer;
+      font-size: 20px;
+      color: #ffffff;
+      font-family: 'Material Icons';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      /* Preferred icon size */
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      /* Support for all WebKit browsers. */
+      -webkit-font-smoothing: antialiased;
+      /* Support for Safari and Chrome. */
+      text-rendering: optimizeLegibility;
+      /* Support for Firefox. */
+      -moz-osx-font-smoothing: grayscale;
+      /* Support for IE. */
+      font-feature-settings: 'liga';
+      display: block;
+      margin-top: .2em; }
+      body .p-datepicker-panel .ui-timepicker .ui-picker-down:before {
+        content: ""; }
+      body .p-datepicker-panel .ui-timepicker .ui-picker-down:hover {
+        background-color: #81C784;
+        -moz-border-radius: 50%;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        -moz-transition: background-color 0.3s;
+        -o-transition: background-color 0.3s;
+        -webkit-transition: background-color 0.3s;
+        transition: background-color 0.3s; }
+      body .p-datepicker-panel .ui-timepicker .ui-picker-down span {
+        display: none; }
+  body .p-datepicker-panel .ui-datepicker-buttonbar {
+    border-top: 0 none; }
+    body .p-datepicker-panel .ui-datepicker-buttonbar .ui-button {
+      width: auto; }
+      body .p-datepicker-panel .ui-datepicker-buttonbar .ui-button:hover {
+        background-color: #388E3C; }
+      body .p-datepicker-panel .ui-datepicker-buttonbar .ui-button:focus {
+        outline: 0 none;
+        background-color: #6ec071; }
 body .ui-rating .ui-rating-cancel {
   text-indent: 0; }
   body .ui-rating .ui-rating-cancel a {
@@ -1182,6 +1461,71 @@ body .ui-fileupload .ui-fileupload-content .ui-messages-error .ui-icon {
   color: #ffffff; }
 body .ui-editor.ui-widget-content {
   padding: 0px; }
+body .ui-inputgroup {
+  height: 100%; }
+  body .ui-inputgroup .ui-inputgroup-addon,
+  body .ui-inputgroup .ui-inputgroup-addon-checkbox {
+    padding: 2px 2px 1px 2px;
+    border-color: #bdbdbd;
+    background-color: transparent;
+    color: #757575;
+    min-width: 28px;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0; }
+    body .ui-inputgroup .ui-inputgroup-addon:first-child,
+    body .ui-inputgroup .ui-inputgroup-addon-checkbox:first-child {
+      -moz-border-radius-topleft: 0;
+      -webkit-border-top-left-radius: 0;
+      border-top-left-radius: 0;
+      -moz-border-radius-bottomleft: 0;
+      -webkit-border-bottom-left-radius: 0;
+      border-bottom-left-radius: 0; }
+    body .ui-inputgroup .ui-inputgroup-addon:last-child,
+    body .ui-inputgroup .ui-inputgroup-addon-checkbox:last-child {
+      -moz-border-radius-topright: 0px;
+      -webkit-border-top-right-radius: 0px;
+      border-top-right-radius: 0px;
+      -moz-border-radius-bottomright: 0px;
+      -webkit-border-bottom-right-radius: 0px;
+      border-bottom-right-radius: 0px; }
+  body .ui-inputgroup .ui-inputgroup-addon {
+    align-self: flex-end; }
+    body .ui-inputgroup .ui-inputgroup-addon > i {
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      align-self: flex-end;
+      font-size: 1.5em; }
+  body .ui-inputgroup .ui-inputtext {
+    align-self: flex-end; }
+  body .ui-inputgroup .md-inputfield {
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    width: 1%;
+    display: inherit; }
+    body .ui-inputgroup .md-inputfield label {
+      top: 5px; }
+  body .ui-inputgroup .ui-button .ui-button-text {
+    padding: 0; }
+  body .ui-inputgroup .ui-inputgroup-addon-checkbox {
+    padding: 0;
+    position: relative; }
+    body .ui-inputgroup .ui-inputgroup-addon-checkbox .ui-chkbox {
+      vertical-align: baseline;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      margin-top: -9px;
+      margin-left: -9px; }
+body .ui-fluid .ui-inputgroup .ui-button.ui-button-icon-only {
+  width: 1.643em;
+  height: 1.643em;
+  min-width: 0;
+  padding: 0; }
+  body .ui-fluid .ui-inputgroup .ui-button.ui-button-icon-only .ui-button-icon-left {
+    margin-left: -.45em; }
 
 body .ui-paginator {
   padding: 6px 10px;
@@ -1446,7 +1790,7 @@ body .ui-datatable tbody tr td {
     color: #ffffff; }
 body .ui-datatable tbody tr.ui-widget-content {
   border: 0 none; }
-body .ui-datatable tbody tr.ui-state-highlight┬á {
+body .ui-datatable tbody tr.ui-state-highlight  {
   background-color: #795548;
   color: #ffffff; }
 body .ui-datatable tbody tr .ui-cell-editor-input input {
@@ -1502,6 +1846,13 @@ body .ui-datatable.ui-datatable-scrollable tfoot tr td {
   font-size: 14px; }
 body .ui-draggable-dragging.ui-state-default {
   background-color: #4CAF50; }
+body .ui-dataview .ui-datalist-header {
+  padding: 8px 14px; }
+  body .ui-dataview .ui-datalist-header .ui-dataview-layout-options .ui-button-icon-only {
+    width: 2.5em;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px; }
 body .ui-picklist .ui-picklist-list {
   padding: 0; }
 body .ui-picklist .ui-picklist-caption {
@@ -2764,6 +3115,10 @@ body .ui-dialog .ui-dialog-buttonpane, body .ui-dialog .ui-dialog-footer {
       color: #000000; }
 body .ui-dialog .ui-confirm-dialog-severity {
   margin: 0px 12px; }
+body .ui-sidebar .ui-sidebar-close:hover {
+  padding: 1px; }
+body .ui-sidebar .ui-button {
+  width: auto; }
 body .ui-lightbox.ui-shadow {
   -webkit-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
   -moz-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);

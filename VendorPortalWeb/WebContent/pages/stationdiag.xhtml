@@ -4,7 +4,7 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 
-	<!-- <h:form id="stationDiagForm"> -->
+	<h:form id="stationDiagForm">
 		<p:panelGrid id="stationGrid" columns="2" styleClass="ui-panelgrid-blank">
 			<p:outputLabel for="stationDlgId" value="Station: " />
 			<p:inputText id="stationDlgId" value="#{adHocStaking.station}" required="true" requiredMessage="Please enter a station description" />
@@ -27,15 +27,19 @@
 				<p:ajax update="unitId" process="@this" listener="#{adHocStaking.findAssemblyUnits}" />
 			</p:selectOneRadio>
 			<p:outputLabel for="unitId" value="Assembly Unit: " />
-			<p:selectOneMenu id="unitId" value="#{adHocStaking.assemblyUnit}" style="width: 99%;" required="true" requiredMessage="Please select an assembly unit.">
+			<p:selectOneMenu id="unitId" value="#{adHocStaking.assemblyUnit}" style="width: 99%;" required="true" requiredMessage="Please select an assembly unit." filter="true" filterMatchMode="startsWith">
 				<p:ajax event="change" update="unitDescId" listener="#{adHocStaking.findAssemblyUnitDesc}" />
 				<f:selectItem itemLabel="Select Unit" itemValue="" noSelectionOption="true" />
 				<f:selectItems value="#{adHocStaking.assemblyunits}" var="unit" itemLabel="#{unit.assemblyGuid}" itemValue="#{unit.assemblyGuid}" />
 			</p:selectOneMenu>
 			<p:outputLabel for="unitDescId" value="Unit Description: " />
 			<p:inputTextarea id="unitDescId" disabled="true" value="#{adHocStaking.assemblyUnitDesc}" maxlength="255" autoResize="false" style="width: 99%;opacity: 1;filter: Alpha(Opacity=100);" />
+			
 			<p:outputLabel for="unitQtyId" value="As-Built Qty: " />
-			<p:inputNumber minValue="0" decimalPlaces="0" id="unitQtyId" value="#{adHocStaking.unitQty}" required="true"/>
+			<p:inputNumber minValue="0" decimalPlaces="0" id="unitQtyId" value="#{adHocStaking.unitQty}" required="true">
+				<p:ajax/>
+			</p:inputNumber>
+			
 			<p:outputLabel for="asBuiltStatId" value="As-Built Status: " />
 			<p:selectOneMenu id="asBuiltStatId" value="#{adHocStaking.asBuiltStatus}" style="width: 99%;">
 				<f:selectItem itemLabel="Select Status" itemValue="" noSelectionOption="true" />
@@ -46,9 +50,9 @@
 		</p:panelGrid>
 		<center>
 		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
-			<p:commandButton id="okBtnDlg" value="Add Station/Unit" action="#{adHocStaking.addStation}"  update="stationGrid,messages"/>
-			<p:commandButton id="cancelBtnDlg" value="Cancel" immediate="true" onclick="PF('addStationDlg').hide();" />			
+			<p:commandButton id="okBtnDlg" value="Add Station/Unit" icon="fa fa-wa fa-save" action="#{adHocStaking.addStation}"  update="stationGrid, messages" styleClass="secondary-btn"/>
+			<p:commandButton id="cancelBtnDlg" value="Cancel" icon="fa fa-wa fa-times" immediate="true" onclick="PF('addStationDlg').hide();" styleClass="secondary-btn"/>			
 		</p:panelGrid>
 		</center>
-	<!-- </h:form> -->
+	</h:form>
 </ui:composition>

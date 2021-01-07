@@ -3,8 +3,8 @@
 	<name>VendorPortalAppl</name>
 	<comment></comment>
 	<projects>
-		<project>VendorPortalModel</project>
 		<project>VendorPortalWeb</project>
+		<project>VendorPortalModel</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

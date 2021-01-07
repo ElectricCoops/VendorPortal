@@ -4,7 +4,9 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:a="http://xmlns.jcp.org/jsf/passthrough">
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions">
 
     <h:head>
     	<link rel="sitemap icon" type="image/x-icon" href="#{resource['images/favicon.ico']}" />
@@ -39,7 +41,7 @@
                     </div>
                     <div class="ui-g-12">
                         <h:panelGroup styleClass="md-inputfield">
-                            <p:password value="#{userMBean.user.pwd}" feedback="false" required="true" requiredMessage="Password is required." autocomplete="off" />
+                            <p:password value="#{userMBean.user.password}" feedback="false" required="true" requiredMessage="Password is required." autocomplete="off" />
                             <label>Password</label>
                         </h:panelGroup>
                     </div>

@@ -1,5 +1,7 @@
 package pwr.lcec.vendor.controller;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.PageSize;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -7,70 +9,69 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ValueChangeEvent;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.primefaces.PrimeFaces;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.component.tabview.TabView;
-import org.primefaces.event.RowEditEvent;
+import org.primefaces.event.CellEditEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.event.ToggleEvent;
 import org.primefaces.event.ToggleSelectEvent;
 import org.primefaces.event.UnselectEvent;
 import org.primefaces.model.Visibility;
-
-import com.lowagie.text.Document;
-import com.lowagie.text.PageSize;
-
-import pwr.lcec.vendor.web.helper.Constants;
+import pwr.lcec.vendor.controller.WorkflowController;
 import pwr.lcec.vendor.web.helper.ControllerUtil;
-import pwr.lcec.vendorportal.custom.entity.AsBuiltStatus;
-import pwr.lcec.vendorportal.custom.entity.AsBuiltSummaryVw;
-import pwr.lcec.vendorportal.custom.entity.AssemblyAdhocVw;
-import pwr.lcec.vendorportal.custom.entity.Inspection;
-import pwr.lcec.vendorportal.custom.entity.InspectionDetailVw;
-import pwr.lcec.vendorportal.custom.entity.InspectionStatus;
-import pwr.lcec.vendorportal.custom.entity.Invoice;
-import pwr.lcec.vendorportal.custom.entity.InvoiceDetail;
-import pwr.lcec.vendorportal.custom.entity.InvoiceGLSummaryVw;
-import pwr.lcec.vendorportal.custom.entity.InvoiceStatus;
-import pwr.lcec.vendorportal.custom.entity.StakingSheet;
-import pwr.lcec.vendorportal.custom.entity.StakingSheetDetail;
-import pwr.lcec.vendorportal.custom.entity.Vendor;
-import pwr.lcec.vendorportal.custom.entity.Voucher;
-import pwr.lcec.vendorportal.custom.entity.WorkEventStatus;
-import pwr.lcec.vendorportal.custom.entity.WorkFlow;
-import pwr.lcec.vendorportal.custom.entity.WorkFlowSearch_VW;
-import pwr.lcec.vendorportal.custom.entity.WorkFlowTask;
-import pwr.lcec.vendorportal.custom.entity.WorkOrderAggVw;
-import pwr.lcec.vendorportal.exception.NoResultException;
-import pwr.lcec.vendorportal.exception.ProcessException;
-import pwr.lcec.vendorportal.exception.ValidationException;
-import pwr.lcec.vendorportal.interfaces.InspectionSessionRemote;
-import pwr.lcec.vendorportal.interfaces.InvoiceSessionRemote;
-import pwr.lcec.vendorportal.interfaces.IvueSessionRemote;
-import pwr.lcec.vendorportal.interfaces.UserManagementRemote;
-import pwr.lcec.vendorportal.interfaces.WorkFlowSessionRemote;
-import pwr.lcec.vendorportal.sec.entity.User;
+import pwr.lcec.vendorportal.entity.custom.AsBuiltStatus;
+import pwr.lcec.vendorportal.entity.custom.AsBuiltSummaryVw;
+import pwr.lcec.vendorportal.entity.custom.AssemblyAdhocVw;
+import pwr.lcec.vendorportal.entity.custom.Inspection;
+import pwr.lcec.vendorportal.entity.custom.InspectionDetailVw;
+import pwr.lcec.vendorportal.entity.custom.InspectionStatus;
+import pwr.lcec.vendorportal.entity.custom.InspectionUnlock;
+import pwr.lcec.vendorportal.entity.custom.Invoice;
+import pwr.lcec.vendorportal.entity.custom.InvoiceDetail;
+import pwr.lcec.vendorportal.entity.custom.InvoiceGLSummaryVw;
+import pwr.lcec.vendorportal.entity.custom.InvoiceStatus;
+import pwr.lcec.vendorportal.entity.custom.ServiceOrder;
+import pwr.lcec.vendorportal.entity.custom.StakingSheet;
+import pwr.lcec.vendorportal.entity.custom.StakingSheetDetail;
+import pwr.lcec.vendorportal.entity.custom.StakingSheetDetailGui;
+import pwr.lcec.vendorportal.entity.custom.Vendor;
+import pwr.lcec.vendorportal.entity.custom.Voucher;
+import pwr.lcec.vendorportal.entity.custom.VoucherGui;
+import pwr.lcec.vendorportal.entity.custom.WorkEventStatus;
+import pwr.lcec.vendorportal.entity.custom.WorkFlow;
+import pwr.lcec.vendorportal.entity.custom.WorkFlowSearch_VW;
+import pwr.lcec.vendorportal.entity.custom.WorkFlowTask;
+import pwr.lcec.vendorportal.entity.custom.WorkOrderAggVw;
+import pwr.lcec.vendorportal.interfaces.InspectionLocal;
+import pwr.lcec.vendorportal.interfaces.InvoiceLocal;
+import pwr.lcec.vendorportal.interfaces.IvueLocal;
+import pwr.lcec.vendorportal.interfaces.UserManagementLocal;
+import pwr.lcec.vendorportal.interfaces.WorkFlowLocal;
+import pwr.lcec.vendorportal.entity.sec.UserTbl;
 
 public class WorkflowController implements Serializable {
-
 	private static final long serialVersionUID = 1L;
-
-	private static Logger logger = Logger.getLogger(WorkflowController.class);
+	private static Logger logger = LogManager.getLogger(WorkflowController.class);
 
 	private final String STAKING = "staking?faces-redirect=true";
 	private final String STAKING_INVOICE = "SS";
@@ -81,19 +82,19 @@ public class WorkflowController implements Serializable {
 	private final String INVOICE_SEARCH = "invoicesearch?faces-redirect=true";
 	private final String APPROVED = "Approved";
 	private final String INVOICE_DETAIL = "invoicedetail?faces-redirect=true";
+
+	@EJB
+	private WorkFlowLocal workflowService;
+
+	@EJB
+	private InspectionLocal inspectionService;
+	@EJB
+	private InvoiceLocal invoiceService;
+	@EJB
+	private IvueLocal ivueService;
+	@EJB
+	private UserManagementLocal userManagementService;
 	
-
-	@EJB
-	private WorkFlowSessionRemote workflowService;
-	@EJB
-	private InspectionSessionRemote inspectionService;
-	@EJB
-	private InvoiceSessionRemote invoiceService;
-	@EJB
-	private IvueSessionRemote ivueService;
-	@EJB
-	private UserManagementRemote userManagementService;
-
 	private String woId;
 	private String soId;
 	private String woStatus;
@@ -107,59 +108,63 @@ public class WorkflowController implements Serializable {
 	private List<WorkFlowTask> workFlowTasks;
 	private WorkFlowTask selectedWorkFlowTask;
 	private StakingSheet stakingSheet;
-	private List<StakingSheetDetail> stakingSheetDetail;
-	private List<StakingSheetDetail> asBuiltStakingSheetDetail;
+	private List<StakingSheetDetailGui> asBuiltStakingSheetDetailGui;
 	private List<StakingSheetDetail> invoiceStakingSheetDetail;
-	private StakingSheetDetail selectedStakingSheetDetail;
+	private StakingSheetDetailGui selectedStakingSheetDetail = new StakingSheetDetailGui();
 	private List<StakingSheetDetail> selectedStakingSheetDetails;
-	private List<StakingSheetDetail> filteredStakingSheetDetail;
+	private List<StakingSheetDetailGui> filteredStakingSheetDetail;
 	private List<StakingSheetDetail> invoicedDetail;
-	private List<StakingSheetDetail> inspStakingSheetDetail;
+	private List<StakingSheetDetailGui> inspStakingSheetDetail;
 	private List<Inspection> inspections;
 	private Inspection inspection;
 	private List<InspectionDetailVw> inspectionDetailVw;
+	private InspectionDetailVw selectedInspectionDetailVw;
 	private List<Invoice> invoices;
 	private Invoice invoice;
 	private List<WorkOrderAggVw> workOrderAggVw;
 	private List<InvoiceGLSummaryVw> invoiceGLSummaryVw;
 	private List<InvoiceDetail> invoiceDetail;
 	private List<AssemblyAdhocVw> assemblyunits;
-	private List<Voucher> vouchers;
-	private List<Voucher> newInspVouchers;
-	private List<Voucher> inspectedVouchers;
-	private List<Voucher> invoiceVouchers;
-	private List<Voucher> selectedInvoiceVouchers;
-	private List<Voucher> invoiceApprovalVouchers;
-	private List<Voucher> voucherSubmitInvoiceApproval;
+	private List<VoucherGui> vouchers;
+	private List<VoucherGui> newInspVouchers;
+	private List<VoucherGui> inspectedVouchers;
+	private List<VoucherGui> invoiceVouchers;
+	private List<VoucherGui> selectedInvoiceVouchers;
+	private List<VoucherGui> invoiceApprovalVouchers;
+	private List<VoucherGui> voucherSubmitInvoiceApproval;
 	private List<StakingSheetDetail> invApprovalStakingSheetDet;
-	
+	private List<BigDecimal> selectedItems = new ArrayList<BigDecimal>();
+
 	private List<InvoiceStatus> invoiceStatus;
-	
+
 	private WorkFlow workflow;
-	
+
 	private List<InspectionStatus> inspStatuses;
+
 	private List<InspectionStatus> newInspStatuses;
 	private List<AsBuiltStatus> asBuiltStatuses;
 	private List<AsBuiltStatus> addStationUnitAsBuiltStatuses;
 	private List<AsBuiltSummaryVw> asBuiltSummaryVw;
 	private List<Vendor> vendors;
 	private String vendor;
-	
 	private String inspectionDetStatus;
 	private String inspectionComment;
 	private Integer invoiceNo;
 	private int invoiceStatusId;
 	private String vendorRefNo;
 	private BigDecimal invAmt;
-	
 	ControllerUtil util = new ControllerUtil();
-	
+
 	private Integer inspectionId;
+
 	private String currentStation;
+
 	private int invoiceId;
-	
+
 	private boolean inspHist = false;
+
 	private boolean newInsp = false;
+
 	boolean showDetail = false;
 	private boolean showSubmitInspectionBtn = false;
 	private boolean asBuiltDisable = true;
@@ -171,22 +176,20 @@ public class WorkflowController implements Serializable {
 	private boolean renderBackToInspSearch = false;
 	private boolean disableApprovedBtn;
 	private boolean renderBackToInvoiceTab = false;
-	
-	private List<String> distinctStation;
+	private boolean cancelInspOnBack = false;
+	private boolean continueInspection = false;
+	private List<BigDecimal> distinctStation;
 	private String inspectionStatusId;
 	private String inspectedBy;
 	private String cr;
 	private String transfer;
 	private String energized;
-	
 	private String overallInvoiceStatus;
-	
 	private String tempWoId;
 	private String tempSoId;
 	private String tempwoStatus;
 	private Integer tempStakingInspectionStatus;
 	private Integer tempStakingInvoiceStatus;
-	
 	private BigDecimal amtInvoicedToDt;
 	private BigDecimal amtPaidToDt;
 	private BigDecimal inspectionCompleted;
@@ -194,28 +197,29 @@ public class WorkflowController implements Serializable {
 	private BigDecimal auSubTotal = new BigDecimal(0);
 	private BigDecimal auAmount;
 	private BigDecimal voucherSubTotal = new BigDecimal(0);
+
 	private BigDecimal voucherAmount;
-	
-	private int colSpan;
-	
+
 	private Integer stakingInspectionStatus;
-	private Integer stakingInvoiceStatus;	
-	
-	//private List<Boolean> asBuiltColList;
-	
+
+	private Integer stakingInvoiceStatus;
+
 	private int totalUnits;
+
 	private int inspPassed;
+
 	private int unitsRejected;
 	private int notInspected;
 	private Timestamp inspectionDt;
 	private Timestamp workEventDt;
-	
 	private Integer asBuiltActiveTab;
-	
 	private int wfOutput;
 	private String invoiceComment;
-	
-	private String inspectionFilter;
+	private boolean inspectionFilter;
+	private boolean inspectionVoucherFilter;
+	private String source;
+	private boolean asBuiltShowAllBool = false;
+	private VoucherGui selectedVoucher = new VoucherGui();
 
 	@PostConstruct
 	public void init() {
@@ -223,26 +227,27 @@ public class WorkflowController implements Serializable {
 		findAsBuiltStatus();
 		findInspectionStatus();
 		findVendors();
-		//asBuiltColList = Arrays.asList(true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true);
 	}
 
-	public String findWorkFlows() throws ValidationException, NoResultException, ProcessException {
-
+	public void findWorkFlows() {
 		workflows = workflowService.searchWorkflows(tempWoId, tempSoId, tempwoStatus, tempStakingInspectionStatus, tempStakingInvoiceStatus, util.getWrkGrp(), vendor);
+	}
 
-			tempWoId = woId;
-			tempSoId = soId;
-			tempwoStatus = woStatus;
-			tempStakingInspectionStatus = stakingInspectionStatus;
-			tempStakingInvoiceStatus = stakingInvoiceStatus;
-			
-			clearInputs();
-			
-			return WOSEARCH;
+	public void resetWorkOrderSearch() {
+		workflows = new ArrayList<WorkFlowSearch_VW>();
+
+		clearInputs();
+		
+		/*asBuiltStakingSheetDetailGui = new ArrayList<StakingSheetDetailGui>();
+		invoiceStakingSheetDetail = new ArrayList<StakingSheetDetail>();
+		selectedStakingSheetDetail = new StakingSheetDetailGui();
+		selectedStakingSheetDetails = new ArrayList<StakingSheetDetail>();
+		filteredStakingSheetDetail = new ArrayList<StakingSheetDetailGui>();
+		invoicedDetail = new ArrayList<StakingSheetDetail>();
+		inspStakingSheetDetail = new ArrayList<StakingSheetDetailGui>();*/
 	}
 
 	public List<WorkEventStatus> getAllWorkEvenStatus() {
-
 		workEventStatus = workflowService.getWorkEventStatus();
 
 		Collections.sort(workEventStatus, new Comparator<WorkEventStatus>() {
@@ -254,194 +259,656 @@ public class WorkflowController implements Serializable {
 		return workEventStatus;
 	}
 
-	public String findStakingDetailByWoId() {
+	public String onloadStakingJob() {
+		asBuiltActiveTab = Integer.valueOf(0);
 
-		try {
-			workflows = workflowService.getWorkflowById(woId, util.getWrkGrp());
-			for (WorkFlowSearch_VW wf : workflows) {
-				if (woId.equalsIgnoreCase(wf.getWorkOrderId())) {
-					woStatus = wf.getWorkEventStatus();
-					//woName = wf.getWorkOrderName();
-					wfId = wf.getWorkFlowId();
-					soId = wf.getServiceOrderId();
-					workEventDt = wf.getWorkEventDt();
-				}
+		return findStakingDetailByWoId();
+	}
+
+	public String findStakingDetailByWoId() {
+		workflow = workflowService.findWorkFlowbyWoId(woId, util.getWrkGrp());
+
+		if (workflow != null) {
+
+			woStatus = workflow.getWorkEventStatus().getDescription();
+			wfId = workflow.getWorkFlowId();
+			soId = workflow.getServiceOrderId();
+			workEventDt = workflow.getWorkEventDt();
+
+			try {
+				workOrderAggVw = workflowService.getByWorkflowId(wfId);
+			} catch (Exception e) {
+				logger.error(e);
+				facesError(e.getMessage());
 			}
-			workOrderAggVw = workflowService.getByWorkflowId(wfId);
-			
-			stakingSheet = workflowService.getStakingShetByWoId(woId);
-			
-			if(stakingSheet == null) {
-				facesError("No Stakingsheet available for selected Work Order.");
+
+			stakingSheet = workflowService.getStakingSheetByWoId(woId);
+
+			if (stakingSheet == null) {
+
+				facesError("No Assembly Units available for selected Work Order.");
 				return null;
 			}
-			
+
 			woName = stakingSheet.getWorkOrderDescription();
+
+			/*Remove from here to the next comment section*/
+			/*try {
+				stakingSheetDetail = workflowService.getStakingSheetDetailById(woId);
+			} catch (Exception e) {
+				logger.error(e);
+				facesError(e.getMessage());
+			}
+
+			if (!CollectionUtils.isEmpty(stakingSheetDetail)) {
+
+				source = ((StakingSheetDetail) stakingSheetDetail.stream()
+						.filter(s -> (s.getAssemblyQuantity() != 0)).findFirst().get()).getStakingSource();
+
+				asBuiltStakingSheetDetail = stakingSheetDetail;
+
+				Collections.sort(asBuiltStakingSheetDetail, new Comparator<StakingSheetDetail>() {
+					public int compare(StakingSheetDetail o1, StakingSheetDetail o2) {
+						return o1.getAssemblyGuid().compareToIgnoreCase(o2.getAssemblyGuid());
+					}
+				});
+
+				findDistinctStation(asBuiltStakingSheetDetail);
+			}*/
+			/*To here */
 			
-			stakingSheetDetail = workflowService.getStakingSheetDetailById(woId);
+			asBuiltStakingSheetDetailGui = new ArrayList<StakingSheetDetailGui>();
 			
-			asBuiltStakingSheetDetail = stakingSheetDetail;
+			asBuiltStakingSheetDetailGui = findStakingDetail(woId);
 			
-			workFlowTasks = workflowService.getWorkFlowTaskById(wfId, woId);
+			if(!asBuiltStakingSheetDetailGui.isEmpty()) {
+				
+				findDistinctStationGui(asBuiltStakingSheetDetailGui);
+				
+				try {
+					asBuiltSummaryVw = workflowService.getStakingSheetByGrpSummary(woId);
+				} catch (Exception e) {
+					logger.error(e);
+					facesError(e.getMessage());
+				}
+
+				findAsBuiltStatus();
+
+				setAsBuiltDisable(true);
+				showAsBuiltStatus = true;
+				editAsBuilt = true;
+				renderAsBuiltChkBox = false;
+				renderAddStationUnit = false;
+				
+			}else {
+				facesError("No Assembly Units available for selected Work Order.");
+			}
+			logger.debug("SSDetail Rows: " + asBuiltStakingSheetDetailGui.size());
 			
-			asBuiltSummaryVw = workflowService.getStakingSheetByGrpSummary(woId);
-			
-			workflow = workflowService.getWorkflow(wfId);
-			
-			findInspetions();
-			findAsBuiltStatus();
-			sortWFTaskSeq(workFlowTasks);	
-			findInvoices();
-			findDistinctStation();
-			findVouchers();
-			
-			setAsBuiltDisable(true);
-			showAsBuiltStatus = true;
-			colSpan = 23;
-			editAsBuilt = true;
-			renderAsBuiltChkBox = false;
-			renderAddStationUnit = false;
-			//multiViewState = true;
-			
-			//sortStations(asBuiltStakingSheetDetail);
-			
-			PrimeFaces.current().clearTableStates();
-		} 
-		catch (ValidationException | NoResultException | ProcessException e) {
-			logger.error(e);
-			facesError(e.getMessage());
-		} 
+		}
 
 		return STAKING;
 	}
-
-	public List<String> findDistinctStation() {
-
-		distinctStation = new ArrayList<String>();
+	
+	public List<StakingSheetDetailGui> findStakingDetail(String woId) {
+		filteredStakingSheetDetail = new ArrayList<StakingSheetDetailGui>();
+		logger.debug("findStakingDetail workorderid: " + woId);
 		
-		if (getStakingSheetDetail() != null) {
-			for (StakingSheetDetail det : getStakingSheetDetail()) {
+		List<StakingSheetDetailGui> guiList = new ArrayList<StakingSheetDetailGui>();
+		guiList = workflowService.getStakingSheetDetailGuiByWOId(woId);
+		
+		//logger.debug("findStakingDetail workorderid from asBuiltStakingSheetDetailGui: " + guiList.get(0).getWorkOrderId());
+		
+		
+		Comparator<StakingSheetDetailGui> compareSsd = Comparator.comparing(StakingSheetDetailGui::getStationDescription)
+																.thenComparing(StakingSheetDetailGui::getAssemblyGuid)
+																.thenComparing(StakingSheetDetailGui::getStakingSheetDetailId);
+		
+		guiList = guiList.stream().sorted(compareSsd).collect(Collectors.toList());
+		
+		/*if(!asBuiltStakingSheetDetailGui.isEmpty()) {
+			
+			//asBuiltStakingSheetDetailGui
+			
+			Collections.sort(asBuiltStakingSheetDetailGui, new Comparator<StakingSheetDetailGui>() {
+				@Override
+				public int compare(StakingSheetDetailGui o1, StakingSheetDetailGui o2) {
+					return o1.getAssemblyGuid().compareToIgnoreCase(o2.getAssemblyGuid());
+				}
+			});
+			
+		}*/
+		
+		return guiList;
+	}
+
+	public String exitAsBuiltEditMode() {
+		WorkFlow workflow = workflowService.getWorkFlowByWorkOrderId(woId);
+
+		if (workflow != null) {
+			if (asBuiltStakingSheetDetailGui.stream().allMatch(s -> s.getAsBuiltStatus().equals("Not Started"))) {
+				workflow.setOverallAsBuiltStatusId(1);
+			} else if (asBuiltStakingSheetDetailGui.stream().allMatch(s -> !(!s.getAsBuiltStatus().equals("Completed") && !s.getAsBuiltStatus().equals("Appealed")))) {
+				workflow.setOverallAsBuiltStatusId(3);
+				workflow.setOverallInspectionStatusId(2);
+			} else {
+				workflow.setOverallAsBuiltStatusId(2);
+			}
+
+			workflowService.updateWorkflowTask(workflow);
+
+			int wfTaskId = 0;
+			try {
+				wfTaskId = workflowService.updateOverallAsbuiltStatusId(woId);
+			} catch (Exception e) {
+				logger.error(e);
+				facesError(e.getMessage());
+			}
+
+			if (wfTaskId != 0 || wfTaskId != 1) {
+				try {
+					workflowService.updateWorkflowTask(Integer.valueOf(wfTaskId), "COMP");
+				} catch (Exception e) {
+					logger.error(e);
+					facesError(e.getMessage());
+				}
+			}
+		}
+		return findStakingDetailByWoId();
+	}
+	
+	
+	public void onStakingDetailCellEdit(StakingSheetDetailGui gui) {
+
+		boolean update = false;
+		StakingSheetDetail ssd = workflowService.getStakingSheetDetailBySSDId(gui.getStakingSheetDetailId());
+		logger.debug("gui stake WorkOrderId: " + gui.getWorkOrderId() + " AsBuiltStatusId: " + gui.getAsBuiltStatusId());
+		if(ssd != null) {
+			logger.debug("ssd is not null: " + ssd.getStakingSheetDetailId() + " AsBuiltStatusId From DB: " + ssd.getAsBuiltStatusId());
+			if(ssd.getAsBuiltQuantity() != gui.getAsBuiltQuantity()) {
+				ssd.setAsBuiltQuantity(gui.getAsBuiltQuantity());
+				update = true;
+			}
+			
+			if(gui.getAsBuiltStatusId() == 1) {//Not Started
+				ssd.setAsBuiltDt(null);
+				ssd.setAsBuiltBy(null);
+				//ssd.setAsBuiltQuantity(gui.getAsBuiltQuantity());
+				ssd.setAsBuiltStatusId(gui.getAsBuiltStatusId());
+				ssd.setAsBuiltComments(gui.getAsBuiltComments());
+				ssd.setCurrentInspectionDetailStatusId(Integer.valueOf(1));//Not Inspected
+				update = true;
+			}else if(gui.getAsBuiltStatusId() == 3) {//Completed
+				//if(ssd.getAsBuiltDt() == null) {
+					ssd.setAsBuiltDt(util.currentDtTm());
+					ssd.setAsBuiltBy(util.getCurrentUser());
+				//}
+				
+				ssd.setAsBuiltStatusId(gui.getAsBuiltStatusId());
+				ssd.setAsBuiltComments(gui.getAsBuiltComments());
+				ssd.setCurrentInspectionDetailStatusId(Integer.valueOf(2));//Ready for Inspection
+				update = true;
+			}else if(gui.getAsBuiltStatusId() == 4) {//Rejected
+				ssd.setAsBuiltStatusId(gui.getAsBuiltStatusId());
+				ssd.setAsBuiltComments(gui.getAsBuiltComments());
+				
+				update = true;
+			}else if(gui.getAsBuiltStatusId() == 6 && StringUtils.isBlank(gui.getAsBuiltComments())) {
+				facesError("As-Built comment required if status is 'Appealed'.");	
+				PrimeFaces.current().executeScript("PF('STAKINGSHEET_DETAIL_TABLE:asBuiltComments:asBuiltCommentEditId').click();");
+				ssd.setAsBuiltStatusId(gui.getAsBuiltStatusId());
+				update = true;
+			}else if(gui.getAsBuiltStatusId() == 6 && !StringUtils.isBlank(gui.getAsBuiltComments())) {
+				ssd.setAsBuiltStatusId(gui.getAsBuiltStatusId());
+				ssd.setAsBuiltComments(gui.getAsBuiltComments());
+				update = true;
+			}
+			
+			logger.debug("Update flag set too: " + update);
+
+			if(update) {
+				try {
+					workflowService.updateStakingSheetDetail(ssd);
+					logger.debug("AsBuiltStatusId that should be saved to BD: " + ssd.getAsBuiltStatusId());
+					workflowService.updateAsBuiltAmount(ssd.getStakingSheetDetailId(), workEventDt);
+				} catch (Exception e) {
+					logger.error(e);
+					facesError("Sorry the record was not saved.");
+				}
+				logger.debug("asBuiltStakingSheetDetailGui before status cell edit: " + asBuiltStakingSheetDetailGui.size() + " WOrdOrderID: " + woId);
+				asBuiltStakingSheetDetailGui = new ArrayList<StakingSheetDetailGui>();
+				filteredStakingSheetDetail = new ArrayList<StakingSheetDetailGui>();
+				//asBuiltStakingSheetDetailGui = findStakingDetail(gui.getWorkOrderId());
+				
+				asBuiltStakingSheetDetailGui = findStakingDetail(woId);
+				
+				logger.debug("asBuiltStakingSheetDetailGui after status cell edit: " + asBuiltStakingSheetDetailGui.size());
+				asBuiltStakingSheetDetailGui = asBuiltStakingSheetDetailGui.stream().filter(item -> !(item.getAsBuiltStatus() != null && item.getCurrentInspectionDetailStatus().equals(APPROVED))).collect(Collectors.toList());
+				logger.debug("asBuiltStakingSheetDetailGui after filter: " + asBuiltStakingSheetDetailGui.size());
+			}
+			
+		}else {
+			facesError("Assembly Unit not found");
+		}
+		
+		
+
+		/*PrimeFaces.current().ajax().update("STAKINGSHEET_DETAIL_TABLE:asBuiltStatusId");
+		PrimeFaces.current().ajax().update("STAKINGSHEET_DETAIL_TABLE:asBuiltComments");
+		PrimeFaces.current().ajax().update("STAKINGSHEET_DETAIL_TABLE:asBuiltQuantity");
+		PrimeFaces.current().ajax().update("STAKINGSHEET_DETAIL_TABLE:currentInspectionDetailStatusId");*/
+		
+		PrimeFaces.current().focus("stakingTabForm:STAKINGSHEET_DETAIL_TABLE:15:asBuiltCommentEditId");
+		//PrimeFaces.current().ajax().update("stakingTabForm:STAKINGSHEET_DETAIL_TABLE");
+	}
+
+	public List<BigDecimal> findDistinctStationGui(List<StakingSheetDetailGui> ssd) {
+		distinctStation = new ArrayList<BigDecimal>();
+
+		if (ssd != null) {
+			for (StakingSheetDetailGui det : ssd) {
 				distinctStation.add(det.getStationDescription());
 			}
 			distinctStation = distinctStation.stream().distinct().collect(Collectors.toList());
-			Collections.sort(distinctStation, String.CASE_INSENSITIVE_ORDER);
+			Collections.sort(distinctStation);
+		}
+		return distinctStation;
+	}
+	
+	//TEMP can remove laster.
+	public List<BigDecimal> findDistinctStation(List<StakingSheetDetail> ssd) {
+		distinctStation = new ArrayList<BigDecimal>();
+
+		if (ssd != null) {
+			for (StakingSheetDetail det : ssd) {
+				distinctStation.add(det.getStationDescription());
+			}
+			distinctStation = distinctStation.stream().distinct().collect(Collectors.toList());
+			Collections.sort(distinctStation);
 		}
 		return distinctStation;
 	}
 
-	public void findInspetions() {
-		
+	public boolean filterStationFunction(Object value, Object filter, Locale locale) {
+		if (value == null || !(value instanceof BigDecimal)) {
+			return true;
+		}
+
+		BigDecimal valueInRow = (BigDecimal) value;
+
+		if (selectedItems == null || selectedItems.size() == 0) {
+			return true;
+		}
+
+		for (int i = 0; i < selectedItems.size(); i++) {
+			if (valueInRow.compareTo(new BigDecimal(String.valueOf(selectedItems.get(i)))) == 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public void findInspections() {
 		inspPassed = 0;
 		unitsRejected = 0;
 		notInspected = 0;
 
-		setTotalUnits(stakingSheetDetail.size());
-		for (StakingSheetDetail detail : stakingSheetDetail) {
-			if (detail.getInspectionStatus() != null) {
-				if (detail.getInspectionStatus().getStatus().equals("Approved")) {
+		if (woId != null) {
+			inspectionService.removeNullInspections(woId);
+		}
+
+		setTotalUnits(asBuiltStakingSheetDetailGui.size());
+		for (StakingSheetDetailGui detail : asBuiltStakingSheetDetailGui) {
+			if (detail.getCurrentInspectionDetailStatus() != null) {
+				if (detail.getCurrentInspectionDetailStatus().equals(APPROVED)) {
 					inspPassed++;
 				}
-				if (detail.getInspectionStatus().getStatus().equals("Rejected")) {
+				if (detail.getCurrentInspectionDetailStatus().equals("Rejected")) {
 					unitsRejected++;
 				}
 			}
-			if (detail.getInspectionStatus().getStatus().equals("Ready for Inspection") || detail.getInspectionStatus().getStatus().equals("Not Inspected")) {
+			if (detail.getCurrentInspectionDetailStatus().equals("Ready for Inspection")
+					|| detail.getCurrentInspectionDetailStatus().equals("Not Inspected")) {
 				notInspected++;
 			}
 		}
 		try {
 			inspections = inspectionService.getInspectionByWoId(woId);
-			if (inspections.size() > 0) {
-				// inspectionDetStatus = inspections.get(0).getInspectionStatus().getStatus();
-			}
-		} catch (ValidationException | NoResultException | ProcessException e) {
+			//inspections.size();
+
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 	}
-	
+
 	public void findAsBuiltStatus() {
 		asBuiltStatuses = workflowService.getAsBuiltStatus();
-		
-		addStationUnitAsBuiltStatuses = asBuiltStatuses.stream().filter(item -> item.getDescription().equals("Completed") || item.getDescription().equals("Not Started")).collect(Collectors.toList());
-		
-		asBuiltStatuses = asBuiltStatuses.stream().filter(item -> item.getDescription().equals("Completed") || item.getDescription().equals("Rejected") || item.getDescription().equals("Appealed") || item.getDescription().equals("Not Started")).collect(Collectors.toList());
-		
+
+		addStationUnitAsBuiltStatuses = asBuiltStatuses.stream().filter(
+				item -> !(!item.getDescription().equals("Completed") && !item.getDescription().equals("Not Started")))
+				.collect(Collectors.toList());
+
+		asBuiltStatuses = asBuiltStatuses.stream()
+				.filter(item -> !(!item.getDescription().equals("Completed")
+						&& !item.getDescription().equals("Rejected") && !item.getDescription().equals("Appealed")
+						&& !item.getDescription().equals("Not Started")))
+				.collect(Collectors.toList());
+
 		asBuiltStatuses = asBuiltStatuses.stream().sorted(Comparator.comparing(AsBuiltStatus::getDescription)).collect(Collectors.toList());
 	}
-	
+
+	public List<AsBuiltStatus> findFilteredAsBuiltStatuses(int asBuiltStatusId) {
+		List<AsBuiltStatus> abs = workflowService.getAsBuiltStatus();
+		
+		//logger.info("AsBuiltStatusId" + asBuiltStatusId);
+
+		if (asBuiltStatusId == 1)
+			asBuiltStatuses = abs.stream().filter(s -> !(!s.getDescription().equals("Completed") && !s.getDescription().equals("Not Started"))).collect(Collectors.toList());
+		if (asBuiltStatusId == 3)
+			asBuiltStatuses = abs.stream().filter(s -> !(!s.getDescription().equals("Completed") && !s.getDescription().equals("Not Started") && !s.getDescription().equals("Rejected"))).collect(Collectors.toList());
+		if (asBuiltStatusId == 4)
+			asBuiltStatuses = abs.stream().filter(s -> !(!s.getDescription().equals("Completed") && !s.getDescription().equals("Appealed") && !s.getDescription().equals("Rejected"))).collect(Collectors.toList());
+		if (asBuiltStatusId == 6) {
+			asBuiltStatuses = abs.stream().filter(s -> !(!s.getDescription().equals("Appealed") && !s.getDescription().equals("Rejected"))).collect(Collectors.toList());
+		}
+		return asBuiltStatuses;
+	}
+
 	public void findInvoices() {
 		try {
 			invoices = workflowService.getInvoiceByWoId(woId);
-		} catch (ValidationException | NoResultException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
-	}
 	
+	}
+
 	public int getInspectorId() {
-		
-		User user;
 		StringBuilder sb = new StringBuilder();
 		try {
-			user = userManagementService.finUserByPrincipal(getCurrentUser());
-			
+			UserTbl user = userManagementService.findUserByPrincipal(getCurrentUser());
+
 			sb.append(user.getFirstName());
-			sb.append(Constants.SPACE_SEPARATOR);
+			sb.append(" ");
 			sb.append(user.getLastName());
-			
-		} catch (ValidationException | ProcessException | NoResultException e1) {
-			logger.error(e1);
-			facesError(e1.getMessage());
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
 		}
-		
+
 		int inspectorId = 0;
-		
+
 		try {
 			inspectorId = inspectionService.getResourceId(sb.toString());
-			if(inspectorId == 0) {
-				logger.warn("NoResultException: "+util.getCurrentUser()+" does not exist in the Resource Table.");
+			if (inspectorId == 0) {
+				logger.warn(
+						"NoResultException: " + util.getCurrentUser() + " does not exist in the Resource Table.");
 				facesError("User does not exist in Resource Table.");
 				return inspectorId;
 			}
-		} catch (ValidationException | NoResultException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 		return inspectorId;
 	}
+	
+	public String newInspection() {
+		continueInspection = false;
 
-	public String findInspectionDetails() throws ProcessException, ValidationException, NoResultException {
+		Inspection inspection = new Inspection();
 
-		showSubmitInspectionBtn = false;
+		inspection.setInspectionDt(currentDtTm());
+		inspection.setInspectedBy(getInspectorId());
+		inspection.setInspectionStatusId(1);
+		inspection.setWorkOrderId(woId);
+		inspection.setWorkFlowId(wfId);
+		inspection.setServiceOrderId(soId);
+		inspection.setInspectionType(STAKING_INVOICE);
 
-		inspStakingSheetDetail = stakingSheetDetail.stream().filter(item -> item.getCurrentInspectionDetailStatusId() == 2).collect(Collectors.toList());
-		
-		newInspVouchers = vouchers.stream().filter(item -> item.getInspectionStatusId() == 2).collect(Collectors.toList());
-
-		if (inspStakingSheetDetail.size() <= 0 && newInspVouchers.size() <= 0) {
-			facesError("No Assembly Unit or Vouchers available for inspection!");
-			return null;
-		} else {
-			newInspStatuses = inspStatuses.stream().filter(item -> item.getStatus().equals("Rejected")
-							|| item.getStatus().equals("Ready for Inspection") || item.getStatus().equals("Approved")).collect(Collectors.toList());
-			inspHist = false;
-			newInsp = true;
-			//renderBackToInspTab = true;
+		try {
+			inspectionId = inspectionService.insertInspection(inspection);
+			logger.debug("New Inspection method called - InspectionId: " + inspectionId);
+			inspection = inspectionService.getInspectionStatusId(inspectionId);
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
 		}
 
-		return INSPECTION_DETAIL;
+		inspectionDt = inspection.getInspectionDt();
+		inspectedBy = inspection.getResource().getResourceName();
+		inspectionDetStatus = inspection.getInspectionStatus().getStatus();
+		
+		inspectionFilter = false;
+	    inspectionVoucherFilter = false;
+
+		return findInspectionDetails();
+	}
+
+	public String continueInProgressInspection() {
+		continueInspection = true;
+
+		try {
+			inspection = inspectionService.getInspectionStatusId(inspectionId);
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+
+		inspectionDt = inspection.getInspectionDt();
+		inspectedBy = inspection.getResource().getResourceName();
+		inspectionDetStatus = inspection.getInspectionStatus().getStatus();
+		
+		inspectionFilter = false;
+	    inspectionVoucherFilter = false;
+
+		return findInspectionDetails();
+	}
+	
+	public String findInspectionDetails() {
+	    
+		showSubmitInspectionBtn = false;
+		
+		try {
+			inspStakingSheetDetail = findStakingDetail(woId);
+		
+			if(!inspectionFilter) {
+				List<InspectionDetailVw> idList = inspectionService.getInspectionDetailByInspId(inspectionId);
+				
+				inspStakingSheetDetail = inspStakingSheetDetail.stream()
+				        .filter(item -> ((item.getAsBuiltStatus().equals("Completed") || 
+				          item.getAsBuiltStatus().equals("Appealed")) && (
+				          item.getCurrentInspectionDetailStatus().equals("Ready for Inspection") || 
+				          item.getCurrentInspectionDetailStatus().equals("Rejected"))))
+				        .collect(Collectors.toList());
+				
+				idList.stream().forEach(i -> {
+					
+					StakingSheetDetailGui ssdg = workflowService.getStakingSheetDetailGuiBySSDId(i.getStakingSheetDetailId());
+					
+					if(!inspStakingSheetDetail.stream().anyMatch(in -> in.getStakingSheetDetailId().equals(ssdg.getStakingSheetDetailId()))) {
+						inspStakingSheetDetail.add(ssdg);
+					}
+					
+				});
+				
+				Comparator<StakingSheetDetailGui> compareSsd = Comparator.comparing(StakingSheetDetailGui::getStationDescription)
+						.thenComparing(StakingSheetDetailGui::getAssemblyGuid).thenComparing(StakingSheetDetailGui::getStakingSheetDetailId);
+				
+				inspStakingSheetDetail = inspStakingSheetDetail.stream().sorted(compareSsd).collect(Collectors.toList());
+			}
+			
+			inspectionDetailVoucherFilter();
+			
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			facesError("Sorry we could not find the inspection details.");
+			
+		}
+		    
+	    if (inspStakingSheetDetail.size() <= 0 && newInspVouchers.size() <= 0) {
+	      facesError("No Assembly Unit or Vouchers available for inspection!");
+	      return null;
+	    } 
+	
+	    newInspStatuses = inspStatuses.stream().filter(item -> !(!item.getStatus().equals("Rejected") && 
+	        !item.getStatus().equals("Ready for Inspection") && !item.getStatus().equals(APPROVED))).collect(Collectors.toList());
+	    inspHist = false;
+	    newInsp = true;
+	    /*inspectionFilter = false;
+	    inspectionVoucherFilter = false;*/
+	
+	    
+	    findDistinctStationGui(inspStakingSheetDetail);
+		
+	    return INSPECTION_DETAIL;
+	}
+
+	public String submitInspection() {
+		boolean testValue1 = newInspVouchers.stream().anyMatch(
+				v -> (v.getInspectionStatusId().intValue() == 5 && StringUtils.isBlank(v.getInspectionComment())));
+		boolean testValue2 = inspStakingSheetDetail.stream()
+				.anyMatch(i -> (i.getCurrentInspectionDetailStatusId().intValue() == 5
+						&& StringUtils.isBlank(i.getCurrentInspectorDetailComments())));
+
+		boolean testValue3 = !(!newInspVouchers.stream().anyMatch(v -> (v.getInspectionStatusId().intValue() == 5))
+				&& !inspStakingSheetDetail.stream()
+						.anyMatch(i -> (i.getCurrentInspectionDetailStatusId().intValue() == 5)));
+
+		logger.debug("Voucher noneMatch: " + testValue1);
+		logger.debug("AU noneMatch: " + testValue2);
+		logger.debug("AnyMatch: " + testValue3);
+
+		if (testValue3) {
+			if (testValue1) {
+
+				facesError("Inspection comment required for Rejected Voucher.");
+				return null;
+			}
+			if (testValue2) {
+
+				facesError("Inspection comment required for Rejected Assembly Units.");
+				return null;
+			}
+
+			inspectionService.updateInspection(inspectionId, Integer.valueOf(5));
+			updateOverallInspectionStatus();
+		} else {
+
+			inspectionService.updateInspection(inspectionId, Integer.valueOf(4));
+			updateOverallInspectionStatus();
+		}
+
+		findInspections();
+
+		return findStakingDetailByWoId();
+	}
+
+	public void updateOverallInspectionStatus() {
+		List<VoucherGui> vch = null;
+		List<StakingSheetDetail> ssd = null;
+
+		try {
+			vch = workflowService.getVouchers(woId);
+			ssd = workflowService.getStakingSheetDetailById(woId);
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+
+		boolean conditionFlg1 = vch.stream().allMatch(v -> v.getInspectionStatus().equals(APPROVED));
+		boolean conditionFlg2 = ssd.stream().allMatch(s -> s.getInspectionStatus().getStatus().equals(APPROVED));
+
+		boolean conditionFlg3 = vch.stream().allMatch(v -> v.getInspectionStatus().equals("Not Inspected"));
+		boolean conditionFlg4 = ssd.stream().allMatch(s -> s.getInspectionStatus().getStatus().equals("Not Inspected"));
+
+		boolean conditionFlg5 = vch.stream()
+				.allMatch(v -> !(!v.getInspectionStatus().equals("Ready for Inspection")
+						&& v.getInspectionStatus().equals("Not Inspected")));
+		boolean conditionFlg6 = ssd.stream()
+				.allMatch(s -> !(!s.getInspectionStatus().getStatus().equals("Ready for Inspection")
+						&& s.getInspectionStatus().getStatus().equals("Not Inspected")));
+
+		if (conditionFlg1 && conditionFlg2) {
+			logger.debug("Update Overall Status: 4");
+			workflowService.updateOverallInspectionStatus(woId, 4);
+		} else if (conditionFlg3 && conditionFlg4) {
+			logger.debug("Update Overall Status: 1");
+			workflowService.updateOverallInspectionStatus(woId, 1);
+		} else if (conditionFlg5 && conditionFlg6) {
+			logger.debug("Update Overall Status: 2");
+			workflowService.updateOverallInspectionStatus(woId, 2);
+		} else {
+			logger.debug("Update Overall Status: 3");
+			workflowService.updateOverallInspectionStatus(woId, 3);
+		}
+	}
+
+	public String cancelInspection() {
+		if (cancelInspOnBack) {
+
+			List<InspectionDetailVw> inspDetails = null;
+			try {
+				inspDetails = inspectionService.getInspectionDetailByInspId(inspectionId);
+			} catch (Exception e) {
+				logger.error(e);
+				facesError(e.getMessage());
+			}
+			for (InspectionDetailVw i : inspDetails) {
+
+				workflowService.updateStakingSheetDetailStatusCancel(i.getStakingSheetDetailId(), 2);
+			}
+
+			inspectionService.removeInspectionDetail(inspectionId);
+			findInspections();
+
+			List<VoucherGui> inspVoucher = null;
+			try {
+				inspVoucher = workflowService.getVoucherByInspectionId(inspectionId);
+			} catch (Exception e1) {
+				logger.error(e1);
+				facesError(e1.getMessage());
+			}
+			inspVoucher.stream().forEach(v -> {
+				
+				Voucher vchr = workflowService.getVoucherById(v.getVoucherId());
+				
+				vchr.setInspectionStatusId(Integer.valueOf(2));
+				vchr.setInspectionComment(null);
+				vchr.setInspectionId(Integer.valueOf(0));
+
+				try {
+					workflowService.updateVoucher(vchr);
+				} catch (Exception e) {
+					logger.error(e);
+					facesError(e.getMessage());
+				}
+			});
+
+			findVouchers();
+			inspectionService.removeInspection(inspectionId);
+			findInspections();
+		}
+		return STAKING;
+	}
+
+	public String backInspectionList() {
+		findInspections();
+
+		return STAKING;
 	}
 
 	public String findInspectionById() {
-
 		showSubmitInspectionBtn = true;
 
 		try {
 			inspectionDetailVw = inspectionService.getInspectionDetailByInspId(inspectionId);
 
 			inspection = inspectionService.getInspectionStatusId(inspectionId);
-			
+
 			inspectedVouchers = workflowService.getVoucherByInspectionId(inspectionId);
 
 			inspectionDetStatus = inspection.getInspectionStatus().getStatus();
@@ -449,12 +916,11 @@ public class WorkflowController implements Serializable {
 			woId = inspection.getWorkOrderId();
 			woName = inspection.getWorkFlow().getWorkOrderName();
 			inspectedBy = inspection.getResource().getResourceName();
-
-		} catch (ValidationException | NoResultException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
-		
+
 		inspHist = true;
 		newInsp = false;
 
@@ -462,48 +928,54 @@ public class WorkflowController implements Serializable {
 	}
 
 	public String findSoDetailBySoId() {
-		
 		return WOSEARCH;
 	}
-	
+
 	public String createInvoice() {
-		
-		invoiceVouchers = vouchers.stream().filter(item -> item.getInspectionStatusId() == 4 && (item.getInvoiceStatusId() == 1 || item.getInvoiceStatusId() == 3)).collect(Collectors.toList());
-		
+		findVouchers();
+
+		invoiceVouchers = vouchers.stream()
+				.filter(item -> (item.getInspectionStatusId().intValue() == 4
+						&& (item.getInvoiceStatusId().intValue() == 1 || item.getInvoiceStatusId().intValue() == 3)))
+				.collect(Collectors.toList());
+
 		try {
 			invoiceStakingSheetDetail = workflowService.getStakingSheetAvailForInv(APPROVED, woId);
-			if(invoiceStakingSheetDetail.size() <= 0 && invoiceVouchers.size() <= 0) {
+			if (invoiceStakingSheetDetail.size() <= 0 && invoiceVouchers.size() <= 0) {
 				facesError("No assembly available for invoice.");
 				return null;
 			}
-		} catch (ValidationException | NoResultException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
+
+		vendorRefNo = "";
+
 		return NEW_INVOICE;
 	}
-	
-	public String submitInvoice() throws ProcessException, NoResultException {
 
-		if ((selectedStakingSheetDetails.size() <= 0) && (selectedInvoiceVouchers.size() <= 0)) {
-			facesError("At least one assembly must be selected for Staking and/or Voucher for invoice.");
+	public String submitInvoice() {
+		if (selectedStakingSheetDetails.size() <= 0 && selectedInvoiceVouchers.size() <= 0) {
+			facesError("At least one Assembly or Voucher is required to submit an invoice.");
 			return null;
 		}
-		
-		final String guid = util.genGUID();
-		
+		String guid = util.genGUID();
+		int stakingSheetId = 0;
+
 		if (selectedInvoiceVouchers.size() > 0) {
-			for (Voucher voucher : selectedInvoiceVouchers) {
-				voucher.setInvoiceStatusId(2);
-				voucher.setSubmitGuid(guid);
+			for (VoucherGui voucher : selectedInvoiceVouchers) {
+				Voucher v = workflowService.getVoucherById(voucher.getVoucherId());
+				v.setSubmitGuid(guid);
 				try {
-					workflowService.updateVoucher(voucher);
-				} catch (ValidationException e) {
+					workflowService.updateVoucher(v);
+				} catch (Exception e) {
 					facesError(e.getMessage());
 					logger.error(e.getMessage());
-					throw new ProcessException(e.getMessage());
+					//throw new ProcessException(e.getMessage());
 				}
 			}
+			stakingSheetId = ((VoucherGui) selectedInvoiceVouchers.get(0)).getStakingSheetId().intValue();
 		}
 
 		if (selectedStakingSheetDetails.size() > 0) {
@@ -511,568 +983,862 @@ public class WorkflowController implements Serializable {
 				detail.setInvoiceSubmitGuid(guid);
 				try {
 					workflowService.updateStakingSheetDetail(detail);
-				} catch (ValidationException e) {
+				} catch (Exception e) {
 					facesError(e.getMessage());
 					logger.error(e.getMessage());
 				}
 			}
-			String stakingSheetId = selectedStakingSheetDetails.get(0).getStakingSheetId();
-
-			try {
-				invoiceId = invoiceService.updateSubmitInvoice(guid, getCurrentUser(), vendorRefNo, STAKING_INVOICE);
-
-				wfOutput = invoiceService.updateWorkflowCalc(Integer.valueOf(stakingSheetId), util.currentDtTm(),"INV");
-
-			} catch (Exception e) {
-				logger.error(e);
-				facesError(e.getMessage());
-			}
+			stakingSheetId = Integer
+					.valueOf(((StakingSheetDetail) selectedStakingSheetDetails.get(0)).getStakingSheetId())
+					.intValue();
 		}
-		return findInvoiceDetail(invoiceId);
-	}	
-	
-	public void auInvRowSelectCheckbox(SelectEvent event) {
 
+		Timestamp woEventDate = workflowService.getWorkFlowByStakingSheetId(stakingSheetId).getWorkEventDt();
+
+		try {
+			invoiceId = invoiceService.updateSubmitInvoice(guid, getCurrentUser(), vendorRefNo, STAKING_INVOICE,
+					workEventDt);
+
+			wfOutput = invoiceService.updateWorkflowCalc(Integer.valueOf(stakingSheetId), woEventDate, "INV");
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+
+		updateOverallInvoiceStatus();
+
+		findInvoices();
+		
+		updateServiceOrderInvoice(woId, invoiceId);
+
+		return findInvoiceDetail(Integer.valueOf(invoiceId));
+	}
+	
+	public void updateServiceOrderInvoice(String woId, int invoiceId) {
+		
+		ServiceOrder so = workflowService.getServiceOrderByWOId(woId);
+		Invoice inv = invoiceService.getInvoiceById(invoiceId);
+		
+		so.setInvoiceId(invoiceId);
+		so.setInvoiceStatusId(inv.getInvoiceStatusId());
+		
+		if(inv.getInvoiceStatusId() == 3 || inv.getInvoiceStatusId() == 4) {
+			so.setInvoiceApprovedDt(inv.getApprovedDt());
+			so.setInvoiceApprovedBy(inv.getApprovedBy());
+		}else {
+			so.setInvoiceApprovedDt(inv.getInvoicedDt());
+			so.setInvoiceApprovedBy(inv.getInvoicedBy());
+		}
+		
+		workflowService.updateServiceOrder(so);
+		
+	}
+
+	public void updateOverallInvoiceStatus() {
+		List<VoucherGui> vch = null;
+		List<StakingSheetDetail> ssd = null;
+
+		try {
+			vch = workflowService.getVouchers(woId);
+			ssd = workflowService.getStakingSheetDetailById(woId);
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+
+		boolean conditionFlg1 = vch.stream().allMatch(v -> !(!v.getInvoiceStatus().equals(APPROVED) && v.getInvoiceStatusId().intValue() < 6));
+		boolean conditionFlg2 = ssd.stream().allMatch(s -> !(!s.getInvoiceStatus().getDescription().equals(APPROVED) && s.getInvoiceStatusId().intValue() < 6));
+
+		boolean conditionFlg3 = vch.stream().allMatch(v -> v.getInvoiceStatus().equals("Not Invoiced"));
+		boolean conditionFlg4 = ssd.stream().allMatch(s -> s.getInvoiceStatus().getDescription().equals("Not Invoiced"));
+
+		boolean conditionFlg5 = vch.stream().allMatch(v -> v.getInvoiceStatus().equals("Submitted"));
+		boolean conditionFlg6 = ssd.stream().allMatch(s -> s.getInvoiceStatus().getDescription().equals("Submitted"));
+
+		if (conditionFlg1 && conditionFlg2) {
+
+			workflowService.updateOverallInvoiceStatus(woId, 4);
+		} else if (conditionFlg3 && conditionFlg4) {
+
+			workflowService.updateOverallInvoiceStatus(woId, 1);
+		} else if (conditionFlg5 && conditionFlg6) {
+
+			workflowService.updateOverallInvoiceStatus(woId, 2);
+		} else {
+
+			workflowService.updateOverallInvoiceStatus(woId, 5);
+		}
+	}
+
+	public String backInvoiceList() {
+		findInvoices();
+
+		return findStakingDetailByWoId();
+	}
+
+	public void auInvRowSelectCheckbox(SelectEvent event) {
 		BigDecimal sum = BigDecimal.ZERO;
 
 		if (selectedStakingSheetDetails.size() > 0) {
 			for (StakingSheetDetail detail : selectedStakingSheetDetails) {
 				try {
-					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid(),workEventDt);
-					if(auAmount != null) {
+					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(),
+							detail.getAssemblyActionCode(), detail.getAssemblyGuid(), workEventDt);
+					if (auAmount != null) {
 						auAmount = auAmount.multiply(new BigDecimal(detail.getAsBuiltQuantity()));
 					}
-				} catch (ProcessException e) {
+				} catch (Exception e) {
 					logger.error(e);
 					facesError(e.getMessage());
 				}
-				if(auAmount != null) {
+				if (auAmount != null) {
 					sum = sum.add(auAmount);
 				}
 			}
 		}
 		auSubTotal = sum;
 	}
-	
+
 	public void auInvRowUnSelectCheckbox(UnselectEvent event) {
-		
 		String actionCode = ((StakingSheetDetail) event.getObject()).getAssemblyActionCode();
 		String assemblyGuid = ((StakingSheetDetail) event.getObject()).getAssemblyGuid();
 		int asBuiltQty = ((StakingSheetDetail) event.getObject()).getAsBuiltQuantity();
 
 		try {
-			auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), actionCode, assemblyGuid, workEventDt);
-			if(auAmount != null) {
+			auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), actionCode, assemblyGuid,
+					workEventDt);
+			if (auAmount != null) {
 				auAmount = auAmount.multiply(new BigDecimal(asBuiltQty));
 			}
-		} catch (ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
-		if(auAmount != null) {
+		if (auAmount != null) {
 			auSubTotal = auSubTotal.subtract(auAmount);
 		}
 	}
-	
-	public void auInvAllRowSelectCheckbox(ToggleSelectEvent event) {
 
+	public void auInvAllRowSelectCheckbox(ToggleSelectEvent event) {
 		BigDecimal sum = BigDecimal.ZERO;
 
 		if (selectedStakingSheetDetails.size() > 0) {
 			for (StakingSheetDetail detail : selectedStakingSheetDetails) {
 				try {
-					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(), detail.getAssemblyActionCode(),detail.getAssemblyGuid(), workEventDt);
-					if(auAmount != null) {
+					auAmount = workflowService.getAssemblyAmount(util.getWrkGrp(),
+							detail.getAssemblyActionCode(), detail.getAssemblyGuid(), workEventDt);
+					if (auAmount != null) {
 						auAmount = auAmount.multiply(new BigDecimal(detail.getAsBuiltQuantity()));
 					}
-				} catch (ProcessException e) {
+				} catch (Exception e) {
 					logger.error(e);
 					facesError(e.getMessage());
 				}
-				if(auAmount != null) {
+				if (auAmount != null) {
 					sum = sum.add(auAmount);
 				}
 			}
 		}
 		auSubTotal = sum;
 	}
-	
+
 	public void voucherInvRowSelectCheckbox(SelectEvent event) {
-		
 		BigDecimal sum = BigDecimal.ZERO;
-		if(selectedInvoiceVouchers.size() > 0) {
-			for(Voucher voucher : selectedInvoiceVouchers) {
+		if (selectedInvoiceVouchers.size() > 0) {
+			for (VoucherGui voucher : selectedInvoiceVouchers) {
 				voucherAmount = voucher.getAmount();
-				
+
 				sum = sum.add(voucherAmount);
 			}
 			voucherSubTotal = sum;
 		}
 	}
-	
+
 	public void voucherInvRowUnSelectCheckbox(UnselectEvent event) {
-		
-		voucherAmount = ((Voucher)event.getObject()).getAmount();
-		
+		voucherAmount = ((VoucherGui) event.getObject()).getAmount();
+
 		voucherSubTotal = voucherSubTotal.subtract(voucherAmount);
 	}
-	
+
 	public void voucherInvAllRowSelectCheckbox(ToggleSelectEvent event) {
-		
 		BigDecimal sum = BigDecimal.ZERO;
-		
-		if(selectedInvoiceVouchers.size() > 0) {
-			for(Voucher voucher : selectedInvoiceVouchers) {
+
+		if (selectedInvoiceVouchers.size() > 0) {
+			for (VoucherGui voucher : selectedInvoiceVouchers) {
 				voucherSubTotal = voucher.getAmount();
-				
+
 				sum = sum.add(voucherSubTotal);
 			}
 			voucherSubTotal = sum;
 		}
 	}
-	
-	public String findInvoiceSummaryById() throws NoResultException {
+
+	public String findInvoiceSummaryById() {
 		try {
-			invoice = invoiceService.getInvoiceById(invoiceId);
+			invoice = invoiceService.getInvoiceById(Integer.valueOf(invoiceId));
 			showDetail = true;
-		} catch (ValidationException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 		return INVOICE_DETAIL;
 	}
-	
-	public String findInvoiceDetail(Integer invoiceId) throws NoResultException {
+
+	public String findInvoiceDetail(Integer invoiceId) {
 		getInvoiceDetails(invoiceId);
 		showDetail = true;
-		//renderBackToInvoiceTab = true;
 
 		return INVOICE_DETAIL;
 	}
 
 	public String findInvoiceApproval() {
+		logger.debug("findInvoiceApproval method call started...");
 		invoiceStatus = invoiceService.getAllInvStatus();
+
+		invoiceStatus = invoiceStatus
+				.stream().filter(item -> !(item.getInvoiceStatusId().intValue() != 2
+						&& item.getInvoiceStatusId().intValue() != 3 && item.getInvoiceStatusId().intValue() != 4))
+				.collect(Collectors.toList());
+
+		getInvoiceDetails(Integer.valueOf(invoiceId));
+
+		logger.debug("	invoiceApprovalVouchers " + invoiceApprovalVouchers.size());
 		
-		invoiceStatus = invoiceStatus.stream().filter(item -> item.getInvoiceStatusId() == 2 || item.getInvoiceStatusId() == 3 || item.getInvoiceStatusId() == 4).collect(Collectors.toList());		
+		voucherSubmitInvoiceApproval = invoiceApprovalVouchers.stream().filter(item -> (item.getInvoiceStatusId().intValue() == 2)).collect(Collectors.toList());
+		logger.debug("     Before voucher for loop");
 		
-		getInvoiceDetails(invoiceId);
+		logger.debug("	voucherSubmitInvoiceApproval " + voucherSubmitInvoiceApproval.size());
 		
-		voucherSubmitInvoiceApproval = invoiceApprovalVouchers.stream().filter(item -> item.getInvoiceStatusId() == 2).collect(Collectors.toList());
 		
-		for(Voucher voucher : invoiceApprovalVouchers) {
-			if(voucher.getInvoiceStatusId() == 3) {				
+		for (VoucherGui voucher : invoiceApprovalVouchers) {
+			logger.debug("Inside for loop ");
+			if (voucher.getInvoiceStatusId().intValue() == 3) {
 				disableApprovedBtn = true;
+				logger.debug("Inside for loop if rejected ");
 				return INVOICE_APPROVAL;
-			}else if (voucher.getInvoiceStatusId() != 3) {
+			}
+			if (voucher.getInvoiceStatusId().intValue() != 3) {
 				disableApprovedBtn = false;
+				logger.debug("Inside for loop if not rejected ");
 			}
 		}
+		logger.debug("     After voucher for loop");
 		for (StakingSheetDetail ss : invApprovalStakingSheetDet) {
-			if (ss.getInvoiceStatusId() != null && ss.getInvoiceStatusId() == 3) {
+			if (ss.getInvoiceStatusId() != null && ss.getInvoiceStatusId().intValue() == 3) {
 				disableApprovedBtn = true;
 				return INVOICE_APPROVAL;
-			} else if (ss.getInvoiceStatusId() != null && ss.getInvoiceStatusId() != 3) {
+			}
+			if (ss.getInvoiceStatusId() != null && ss.getInvoiceStatusId().intValue() != 3) {
 				disableApprovedBtn = false;
 			}
 		}
+		logger.debug("findInvoiceApproval method call finished...");
 		return INVOICE_APPROVAL;
 	}
-	
-	public String updateApprovalBtn() {
-		for (StakingSheetDetail ss : invApprovalStakingSheetDet) {
-			if (ss.getInvoiceStatusId() == 3) {
-				disableApprovedBtn = true;
-				facesError("Comment required on rejected Invoice item.");
-				return INVOICE_APPROVAL;
-			} else if (ss.getInvoiceStatusId() != 3)  {
-				disableApprovedBtn = false;
-			}
-		}
-		for(Voucher voucher : invoiceApprovalVouchers) {
-			if(voucher.getInvoiceStatusId() == 3) {				
-				disableApprovedBtn = true;
-				return INVOICE_APPROVAL;
-			}else if (voucher.getInvoiceStatusId() != 3) {
-				disableApprovedBtn = false;
-			}
-		}
-		return INVOICE_APPROVAL;
-	}
-	
-	@SuppressWarnings("unused")
-	public String submitInvoiceApproval() throws NoResultException, ProcessException {
-		int output = 0;
-		try {
-			invoiceService.updateInvoiceApproval(invoiceId, 4, util.getCurrentUser(), util.currentDtTm());
-			output = invoiceService.updateInvoiceStatus(invoiceId, 4, STAKING_INVOICE, util.getCurrentUser(), util.currentDtTm(), invoiceComment);
-			facesInfo("Invoice Approved.");
-		} catch (ValidationException | ProcessException e) {
-			logger.error(e);
-			facesError(e.getMessage());
-		}
-		util.refreshInvoiceSearch();
-		
-		return INVOICE_SEARCH;
-	}
-	
-	@SuppressWarnings("unused")
-	public String submitInvoiceRejected() throws NoResultException, ProcessException {
-		int output = 0;
-		try {
-			output = invoiceService.updateInvoiceStatus(invoiceId, 3, STAKING_INVOICE, util.getCurrentUser(), util.currentDtTm(), invoiceComment);
-			facesInfo("Invoice Rejected.");
-		} catch (ValidationException e) {
-			logger.error(e);
-			facesError(e.getMessage());
-		}
-		util.refreshInvoiceSearch();
-		
-		return INVOICE_SEARCH;
-	}
-	
-	public String updateInvoiceApproval(StakingSheetDetail stakingSheetDetail) throws NoResultException {
-		try {
-			stakingSheetDetail.setInvoiceApprovedBy(util.getCurrentUser());
-			stakingSheetDetail.setInvoiceApprovedDt(util.currentDtTm());
 
-				disableApprovedBtn = false;
-				workflowService.updateStakingSheetDetail(stakingSheetDetail);
+	/*public void onInvApprovalCellEdit(CellEditEvent event) {
+		StakingSheetDetail ssd = (StakingSheetDetail) ((DataTable) event.getComponent()).getRowData();
 
-				getInvoiceDetails(invoiceId);
-				findInvoiceApproval();
-				
-				facesInfo("Record updated successfully.");	
-		} catch (ValidationException | ProcessException e) {
-			logger.error(e);
-			facesError(e.getMessage());
+		ssd.setInvoiceStatusId(ssd.getInvoiceStatus().getInvoiceStatusId());
+		ssd.setInvoiceApprovedBy(util.getCurrentUser());
+		ssd.setInvoiceApprovedDt(util.currentDtTm());
+
+		if (ssd.getInvoiceStatus().getDescription().equals("Rejected")
+				&& StringUtils.isBlank(ssd.getInvoiceApprovedComment())) {
+			facesError("Comment required on rejected Invoice item.");
 		}
-		return INVOICE_APPROVAL;
-	}
-	
-	public String updateVoucherInvoiceApproval(Voucher voucher) {
-
 		try {
-			voucher.setApprovedBy(util.getCurrentUser());
-			voucher.setApprovedDt(util.currentDtTm());
+			workflowService.updateStakingSheetDetail(ssd);
+		} catch (Exception e1) {
+			logger.error(e1);
+			facesError(e1.getMessage());
+		}
 
+		updateApprovalBtn();
+
+		PrimeFaces.current().ajax().update(new String[] { "INVOICE_APPROVAL_TABLE" });
+	}*/
+
+	public void updateApprovalBtn() {
+		if (invApprovalStakingSheetDet.stream()
+				.anyMatch(i -> i.getInvoiceStatus().getDescription().equals("Rejected"))
+				|| invoiceApprovalVouchers.stream()
+						.anyMatch(i -> i.getInvoiceStatus().equals("Rejected"))) {
+			disableApprovedBtn = true;
+			logger.debug("disable the button true");
+		} else if (invApprovalStakingSheetDet.stream()
+				.noneMatch(i -> i.getInvoiceStatus().getDescription().equals("Rejected"))
+				|| invoiceApprovalVouchers.stream()
+						.noneMatch(i -> i.getInvoiceStatus().equals("Rejected"))) {
 			disableApprovedBtn = false;
-			workflowService.updateVoucher(voucher);
+			logger.debug("disable the button false");
+		}
 
-			getInvoiceDetails(invoiceId);
-			findInvoiceApproval();
-			
-			facesInfo("Record updated successfully.");	
-			
-		} catch (ProcessException | ValidationException e) {
+		//PrimeFaces.current().ajax().update(":invApprovBtnFrm:approvalBtnId");
+	}
+
+	public String submitInvoiceApproval() {
+		try {
+			invoiceService.updateInvoiceApproval(Integer.valueOf(invoiceId), Integer.valueOf(4),
+					util.getCurrentUser(), util.currentDtTm());
+			invoiceService.updateInvoiceVoucherApproval(Integer.valueOf(invoiceId), Integer.valueOf(4),
+					util.getCurrentUser(), util.currentDtTm());
+
+			invoiceService.updateInvoiceStatus(Integer.valueOf(invoiceId), Integer.valueOf(4), STAKING_INVOICE,
+					util.getCurrentUser(), util.currentDtTm(), invoiceComment);
+			facesInfo("Invoice Approved.");
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 
+		//findInvoices();
+
+		updateOverallInvoiceStatus();
+
+		if (renderBackToInvoiceTab) {
+			findInvoices();
+			return findStakingDetailByWoId();
+		}
+		
+		InvoiceController controller = (InvoiceController)FacesContext.getCurrentInstance().getApplication().evaluateExpressionGet(FacesContext.getCurrentInstance(), "#{invController}", InvoiceController.class);
+		controller.findInvoices();
+		
+		updateServiceOrderInvoice(woId, invoiceId);
+		
+		return INVOICE_SEARCH;
+	}
+
+	public String submitInvoiceRejected() {
+		if (invoiceComment != null && !StringUtils.isBlank(invoiceComment)) {
+
+			try {
+
+				invoiceService.updateInvoiceStatus(Integer.valueOf(invoiceId), Integer.valueOf(3), STAKING_INVOICE,
+						util.getCurrentUser(), util.currentDtTm(), invoiceComment);
+				facesInfo("Invoice Rejected.");
+			} catch (Exception e) {
+				logger.error(e);
+				facesError(e.getMessage());
+			}
+
+			//findInvoices();
+			invoiceComment = "";
+			if (renderBackToInvoiceTab) {
+				findInvoices();
+				return findStakingDetailByWoId();
+			}
+			
+			InvoiceController controller = (InvoiceController)FacesContext.getCurrentInstance().getApplication().evaluateExpressionGet(FacesContext.getCurrentInstance(), "#{invController}", InvoiceController.class);
+			controller.findInvoices();
+			
+			updateServiceOrderInvoice(woId, invoiceId);
+			
+			return INVOICE_SEARCH;
+		}
+
+		facesError("Comment required on rejected Invoice.");
+
+		return null;
+	}
+
+	public String updateInvoiceApproval(StakingSheetDetail ssd) {
+		ssd.setInvoiceStatusId(ssd.getInvoiceStatus().getInvoiceStatusId());
+		ssd.setInvoiceApprovedBy(util.getCurrentUser());
+		ssd.setInvoiceApprovedDt(util.currentDtTm());
+
+		if (ssd.getInvoiceStatus().getDescription().equals("Rejected")
+				&& StringUtils.isBlank(ssd.getInvoiceApprovedComment())) {
+			facesError("Comment required on rejected Invoice item.");
+		}
+		try {
+			workflowService.updateStakingSheetDetail(ssd);
+		} catch (Exception e1) {
+			logger.error(e1);
+			facesError(e1.getMessage());
+		}
+
+		updateApprovalBtn();
+
 		return INVOICE_APPROVAL;
+	}
+
+	public void updateVoucherInvoiceApproval(VoucherGui voucher) {
+		logger.debug("Method called from client side - updateVoucherInvoiceApproval " + voucher.getAmount());
+		Voucher v = workflowService.getVoucherById(voucher.getVoucherId());
+		
+		try {
+			v.setApprovedBy(util.getCurrentUser());
+			v.setApprovedDt(util.currentDtTm());
+			v.setInvoiceStatusId(voucher.getInvoiceStatusId());
+			v.setApprovedComment(voucher.getApprovedComment());
+
+			v = workflowService.updateVoucher(v);
+			logger.debug("Voucher invoice ststus id: " + v.getInvoiceStatusId());
+			logger.debug("Voucher Comment: " + v.getApprovedComment());
+
+			if (v.getInvoiceStatusId() == 3 && StringUtils.isBlank(v.getApprovedComment())) {
+				facesError("Comment required on rejected Invoice voucher.");
+				logger.debug("Comment required from bean...");
+				//PrimeFaces.current().ajax().update("messages");
+			}
+
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+		
+		findInvoiceApproval();
+		
+		updateApprovalBtn();
+
+		//return INVOICE_APPROVAL;
 	}
 
 	public void getInvoiceDetails(Integer invoiceId) {
 		try {
 			invoiceDetail = invoiceService.getInvoiceDetails(invoiceId);
 			invoiceGLSummaryVw = invoiceService.getInvoiceGLSummaryVw(invoiceId);
-			invApprovalStakingSheetDet = workflowService.getStakingSheetByInvId(invoiceId);
-			invoice = invoiceService.getInvoiceById(invoiceId);	
+			invApprovalStakingSheetDet = workflowService.getStakingSheetByInvId(invoiceId.intValue());
+			invoice = invoiceService.getInvoiceById(invoiceId);
 			invoiceApprovalVouchers = workflowService.getVoucherByInvoiceId(invoiceId);
-			
-			//invoiceGLSummaryVwTotal = invoiceGLSummaryVw.stream().map(InvoiceGLSummaryVw::getExtCost).reduce(BigDecimal::add).get();
-			
-		} catch (ValidationException | NoResultException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 	}
 
-	public String findInvoiceById(Integer invoiceNo) throws NoResultException {
+	public String findInvoiceById(Integer invoiceNo) {
 		try {
 			invoice = invoiceService.getInvoiceById(invoiceNo);
 			showDetail = true;
-		} catch (ValidationException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 		return INVOICE_DETAIL;
 	}
-	
+
 	public void findInspectionStatus() {
-		inspStatuses = inspectionService.getInspetionStatus();
-	}
-	
-	public void sortWFTaskSeq(List<WorkFlowTask> tasks) {
-		Collections.sort(tasks, new Comparator<WorkFlowTask>() {
-			public int compare(WorkFlowTask s1, WorkFlowTask s2) {
-				double i1 = Double.parseDouble(s1.getWorkFlowTaskSeq());
-				double i2 = Double.parseDouble(s2.getWorkFlowTaskSeq());
-				return Double.compare(i1, i2);
-			}
-		});
-	}
-	
-	public void sortStations(List<StakingSheetDetail> details) {
-		Collections.sort(details, new Comparator<StakingSheetDetail>() {
-			public int compare(StakingSheetDetail o1, StakingSheetDetail o2) {
-
-				int i1 = Integer.valueOf(o1.getStationDescription());
-				int i2 = Integer.valueOf(o2.getStationDescription());
-				if (i1 > i2) {
-					return -1;
-				} else {
-					return 0;
-				}
-
-			}
-		});
+		inspStatuses = inspectionService.getInspectionStatus();
 	}
 
-	public void onStakingRowEdit(RowEditEvent event) {
-		StakingSheetDetail asBuiltStake = (StakingSheetDetail) event.getObject();
-
-		asBuiltStake.setAsBuiltDt(currentDtTm());
-		asBuiltStake.setAsBuiltBy(getCurrentUser());
-		try {
-			workflowService.updateAsBuiltStakingSheetDetail(asBuiltStake);
-		} catch (ValidationException | ProcessException e) {
-			logger.error(e.getMessage());
-			facesError(e.getMessage());
-		}
-	}
-	
-	public String submitInspection() throws ValidationException, ProcessException {
-
-		Inspection inspection = new Inspection();
-
-		inspection.setInspectionDt(currentDtTm());
-		inspection.setInspectedBy(getInspectorId());
-		inspection.setInspectionStatusId(2);
-		inspection.setWorkOrderId(woId);
-		inspection.setWorkFlowId(wfId);
-		inspection.setServiceOrderId(soId);
-		inspection.setInspectionType("SS");
-
-		try {
-			inspectionId = inspectionService.insertInspection(inspection);
-		} catch (ValidationException | ProcessException e) {
-			logger.error(e);
-			facesError(e.getMessage());
-		}
-		int rejected = 0;
-		for (StakingSheetDetail inspected : inspStakingSheetDetail) {
-			if (inspected.getCurrentInspectionDetailStatusId() != 2) {
-				inspected.setCurrentInspectionDetailDt(currentDtTm());
-				inspected.setCurrentInspectedDetailBy(String.valueOf(getInspectorId()));
-
-				if (inspected.getCurrentInspectionDetailStatusId() == 0
-						|| inspected.getCurrentInspectionDetailStatusId() == null) {
-					facesError("Please select an Inpection Status from the drop-down menu.");
-					return null;
-				}
-				try {
-					workflowService.updateInspectionStakingSheetDetail(inspected, inspectionId);
-				} catch (ProcessException e) {
-					logger.error(e);
-					facesError(e.getMessage());
-				}
-				if (inspected.getCurrentInspectionDetailStatusId() == 5) {
-					rejected++;
-				}
-			}
-		}
-		for (Voucher voucher : newInspVouchers) {
-			if (voucher.getInspectionStatusId() != 2) {
-				voucher.setInspectionId(inspectionId);
-				if (voucher.getInspectionStatusId() == null || voucher.getInspectionStatusId() == 0) {
-					facesError("Please select an Inpection Status from the drop-down menu.");
-					return null;
-				}
-				workflowService.updateVoucher(voucher);
-
-				if (voucher.getInspectionStatusId() == 5) {
-					rejected++;
-				}
-			}
-		}
-		if (rejected > 0) {
-			inspectionService.updateInspection(inspectionId, 5);
-		} else {
-			inspectionService.updateInspection(inspectionId, 4);
-		}
-
-		return findStakingDetailByWoId();
-	}
-	
 	public String asBuiltEdit() {
+		//PrimeFaces.current().clearTableStates();
+		logger.debug("AsBuiltEdit Method called....");
+		asBuiltStakingSheetDetailGui = new ArrayList<StakingSheetDetailGui>();
+		PrimeFaces.current().ajax().update("stakingTabForm");
+		asBuiltStakingSheetDetailGui = findStakingDetail(woId);
+		
+		asBuiltStakingSheetDetailGui = asBuiltStakingSheetDetailGui.stream().filter(item -> !(item.getAsBuiltStatus() != null && item.getCurrentInspectionDetailStatus().equals(APPROVED))).collect(Collectors.toList());
 
-		PrimeFaces.current().clearTableStates();
-
-		asBuiltStakingSheetDetail = stakingSheetDetail.stream().filter(item -> (item.getAsBuiltStatus() == null
-						|| (item.getAsBuiltStatus().getAsBuiltStatusId() == 3 && item.getInspectionStatus().getStatus().equals("Ready for Inspection"))
-						|| (item.getAsBuiltStatusId() != 6 && item.getAsBuiltStatusId() != 3 && item.getAsBuiltStatusId() != 5))).collect(Collectors.toList());
-
+		if(asBuiltStakingSheetDetailGui.size() > 0) {
+			logger.debug("asbuiltEdit button: WorkorderId: " + asBuiltStakingSheetDetailGui.get(0).getWorkOrderId());
+		}else {
+			logger.debug("AsBuiltEdit button pressed but no current AU's available to edit");
+		}
+		
 		setAsBuiltDisable(false);
 		showAsBuiltStatus = false;
-		colSpan = 12;
+
 		editAsBuilt = false;
 		renderAsBuiltChkBox = true;
 		renderAddStationUnit = true;
-		// multiViewState = true;
-
-		return STAKING;
-	}
-	
-	public String asBuiltSave() throws ValidationException, ProcessException, NoResultException {
-
-		for (StakingSheetDetail staking : asBuiltStakingSheetDetail) {
-			if ((staking.getAsBuiltStatusId() == 3) || (staking.getAsBuiltStatusId() == 6) ) {
-				
-				staking.setAsBuiltStatusId(staking.getAsBuiltStatusId());
-				staking.setCurrentInspectionDetailStatusId(2);
-				staking.setAsBuiltDt(util.currentDtTm());
-				staking.setAsBuiltBy(util.getCurrentUser());
-				staking.setAsBuiltComments(staking.getAsBuiltComments());
-
-				if(staking.getAsBuiltStatusId() == 6 && StringUtils.isBlank(staking.getAsBuiltComments())) {
-					facesError("As-Built comment required if status is 'Appealed'.");
-					return null;
-				}
-				workflowService.updateStakingSheetDetail(staking);
-				
-				try {
-					workflowService.updateAsBuiltAmount(staking.getStakingSheetDetailId());
-				} catch (Exception e) {
-					logger.error(e);
-					facesError(e.getMessage());
-				}
-			}
-		}
-		int wfTaskId = workflowService.updateOverallAsbuiltStatusId(woId);
-
-		if ((wfTaskId != 0) || (wfTaskId != 1)) {
-			workflowService.updateWorkflowTask(wfTaskId, "COMP");
-		}
-
-		asBuiltStakingSheetDetail = workflowService.getStakingSheetDetailById(woId);
-		/*asBuiltStakingSheetDetail = asBuiltStakingSheetDetail.stream()
-				.filter(item -> (item.getAsBuiltStatus() == null || (item.getAsBuiltStatusId() != 3) && (item.getAsBuiltStatusId() != 6)))
-				.collect(Collectors.toList());*/
-		asBuiltStakingSheetDetail = asBuiltStakingSheetDetail.stream().filter(item -> (item.getAsBuiltStatus() == null
-				|| (item.getAsBuiltStatus().getAsBuiltStatusId() == 3 && item.getInspectionStatus().getStatus().equals("Ready for Inspection"))
-				|| (item.getAsBuiltStatusId() != 6 && item.getAsBuiltStatusId() != 3 && item.getAsBuiltStatusId() != 5))).collect(Collectors.toList());
-
-		facesInfo("Record(s) saved successful.");
-
-		return STAKING;
-	}
-	
-	public void asBuiltCellEdit(StakingSheetDetail stakingSheetDetail) {
-
-		if(stakingSheetDetail.getAsBuiltStatus().getDescription().equals("Appealed")
-				&& StringUtils.isEmpty(stakingSheetDetail.getAsBuiltComments())) {
-			facesError("As-Built Comment is required on Appealed As-Built Status");
-			return;
-		}
-		updateStakingsheetDetail(stakingSheetDetail);
-	}
-	
-	public void updateStakingsheetDetail(StakingSheetDetail stakingSheetDetail) {
 		
+		PrimeFaces.current().ajax().update("stakingTabForm");
+		
+		return STAKING;
+	}
+
+	public void onInspectionCellEdit(StakingSheetDetailGui gui) {
+		
+		StakingSheetDetail ssd = workflowService.getStakingSheetDetailBySSDId(gui.getStakingSheetDetailId());
+		
+		if(gui.getCurrentInspectionDetailStatusId() == 2) {//Ready for Inspection
+			ssd.setCurrentInspectionDetailStatusId(gui.getCurrentInspectionDetailStatusId());
+			ssd.setCurrentInspectionDetailDt(null);
+			ssd.setCurrentInspectedDetailBy(null);
+			ssd.setCurrentInspectorDetailComments(null);
+		}else if(gui.getCurrentInspectionDetailStatusId() == 4) {//Approved
+			ssd.setCurrentInspectionDetailStatusId(gui.getCurrentInspectionDetailStatusId());
+			ssd.setCurrentInspectionDetailDt(util.currentDtTm());
+			ssd.setCurrentInspectedDetailBy(String.valueOf(getInspectorId()));
+		}else if(gui.getCurrentInspectionDetailStatusId() == 5) {//Rejected
+			ssd.setCurrentInspectionDetailStatusId(gui.getCurrentInspectionDetailStatusId());
+			ssd.setCurrentInspectionDetailDt(util.currentDtTm());
+			ssd.setCurrentInspectedDetailBy(String.valueOf(getInspectorId()));
+			//ssd.setCurrentInspectorDetailComments(gui.getCurrentInspectorDetailComments());
+		}
+		/*ssd.setCurrentInspectionDetailStatusId(gui.getCurrentInspectionDetailStatusId());
+		ssd.setCurrentInspectionDetailDt(util.currentDtTm());
+		ssd.setCurrentInspectedDetailBy(String.valueOf(getInspectorId()));*/
+
 		try {
-			workflowService.updateStakingSheetDetail(stakingSheetDetail);
-			facesInfo("Record updated successfully.");
-		} catch (ValidationException | ProcessException e) {
+			workflowService.updateInspectionStakingSheetDetail(ssd, inspectionId);
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
+
+		try {
+			inspectionService.updateInspection(inspectionId, Integer.valueOf(3));
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+		if (gui.getCurrentInspectionDetailStatusId() == 5 && StringUtils.isBlank(ssd.getCurrentInspectorDetailComments())) {
+			facesError("Inspection comment required.");
+		}
+		
+		findInspectionDetails();
+		PrimeFaces.current().ajax().update("NEW_INSPECTION_TABLE");
+	}
+	
+	public void onInspectionCommentCellEdit(StakingSheetDetailGui gui) {
+		
+		StakingSheetDetail ssd = workflowService.getStakingSheetDetailBySSDId(gui.getStakingSheetDetailId());
+		
+		ssd.setCurrentInspectorDetailComments(gui.getCurrentInspectorDetailComments());
+		
+		try {
+			workflowService.updateInspectionStakingSheetDetail(ssd, inspectionId);
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+		
+		findInspectionDetails();
+		PrimeFaces.current().ajax().update("NEW_INSPECTION_TABLE");
 	}
 
-	public void inspectionDetailFilter() {
+	public void onVoucherInspectCellEdit(VoucherGui voucher) {
+		
+		Voucher vchr = workflowService.getVoucherById(voucher.getVoucherId());
+		
+		vchr.setInspectionId(inspectionId);
+		vchr.setInspectionStatusId(voucher.getInspectionStatusId());
 
-		if (StringUtils.isNotBlank(inspectionFilter)) {
-			if (inspectionFilter.equals("all")) {
-				this.inspStakingSheetDetail = asBuiltStakingSheetDetail;
-			} else if (inspectionFilter.equals("ready")) {
-				this.inspStakingSheetDetail = stakingSheetDetail.stream().filter(item -> item.getCurrentInspectionDetailStatusId() == 2).collect(Collectors.toList());
+		try {
+			workflowService.updateVoucher(vchr);
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+
+		try {
+			inspectionService.updateInspection(inspectionId, Integer.valueOf(3));
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+		if (voucher.getInspectionStatusId() == 5 && StringUtils.isBlank(voucher.getInspectionComment())) {
+			facesError("Inspection comment required.");
+		}
+		
+		findInspectionDetails();
+		
+		PrimeFaces.current().ajax().update("INSPECTION_NEW_VOUCHER_TABLE");
+	}
+	
+	public void onVoucherInspCommentCellEdit(VoucherGui voucher) {
+		
+		Voucher vchr = workflowService.getVoucherById(voucher.getVoucherId());
+		
+		vchr.setInspectionComment(voucher.getInspectionComment());
+		try {
+			workflowService.updateVoucher(vchr);
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+
+		findVouchers();
+	}
+
+	public String pickAsBuiltStyleClass(StakingSheetDetailGui ssd) {
+		if (ssd != null) {
+
+			if (ssd.getAsBuiltStatus().equals("Not Started"))
+				return "inspEditDefault";
+			if (ssd.getAsBuiltStatus().equals("Completed")) {
+				return "inspGreen";
 			}
+
+			if (ssd.getAsBuiltStatus().equals("Appealed")) {
+				return "inspGreen";
+			}
+
+			return "inspRed";
+		}
+
+		return null;
+	}
+
+	public void pickAsBuiltDisable(StakingSheetDetail ssd) {
+	}
+
+	public String pickInspectionStyleClass(StakingSheetDetailGui ssd) {
+		if (ssd != null) {
+
+			if (ssd.getCurrentInspectionDetailStatus() .equals("Not Inspected"))
+				return "null";
+			if (ssd.getCurrentInspectionDetailStatus().equals("Ready for Inspection")) {
+				return "inspEditDefault";
+			}
+
+			if (ssd.getCurrentInspectionDetailStatus().equals(APPROVED)) {
+				return "inspGreen";
+			}
+
+			return "inspRed";
+		}
+
+		return null;
+	}
+
+	public boolean pickInspectionDisable(StakingSheetDetailGui ssd) {
+		if (ssd.getCurrentInspectionDetailStatus().equals("Not Inspected"))
+			return true;
+		if (ssd.getCurrentInspectionDetailStatus().equals("Ready for Inspection"))
+			return false;
+		if (ssd.getCurrentInspectionDetailStatus().equals(APPROVED)) {
+			if (ssd.getInvoiceStatus().equals("Not Invoiced")) {
+				return false;
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	public String pickVoucherStyleClass(VoucherGui v) {
+		if (v != null) {
+			if (v.getInspectionStatus().equals("Not Inspected"))
+				return "null";
+			if (v.getInspectionStatus().equals("Ready for Inspection"))
+				return "inspEditDefault";
+			if (v.getInspectionStatus().equals(APPROVED)) {
+				return "inspGreen";
+			}
+			return "inspRed";
+		}
+
+		return null;
+	}
+
+	public boolean pickVoucherDisable(VoucherGui v) {
+		if (v.getInspectionStatus().equals("Not Inspected"))
+			return true;
+		if (v.getInspectionStatus().equals("Ready for Inspection"))
+			return false;
+		if (v.getInspectionStatus().equals(APPROVED)) {
+			if (v.getInvoiceStatus().equals("Not Invoiced")) {
+				return false;
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	public void inspectionDetailVoucherFilter() {
+		findVouchers();
+
+		if (inspectionVoucherFilter) {
+			newInspVouchers = vouchers;
+			logger.debug("InspectionVoucherFilter: " + inspectionVoucherFilter);
+		} else {
+			if (continueInspection) {
+				logger.debug("ContinueInspection: " + continueInspection);
+				newInspVouchers = vouchers.stream().filter(v -> !(v.getInspectionStatusId().intValue() != 2
+						&& !v.getInspectionId().equals(inspectionId))).collect(Collectors.toList());
+
+			} else {
+				logger.debug("ContinueInspection: " + continueInspection);
+				newInspVouchers = vouchers.stream().filter(v -> ((v.getInspectionStatusId().intValue() == 2 || (v.getInspectionStatusId().intValue() != 2 && v.getInspectionId().equals(inspectionId))))).collect(Collectors.toList());
+			}
+		}
+	}
+
+	public void inspectionDetailAuFilter() {
+		
+		inspStakingSheetDetail = findStakingDetail(woId);//workflowService.getStakingSheetDetailGuiByWOId(woId);
+		
+		if (!inspectionFilter)  {
+
+			inspStakingSheetDetail = inspStakingSheetDetail.stream()
+					.filter(item -> ((item.getAsBuiltStatus().equals("Completed")
+							|| item.getAsBuiltStatus().equals("Appealed"))
+							&& (item.getCurrentInspectionDetailStatus().equals("Ready for Inspection")
+									|| item.getCurrentInspectionDetailStatus().equals("Rejected"))))
+					.collect(Collectors.toList());
 		}
 	}
 
 	public void findVouchers() {
 		try {
 			vouchers = workflowService.getVouchers(woId);
-		} catch (ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 	}
 
 	public void onAsBuiltTabChange(TabChangeEvent event) {
-
 		Tab activeTab = event.getTab();
 
-		asBuiltActiveTab = ((TabView) event.getSource()).getChildren().indexOf(activeTab);
-	}
-	
-	public void onAsBuiltToggle(ToggleEvent event) {
-
-		if (event.getVisibility() == Visibility.VISIBLE) {
-			colSpan++;
-		} else if (event.getVisibility() == Visibility.HIDDEN) {
-			colSpan--;
+		asBuiltActiveTab = Integer.valueOf(((TabView) event.getSource()).getChildren().indexOf(activeTab));
+		
+		if(activeTab.getTitle().equals("As-Builts")) {
+			onloadStakingJob();
+		}else if (activeTab.getTitle().equals("Inspections")) {
+			findInspections();
+		}else if (activeTab.getTitle().equals("Invoices")) {
+			findInvoices();
+		}else if (activeTab.getTitle().equals("Vouchers")) {
+			findVouchers();
 		}
 	}
-	
+
+	public void onAsBuiltToggle(ToggleEvent event) {
+    if (event.getVisibility() != Visibility.VISIBLE) {
+      
+      event.getVisibility(); 
+      //Visibility.HIDDEN;
+      
+      //TODO: Will need to look at this*****
+      
+    } 
+  }
+
 	public void updateAssemblyUnitEnergized() {
-		
-		assemblyunits = assemblyunits.stream().filter(item -> item.getEnergized().equals(energized)).collect(Collectors.toList());
+		assemblyunits = assemblyunits.stream().filter(item -> item.getEnergized().equals(energized))
+				.collect(Collectors.toList());
 	}
 
 	public void preProcessorStakingSheetRsltPDF(Object document) {
 		Document doc = (Document) document;
 		doc.setPageSize(PageSize.A4.rotate());
 	}
-	
+
 	public void preProcessorRejectionRpt(Object document) {
-		HSSFWorkbook wb = (HSSFWorkbook) document;
-        HSSFSheet sheet = wb.getSheetAt(0);
-        
-        asBuiltStakingSheetDetail= asBuiltStakingSheetDetail.stream().filter(item -> item.getInspectionStatus().getStatus().equals("Rejected")).collect(Collectors.toList());
+		asBuiltStakingSheetDetailGui = asBuiltStakingSheetDetailGui.stream()
+				.filter(item -> item.getCurrentInspectionDetailStatus().equals("Rejected")).collect(Collectors.toList());
+
+		postProcessorRejectionRpt(document);
 	}
-	
+
+	public void postProcessorRejectionRpt(Object document) {
+		HSSFWorkbook wb = (HSSFWorkbook) document;
+		HSSFSheet sheet = wb.getSheetAt(0);
+		HSSFRow header = sheet.createRow(0);
+		header.createCell(0).setCellValue("Work Order Number");
+
+		HSSFCellStyle cellStyle = wb.createCellStyle();
+		cellStyle.setFillForegroundColor(HSSFColor.HSSFColorPredefined.GREEN.getIndex());
+		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+		sheet.shiftRows(0, asBuiltStakingSheetDetailGui.size(), 2);
+	}
+
 	public void findVendors() {
 		vendors = workflowService.getVendors();
 	}
 
-	public void onRowCancel(RowEditEvent event) { }
-	
 	public Timestamp currentDtTm() {
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		
-		return now;
+		return new Timestamp(System.currentTimeMillis());
 	}
-	
+
 	public String getCurrentUser() {
 		Subject currentUser = SecurityUtils.getSubject();
-		
+
 		return currentUser.getPrincipal().toString();
 	}
 	
-	private void facesError(String message) {
+	public void unlockInspectionDetail() {
+		
+		StakingSheetDetail ssd = workflowService.getStakingSheetDetailBySSDId(selectedInspectionDetailVw.getStakingSheetDetailId());
+		
+		if(ssd.getInvoiceStatusId() == 1 || ssd.getInvoiceStatusId() == 3) {
+			
+			ssd.setCurrentInspectionDetailStatusId(2);
+			ssd.setCurrentInspectedDetailBy(null);
+			ssd.setCurrentInspectionDetailDt(null);
+			ssd.setCurrentInspectionDetailId(0);
+			ssd.setCurrentInspectorDetailComments(null);
+			
+			
+			workflowService.updateAsBuiltStakingSheetDetail(ssd);
+			
+			if(inspectionService.removeInspectionDetailById(selectedInspectionDetailVw.getInspectionDetailId())) {
+				facesInfo(ssd.getAssemblyGuid() + " has been unlocked.");
+			}else {
+				facesError("Sorry something went wrong.");
+			}
+			
+		}else {
+			facesError("Sorry this AU has already been invoiced, and connot be unlocked.");
+		}
 
+		findInspectionById();
+		PrimeFaces.current().ajax().update("inspectionForm");
+		findStakingDetailByWoId();
+		
+		InspectionUnlock iu = new InspectionUnlock();
+		
+		iu.setInspectionId(selectedInspectionDetailVw.getInspectionId());
+		iu.setStakingSheetDetailId(selectedInspectionDetailVw.getStakingSheetDetailId());
+		iu.setWorkOrderId(woId);
+		iu.setUnlockedBy(getCurrentUser());
+		iu.setUnlockedDt(currentDtTm());
+		
+		workflowService.insertInspectionUnlock(iu);
+	}
+	
+	public void unlockInspectionVoucher() {
+		
+		if(selectedVoucher.getInvoiceStatusId() == 1 || selectedVoucher.getInvoiceStatusId() == 3) {
+			
+			Voucher v = workflowService.getVoucherById(selectedVoucher.getVoucherId());
+			
+			v.setInspectionId(0);
+			v.setInspectionComment("");
+			v.setInspectionStatusId(2);
+			
+			workflowService.updateVoucher(v);
+			
+			facesInfo("This voucher has been unlocked.");
+		}else {
+			facesError("Sorry this Voucher has already been invoiced, and connot be unlocked.");
+		}
+
+		findInspectionById();
+		PrimeFaces.current().ajax().update("inspectionForm");
+		//findStakingDetailByWoId();
+		
+		InspectionUnlock iu = new InspectionUnlock();
+		
+		iu.setInspectionId(selectedVoucher.getInspectionId());
+		iu.setVoucherId(selectedVoucher.getVoucherId());
+		iu.setWorkOrderId(woId);
+		iu.setUnlockedBy(getCurrentUser());
+		iu.setUnlockedDt(currentDtTm());
+		
+		workflowService.insertInspectionUnlock(iu);
+	}
+
+	private void facesError(String message) {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
 		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
-	
-	private void facesInfo(String message) {
 
+	private void facesInfo(String message) {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
 		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
-	
+
 	public void clearInputs() {
 		tempWoId = null;
 		tempSoId = null;
@@ -1085,6 +1851,8 @@ public class WorkflowController implements Serializable {
 		notInspected = 0;
 	}
 
+	/***************************TODO: Getters and Setters*************************/
+	
 	public List<WorkFlowSearch_VW> getWorkflows() {
 		return workflows;
 	}
@@ -1173,19 +1941,19 @@ public class WorkflowController implements Serializable {
 		this.selectedWorkFlowTask = selectedWorkFlowTask;
 	}
 
-	public List<StakingSheetDetail> getStakingSheetDetail() {
+/*	public List<StakingSheetDetail> getStakingSheetDetail() {
 		return stakingSheetDetail;
 	}
 
 	public void setStakingSheetDetail(List<StakingSheetDetail> stakingSheetDetail) {
 		this.stakingSheetDetail = stakingSheetDetail;
-	}
+	}*/
 
-	public List<StakingSheetDetail> getFilteredStakingSheetDetail() {
+	public List<StakingSheetDetailGui> getFilteredStakingSheetDetail() {
 		return filteredStakingSheetDetail;
 	}
 
-	public void setFilteredStakingSheetDetail(List<StakingSheetDetail> filteredStakingSheetDetail) {
+	public void setFilteredStakingSheetDetail(List<StakingSheetDetailGui> filteredStakingSheetDetail) {
 		this.filteredStakingSheetDetail = filteredStakingSheetDetail;
 	}
 
@@ -1196,7 +1964,7 @@ public class WorkflowController implements Serializable {
 	public void setInspections(List<Inspection> inspections) {
 		this.inspections = inspections;
 	}
-	
+
 	public String getInspectionComment() {
 		return inspectionComment;
 	}
@@ -1211,14 +1979,6 @@ public class WorkflowController implements Serializable {
 
 	public void setInspStatuses(List<InspectionStatus> inspStatuses) {
 		this.inspStatuses = inspStatuses;
-	}
-
-	public StakingSheetDetail getSelectedStakingSheetDetail() {
-		return selectedStakingSheetDetail;
-	}
-
-	public void setSelectedStakingSheetDetail(StakingSheetDetail selectedStakingSheetDetail) {
-		this.selectedStakingSheetDetail = selectedStakingSheetDetail;
 	}
 
 	public List<AsBuiltStatus> getAsBuiltStatuses() {
@@ -1326,12 +2086,10 @@ public class WorkflowController implements Serializable {
 	}
 
 	public BigDecimal getInvAmt() {
-		BigDecimal x;
-		BigDecimal y;
 		invAmt = new BigDecimal(0);
 		for (StakingSheetDetail detail : selectedStakingSheetDetails) {
-			x = BigDecimal.valueOf(detail.getAsBuiltQuantity());
-			y = x.multiply(new BigDecimal(detail.getRateGroupPrice().getFixedCost()));
+			BigDecimal x = BigDecimal.valueOf(detail.getAsBuiltQuantity());
+			BigDecimal y = x.multiply(new BigDecimal(detail.getRateGroupPrice().getFixedCost()));
 
 			invAmt = invAmt.add(y);
 		}
@@ -1349,7 +2107,7 @@ public class WorkflowController implements Serializable {
 	public void setAsBuiltSummaryVw(List<AsBuiltSummaryVw> asBuiltSummaryVw) {
 		this.asBuiltSummaryVw = asBuiltSummaryVw;
 	}
-	
+
 	public String getCurrentStation() {
 		return currentStation;
 	}
@@ -1358,11 +2116,11 @@ public class WorkflowController implements Serializable {
 		this.currentStation = currentStation;
 	}
 
-	public List<String> getDistinctStation() {
+	public List<BigDecimal> getDistinctStation() {
 		return distinctStation;
 	}
 
-	public void setDistinctStation(List<String> distinctStation) {
+	public void setDistinctStation(List<BigDecimal> distinctStation) {
 		this.distinctStation = distinctStation;
 	}
 
@@ -1451,12 +2209,13 @@ public class WorkflowController implements Serializable {
 					}
 					if (invoice.getInvoiceStatus().getDescription().equals("Paid")) {
 						amtPaidToDt = amtPaidToDt.add(invoice.getInvoiceAmount());
-					} else {
-						amtPaidToDt = BigDecimal.ZERO;
+						continue;
 					}
+					amtPaidToDt = BigDecimal.ZERO;
 				}
 			}
 		}
+
 		return amtInvoicedToDt;
 	}
 
@@ -1467,15 +2226,16 @@ public class WorkflowController implements Serializable {
 	public BigDecimal getInspectionCompleted() {
 		inspectionCompleted = new BigDecimal(0);
 		int count = 0;
-		for(Inspection inspection : inspections) {
-			if(inspection.getInspectionStatus() != null && inspection.getInspectionStatus().getDescription().equals("Passed")) {
+		for (Inspection inspection : inspections) {
+			if (inspection.getInspectionStatus() != null
+					&& inspection.getInspectionStatus().getDescription().equals("Passed")) {
 				count++;
 			}
 		}
-		if(count > 0 && inspections.size() > 0) {
-			inspectionCompleted = new BigDecimal(count).divide(new BigDecimal(inspections.size()));
+		if (count > 0 && inspections.size() > 0) {
+			inspectionCompleted = (new BigDecimal(count)).divide(new BigDecimal(inspections.size()));
 		}
-		
+
 		return inspectionCompleted;
 	}
 
@@ -1505,14 +2265,6 @@ public class WorkflowController implements Serializable {
 
 	public void setAsBuiltDisable(boolean asBuiltDisable) {
 		this.asBuiltDisable = asBuiltDisable;
-	}
-
-	public int getColSpan() {
-		return colSpan;
-	}
-
-	public void setColSpan(int colSpan) {
-		this.colSpan = colSpan;
 	}
 
 	public boolean isEditAsBuilt() {
@@ -1555,14 +2307,6 @@ public class WorkflowController implements Serializable {
 		this.renderAddStationUnit = renderAddStationUnit;
 	}
 
-	/*public List<Boolean> getAsBuiltColList() {
-		return asBuiltColList;
-	}
-
-	public void setAsBuiltColList(List<Boolean> asBuiltColList) {
-		this.asBuiltColList = asBuiltColList;
-	}
-*/
 	public Integer getTempStakingInspectionStatus() {
 		return tempStakingInspectionStatus;
 	}
@@ -1763,27 +2507,27 @@ public class WorkflowController implements Serializable {
 		this.invoiceStatus = invoiceStatus;
 	}
 
-	public List<Voucher> getVouchers() {
+	public List<VoucherGui> getVouchers() {
 		return vouchers;
 	}
 
-	public void setVouchers(List<Voucher> vouchers) {
+	public void setVouchers(List<VoucherGui> vouchers) {
 		this.vouchers = vouchers;
 	}
 
-	public List<Voucher> getInspectedVouchers() {
+	public List<VoucherGui> getInspectedVouchers() {
 		return inspectedVouchers;
 	}
 
-	public void setInspectedVouchers(List<Voucher> inspectedVouchers) {
+	public void setInspectedVouchers(List<VoucherGui> inspectedVouchers) {
 		this.inspectedVouchers = inspectedVouchers;
 	}
 
-	public List<StakingSheetDetail> getInspStakingSheetDetail() {
+	public List<StakingSheetDetailGui> getInspStakingSheetDetail() {
 		return inspStakingSheetDetail;
 	}
 
-	public void setInspStakingSheetDetail(List<StakingSheetDetail> inspStakingSheetDetail) {
+	public void setInspStakingSheetDetail(List<StakingSheetDetailGui> inspStakingSheetDetail) {
 		this.inspStakingSheetDetail = inspStakingSheetDetail;
 	}
 
@@ -1795,35 +2539,35 @@ public class WorkflowController implements Serializable {
 		this.invoiceStakingSheetDetail = invoiceStakingSheetDetail;
 	}
 
-	public List<Voucher> getInvoiceVouchers() {
+	public List<VoucherGui> getInvoiceVouchers() {
 		return invoiceVouchers;
 	}
 
-	public void setInvoiceVouchers(List<Voucher> invoiceVouchers) {
+	public void setInvoiceVouchers(List<VoucherGui> invoiceVouchers) {
 		this.invoiceVouchers = invoiceVouchers;
 	}
 
-	public List<Voucher> getSelectedInvoiceVouchers() {
+	public List<VoucherGui> getSelectedInvoiceVouchers() {
 		return selectedInvoiceVouchers;
 	}
 
-	public void setSelectedInvoiceVouchers(List<Voucher> selectedInvoiceVouchers) {
+	public void setSelectedInvoiceVouchers(List<VoucherGui> selectedInvoiceVouchers) {
 		this.selectedInvoiceVouchers = selectedInvoiceVouchers;
 	}
 
-	public List<Voucher> getInvoiceApprovalVouchers() {
+	public List<VoucherGui> getInvoiceApprovalVouchers() {
 		return invoiceApprovalVouchers;
 	}
 
-	public void setInvoiceApprovalVouchers(List<Voucher> invoiceApprovalVouchers) {
+	public void setInvoiceApprovalVouchers(List<VoucherGui> invoiceApprovalVouchers) {
 		this.invoiceApprovalVouchers = invoiceApprovalVouchers;
 	}
 
-	public List<Voucher> getVoucherSubmitInvoiceApproval() {
+	public List<VoucherGui> getVoucherSubmitInvoiceApproval() {
 		return voucherSubmitInvoiceApproval;
 	}
 
-	public void setVoucherSubmitInvoiceApproval(List<Voucher> voucherSubmitInvoiceApproval) {
+	public void setVoucherSubmitInvoiceApproval(List<VoucherGui> voucherSubmitInvoiceApproval) {
 		this.voucherSubmitInvoiceApproval = voucherSubmitInvoiceApproval;
 	}
 
@@ -1851,20 +2595,12 @@ public class WorkflowController implements Serializable {
 		this.newInspStatuses = newInspStatuses;
 	}
 
-	public List<Voucher> getNewInspVouchers() {
+	public List<VoucherGui> getNewInspVouchers() {
 		return newInspVouchers;
 	}
 
-	public void setNewInspVouchers(List<Voucher> newInspVouchers) {
+	public void setNewInspVouchers(List<VoucherGui> newInspVouchers) {
 		this.newInspVouchers = newInspVouchers;
-	}
-
-	public List<StakingSheetDetail> getAsBuiltStakingSheetDetail() {
-		return asBuiltStakingSheetDetail;
-	}
-
-	public void setAsBuiltStakingSheetDetail(List<StakingSheetDetail> asBuiltStakingSheetDetail) {
-		this.asBuiltStakingSheetDetail = asBuiltStakingSheetDetail;
 	}
 
 	public List<Vendor> getVendors() {
@@ -1892,7 +2628,6 @@ public class WorkflowController implements Serializable {
 	}
 
 	public BigDecimal getAuSubTotal() {
-
 		return auSubTotal;
 	}
 
@@ -1924,14 +2659,6 @@ public class WorkflowController implements Serializable {
 		this.voucherAmount = voucherAmount;
 	}
 
-	public String getInspectionFilter() {
-		return inspectionFilter;
-	}
-
-	public void setInspectionFilter(String inspectionFilter) {
-		this.inspectionFilter = inspectionFilter;
-	}
-
 	public Timestamp getWorkEventDt() {
 		return workEventDt;
 	}
@@ -1939,4 +2666,93 @@ public class WorkflowController implements Serializable {
 	public void setWorkEventDt(Timestamp workEventDt) {
 		this.workEventDt = workEventDt;
 	}
+
+	public String getSource() {
+		return source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+	}
+
+	public boolean isInspectionFilter() {
+		return inspectionFilter;
+	}
+
+	public void setInspectionFilter(boolean inspectionFilter) {
+		this.inspectionFilter = inspectionFilter;
+	}
+
+	public boolean isInspectionVoucherFilter() {
+		return inspectionVoucherFilter;
+	}
+
+	public void setInspectionVoucherFilter(boolean inspectionVoucherFilter) {
+		this.inspectionVoucherFilter = inspectionVoucherFilter;
+	}
+
+	public List<BigDecimal> getSelectedItems() {
+		return selectedItems;
+	}
+
+	public void setSelectedItems(List<BigDecimal> selectedItems) {
+		this.selectedItems = selectedItems;
+	}
+
+	public boolean isAsBuiltShowAllBool() {
+		return asBuiltShowAllBool;
+	}
+
+	public void setAsBuiltShowAllBool(boolean asBuiltShowAllBool) {
+		this.asBuiltShowAllBool = asBuiltShowAllBool;
+	}
+
+	public boolean isCancelInspOnBack() {
+		return cancelInspOnBack;
+	}
+
+	public void setCancelInspOnBack(boolean cancelInspOnBack) {
+		this.cancelInspOnBack = cancelInspOnBack;
+	}
+
+	public boolean isContinueInspection() {
+		return continueInspection;
+	}
+
+	public void setContinueInspection(boolean continueInspection) {
+		this.continueInspection = continueInspection;
+	}
+
+	public List<StakingSheetDetailGui> getAsBuiltStakingSheetDetailGui() {
+		return asBuiltStakingSheetDetailGui;
+	}
+
+	public void setAsBuiltStakingSheetDetailGui(List<StakingSheetDetailGui> asBuiltStakingSheetDetailGui) {
+		this.asBuiltStakingSheetDetailGui = asBuiltStakingSheetDetailGui;
+	}
+
+	public InspectionDetailVw getSelectedInspectionDetailVw() {
+		return selectedInspectionDetailVw;
+	}
+
+	public void setSelectedInspectionDetailVw(InspectionDetailVw selectedInspectionDetailVw) {
+		this.selectedInspectionDetailVw = selectedInspectionDetailVw;
+	}
+
+	public VoucherGui getSelectedVoucher() {
+		return selectedVoucher;
+	}
+
+	public void setSelectedVoucher(VoucherGui selectedVoucher) {
+		this.selectedVoucher = selectedVoucher;
+	}
+
+	public StakingSheetDetailGui getSelectedStakingSheetDetail() {
+		return selectedStakingSheetDetail;
+	}
+
+	public void setSelectedStakingSheetDetail(StakingSheetDetailGui selectedStakingSheetDetail) {
+		this.selectedStakingSheetDetail = selectedStakingSheetDetail;
+	}
+	
 }

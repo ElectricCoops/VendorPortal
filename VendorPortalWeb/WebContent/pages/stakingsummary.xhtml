@@ -4,8 +4,8 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 
-	<h:form id="sumFormId" style="display:inline-block;">
-		<p:dataTable id="summaryTbl" var="sum" value="#{wfController.asBuiltSummaryVw}" reflow="true" style="margin-top:10px" draggableColumns="true">
+	<!-- <h:form id="sumFormId" style="display:inline-block;"> -->
+		<p:dataTable id="summaryTbl" var="sum" value="#{wfController.asBuiltSummaryVw}" reflow="true" style="margin-top:10px" draggableColumns="true" scrollable="true" scrollHeight="500" >
 			<f:facet name="header">
             			As-Built Summary
         	</f:facet>
@@ -24,9 +24,9 @@
 			<p:column headerText="Energize" style="text-align:center" >
 				<h:outputText value="#{sum.energize}" />
 			</p:column>			
-			<p:column headerText="Trasnfer" style="text-align:center" >
+			<p:column headerText="Transfer" style="text-align:center" >
 				<h:outputText value="#{sum.transfer}" />
 			</p:column>
 		</p:dataTable>
-	</h:form>
+	<!-- </h:form> -->
 </ui:composition>

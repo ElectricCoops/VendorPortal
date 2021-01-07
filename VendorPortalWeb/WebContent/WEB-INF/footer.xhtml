@@ -5,15 +5,18 @@
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:p="http://primefaces.org/ui">
     
-    <f:loadBundle basename="pwr.lcec.vendor.web.resource.messages" var="msgs" />
+    <f:loadBundle basename="resources.messages" var="msgs" />
     
     <div class="layout-footer clearfix">
         <a href="home.xhtml">
             <p:graphicImage name="lcec-blue.png" library="images" />
         </a>
+        <span class="footer-text-center">
+        	<h:link outcome="/pages/about" value="v#{msgs.current_version}"/>
+        </span>
         <span class="footer-text-right">
             <span class="ui-icon ui-icon-copyright"></span> 
-            <span>2018 LCEC All Rights Reserved</span>
+            <span>2020 LCEC All Rights Reserved</span>
         </span>
     </div>
 </ui:composition>

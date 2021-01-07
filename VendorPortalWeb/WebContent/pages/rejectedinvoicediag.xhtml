@@ -4,18 +4,20 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 
-	<h:form id="rejectedInvoiceForm">
-	<p:panelGrid id="invRejGrid" columns="2" styleClass="ui-panelgrid-blank">
+	<!-- <h:form id="rejectedInvoiceForm"> -->
+	<h:panelGroup id="invRejGrid" styleClass="md-inputfield" style="margin-top:20px;">
+		<p:inputTextarea id="invoiceCommentId" value="#{wfController.invoiceComment}" maxlength="255" autoResize="false" style="width:350px;height:100px;"
+			required="true" requiredMessage="Rejected invoice comment is required." counter="display" counterTemplate="{0} characters remaining"/>
 		<p:outputLabel for="invoiceCommentId" value="Comment: " />
-		<p:inputTextarea id="invoiceCommentId" value="#{wfController.invoiceComment}" maxlength="255" autoResize="false" style="width: 99%;" 
-			required="true" requiredMessage="Rejected invoice comment is required."/>
-	</p:panelGrid>
+		
+	</h:panelGroup>
+	<h:outputText id="display" />
 	<center>
 		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
-			<p:commandButton id="okBtnDlg" value="OK"  action="#{wfController.submitInvoiceRejected}" update="invRejGrid,messages" ajax="true"/>
-			<p:commandButton id="cancelBtnDlg" value="Cancel" immediate="true" onclick="PF('rejectedInvoiceDlg').hide();" />			
+			<p:commandButton id="okBtnDlg" value="OK" action="#{wfController.submitInvoiceRejected}" update="invRejGrid messages" styleClass="secondary-btn"/>
+			<p:commandButton id="cancelBtnDlg" value="Cancel" oncomplete="PF('rejectedInvoiceDlg').hide();" styleClass="secondary-btn" />			
 		</p:panelGrid>
 	</center>
-	</h:form>
+	<!-- </h:form> -->
 
 </ui:composition>

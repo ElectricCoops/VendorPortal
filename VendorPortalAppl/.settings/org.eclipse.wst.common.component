@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
     <wb-module deploy-name="VendorPortalAppl">
         <wb-resource deploy-path="/" source-path="/EarContent" tag="defaultRootSource"/>
-        <dependent-module archiveName="VendorPortalModel.jar" deploy-path="/" handle="module:/resource/VendorPortalModel/VendorPortalModel">
-            <dependent-object/>
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="VendorPortalWeb.war" deploy-path="/" handle="module:/resource/VendorPortalWeb/VendorPortalWeb">
             <dependent-object/>
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="log4j-1.2.16.jar" deploy-path="/lib" handle="module:/classpath/lib/VendorPortalWeb/WebContent/WEB-INF/lib/log4j-1.2.16.jar">
+        <dependent-module archiveName="log4j-api-2.12.1.jar" deploy-path="/lib" handle="module:/classpath/lib/L:/lib/apache-log4j-2.12.1-bin/apache-log4j-2.12.1-bin/log4j-api-2.12.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="log4j-core-2.12.1.jar" deploy-path="/lib" handle="module:/classpath/lib/L:/lib/apache-log4j-2.12.1-bin/apache-log4j-2.12.1-bin/log4j-core-2.12.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="VendorPortalModel.jar" deploy-path="/" handle="module:/resource/VendorPortalModel/VendorPortalModel">
+            <dependent-object/>
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="omnifaces-2.7.1.jar" deploy-path="/lib" handle="module:/classpath/lib/E:/OPT/lib/omnifaces-2.7.1.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
     </wb-module>

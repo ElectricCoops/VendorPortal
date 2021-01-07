@@ -1,80 +1,84 @@
 package pwr.lcec.vendor.controller;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.PageSize;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import org.apache.log4j.Logger;
-
-import com.lowagie.text.Document;
-import com.lowagie.text.PageSize;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import pwr.lcec.vendor.controller.InspectionController;
 import pwr.lcec.vendor.web.helper.ControllerUtil;
-import pwr.lcec.vendorportal.custom.entity.Inspection;
-import pwr.lcec.vendorportal.custom.entity.InspectionStatus;
-import pwr.lcec.vendorportal.exception.ProcessException;
-import pwr.lcec.vendorportal.exception.ValidationException;
-import pwr.lcec.vendorportal.interfaces.InspectionSessionRemote;
+import pwr.lcec.vendorportal.entity.custom.Inspection;
+import pwr.lcec.vendorportal.entity.custom.InspectionStatus;
+import pwr.lcec.vendorportal.interfaces.InspectionLocal;
 
-public class InspectionController implements Serializable{
-
+public class InspectionController implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
-	private static Logger logger = Logger.getLogger(InspectionController.class);
-	
-	ControllerUtil util = new ControllerUtil();
-	
+	private static Logger logger = LogManager.getLogger(InspectionController.class);
+
+	final ControllerUtil util = new ControllerUtil();
+	private final String INSPSEARCH = "inspectionsearch?faces-redirect=true";
+
 	@EJB
-	private InspectionSessionRemote inspectionService;
+	private InspectionLocal inspectionService;
 
 	private String woId;
+
 	private Integer inspectionStatus;
-	
+
 	private List<Inspection> inspections;
 	private List<InspectionStatus> inspStatuses;
-	
+
 	@PostConstruct
 	void init() {
 		findInspectionStatus();
 	}
 
-	public void findInspetions(){
-		
+	public String findInspections() {
 		try {
 			inspections = inspectionService.getInspections(woId, inspectionStatus, util.getWrkGrp());
-		} catch (ValidationException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 		
+		inspections.sort((Inspection i1, Inspection i2) -> i2.getInspectionDt().compareTo(i1.getInspectionDt()));
+
+		return INSPSEARCH;
+	}
+
+	public void resetInspectionSearch() {
 		clearInputs();
+		inspections = new ArrayList<Inspection>();
 	}
-	
+
 	public void findInspectionStatus() {
-		inspStatuses = inspectionService.getInspetionStatus();
+		inspStatuses = inspectionService.getInspectionStatus();
 	}
-	
+
 	public void preProcessorPDF(Object document) {
 		Document doc = (Document) document;
 		doc.setPageSize(PageSize.A4.rotate());
 	}
-	
+
 	private void facesError(String message) {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
 		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
-		
+
 	public void clearInputs() {
-		woId = null;
-		inspectionStatus = null;
+		this.woId = null;
+		this.inspectionStatus = null;
 	}
 
 	public String getWoId() {
-		return woId;
+		return this.woId;
 	}
 
 	public void setWoId(String woId) {
@@ -82,7 +86,7 @@ public class InspectionController implements Serializable{
 	}
 
 	public List<Inspection> getInspections() {
-		return inspections;
+		return this.inspections;
 	}
 
 	public void setInspections(List<Inspection> inspections) {
@@ -90,7 +94,7 @@ public class InspectionController implements Serializable{
 	}
 
 	public List<InspectionStatus> getInspStatuses() {
-		return inspStatuses;
+		return this.inspStatuses;
 	}
 
 	public void setInspStatuses(List<InspectionStatus> inspStatuses) {
@@ -98,7 +102,7 @@ public class InspectionController implements Serializable{
 	}
 
 	public Integer getInspectionStatus() {
-		return inspectionStatus;
+		return this.inspectionStatus;
 	}
 
 	public void setInspectionStatus(Integer inspectionStatus) {

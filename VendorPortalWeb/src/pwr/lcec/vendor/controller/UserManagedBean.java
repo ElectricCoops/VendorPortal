@@ -10,7 +10,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
@@ -20,23 +21,20 @@ import org.omnifaces.util.Faces;
 
 import pwr.lcec.vendor.web.helper.ControllerUtil;
 import pwr.lcec.vendor.web.helper.Util;
-import pwr.lcec.vendor.web.model.User;
-import pwr.lcec.vendorportal.exception.NoResultException;
-import pwr.lcec.vendorportal.exception.ProcessException;
-import pwr.lcec.vendorportal.exception.ValidationException;
-import pwr.lcec.vendorportal.interfaces.UserManagementRemote;
-import pwr.lcec.vendorportal.sec.entity.LoginAttempt;
+import pwr.lcec.vendorportal.entity.sec.LoginAttempt;
+import pwr.lcec.vendorportal.entity.sec.UserTbl;
+import pwr.lcec.vendorportal.interfaces.UserManagementLocal;
 
 public class UserManagedBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	private static Logger logger = Logger.getLogger(UserManagedBean.class);
+	
+	private static Logger logger = LogManager.getLogger(UserManagedBean.class);
 	
 	@EJB
-	private UserManagementRemote userManagementService;
+	private UserManagementLocal userManagementService;
 
-	private User user = new User();
+	private UserTbl user = new UserTbl();
 	private Subject currentUser;
 
 	private String home_url;
@@ -65,45 +63,50 @@ public class UserManagedBean implements Serializable {
 		currentUser = SecurityUtils.getSubject();
 
 		if (!currentUser.isAuthenticated()) {
-			UsernamePasswordToken token = new UsernamePasswordToken(user.getUserName(), user.getPwd());
+			UsernamePasswordToken token = new UsernamePasswordToken(user.getUserName(), user.getPassword());
 			try {
 				currentUser.login(token);
 				
-				pwr.lcec.vendorportal.sec.entity.User user = userManagementService.finUserByPrincipal(currentUser.getPrincipal().toString());
+				UserTbl attemptedUser = userManagementService.findUserByPrincipal(currentUser.getPrincipal().toString());
 				fullname = new StringBuilder();
-				if(user != null) {
-					vendor = user.getWorkGroup();
-			
-					fullname.append(user.getFirstName());
+				if(attemptedUser != null) {
+					
+					vendor = attemptedUser.getWorkGroup();
+					//logger.info("Vendor: " + vendor);
+					fullname.append(attemptedUser.getFirstName());
 					fullname.append(" ");
-					fullname.append(user.getLastName());
+					fullname.append(attemptedUser.getLastName());
 				}
 				
 				loginSucceed = true;
 				
 				/*SavedRequest savedRequest = WebUtils.getSavedRequest(Faces.getRequest());
+				logger.info(savedRequest.getRequestURI());
 				Faces.redirect(savedRequest != null ? savedRequest.getRequestUrl() : home_url);*/
 				
 				Faces.redirect(home_url);
+				//return home_url;
 
 			}  catch (LockedAccountException lae) {
 				logger.error(lae);
 				facesError("User account is locked.");
-			} catch (AuthenticationException | IOException ex) {
+			} catch (AuthenticationException ex) {
 				logger.error(ex);
 				facesError("Incorrect username and/or password.");
-			} catch (ValidationException | ProcessException | NoResultException e) {
+			} catch (Exception e) {
 				logger.error(e);
-				facesError(e.getMessage());
+				facesError("Something Went wrong, please contact ITfor support.");
 			} 
 			
 			updateLoginActivity(loginSucceed);
 		}
+
 	}
 
 	public void doLogout() throws IOException {
 		SecurityUtils.getSubject().logout();
 		Faces.redirect(login_url);
+		//return "/" + login_url;
 	}
 	
 	public void updateLoginActivity(boolean succeed) {
@@ -113,10 +116,10 @@ public class UserManagedBean implements Serializable {
 		final String userAgent = request.getHeader("user-agent");
 		
 		try {
-			pwr.lcec.vendorportal.sec.entity.User user = null;
+			UserTbl user = null;
 			
 			if(currentUser.isAuthenticated()) {
-				user = userManagementService.finUserByPrincipal(currentUser.getPrincipal().toString());
+				user = userManagementService.findUserByPrincipal(currentUser.getPrincipal().toString());
 			}
 			attempt.setUserID(user != null ? user.getUserID() : 0);
 			attempt.setIPAddress(util.getClientIp(request));
@@ -130,7 +133,7 @@ public class UserManagedBean implements Serializable {
 				userManagementService.updateLastLogin(user.getUserID(), util.currentDtTm());
 			}
 			
-		} catch (ValidationException | ProcessException | NoResultException e) {
+		} catch (Exception e) {
 			logger.error(e);
 		}
 	}
@@ -141,11 +144,11 @@ public class UserManagedBean implements Serializable {
 		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 
-	public User getUser() {
+	public UserTbl getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(UserTbl user) {
 		this.user = user;
 	}
 

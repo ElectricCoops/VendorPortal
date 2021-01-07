@@ -1,4 +1,5 @@
 @import '../variables/_theme';
+@import '../overrides/_theme_variables';
 @import '../_mixins';
 @import '_common';
 @import '_forms';
@@ -10,5 +11,5 @@
 @import '_overlays';
 @import '_media';
 @import '_icons';
-@import '../_theme_styles.scss';
+@import '../overrides/_theme_styles';
 

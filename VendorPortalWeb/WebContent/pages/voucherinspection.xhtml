@@ -3,98 +3,151 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
-
-	<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.newInsp}">
-		<p:dataTable id="voucherTbl" var="voucher" value="#{wfController.newInspVouchers}" rowKey="#{voucher.voucherId}">
-			<f:facet name="header">
-           			Vouchers
-           	<p:panelGrid styleClass="ui-panelgrid-blank">
-				<div style="float: right">
-					<p:commandButton id="toggler" type="button" icon="fa fa-align-left" style="float: right" value="Columns" />
-					<p:columnToggler datasource="voucherTbl" trigger="toggler" />
+	
+	<p:focus context="inspectionForm" />
+	
+	<p:dataTable id="INSPECTION_NEW_VOUCHER_TABLE" var="voucher" value="#{wfController.newInspVouchers}" editable="true"
+				 rowKey="#{voucher.voucherId}" styleClass="customHeader" rendered="#{wfController.newInsp}" editMode="cell">
+		<f:facet name="header" >
+          	<p:panelGrid styleClass="ui-panelgrid-blank">
+				<div style="float: right;margin-top:-3px;">
+					<p:commandLink id="toggler" style="margin-right:10px;">
+						<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+						<p:tooltip for="toggler" value="Columns" position="top"/>
+					</p:commandLink>
+					<p:columnToggler datasource="INSPECTION_NEW_VOUCHER_TABLE" trigger="toggler">
+						<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+					</p:columnToggler>
 				</div>
+				<div style="right:50%;">
+					<span>Voucher(s)</span>
+				</div>
+				<div style="float:left;margin-top:-18px;">
+					<p:selectBooleanCheckbox id="chkActive" value="#{wfController.inspectionVoucherFilter}" itemLabel="Show All" style="width:250px;margin-left:-80px;" >
+		          		<p:ajax update="INSPECTION_NEW_VOUCHER_TABLE submitInspBtn" listener="#{wfController.inspectionDetailVoucherFilter}" />
+		          	</p:selectBooleanCheckbox>
+	          	</div>
 			</p:panelGrid>
 		</f:facet>
-			<p:column headerText="Work Order" style="text-align:center">
-				<h:outputText value="#{voucher.workOrderId}" />
-			</p:column>
-			<p:column headerText="Service Order" style="text-align:center">
-				<h:outputText value="#{voucher.serviceOrderId}" />
-			</p:column>
-			<p:column headerText="Station" style="text-align:center">
-				<h:outputText value="#{voucher.stationDescription}" />
-			</p:column>
-			<p:column headerText="Description" style="text-align:center">
-				<h:outputText value="#{voucher.description}" />
-			</p:column>
-			<p:column headerText="Crew" style="text-align:center">
-				<h:outputText value="#{voucher.crew}" />
-			</p:column>
-			<p:column headerText="Amount" style="text-align:center">
-				<h:outputText value="#{voucher.amount}">
-					<f:convertNumber type="currency" currencySymbol="$" />
-				</h:outputText>
-			</p:column>
-			<p:column headerText="Requestor" style="text-align:center">
-				<h:outputText value="#{voucher.requestor}" />
-			</p:column>
-			<p:column headerText="Created Date" style="text-align:center">
-				<h:outputText value="#{voucher.createdDt}">
-					<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
-				</h:outputText>
-			</p:column>
-			<p:column headerText="Inspection Status" styleClass="columnBgColor">
-					<p:selectOneMenu id="statusId" value="#{voucher.inspectionStatusId}" style="width: 99%;" required="true">
-						<p:ajax event="change" update="voucherInspCommentId"/>
+		
+		<!-- <p:ajax event="cellEdit" listener="#{wfController.onVoucherInspectCellEdit}" update="INSPECTION_NEW_VOUCHER_TABLE messages" process="@this" /> -->
+
+		<p:column id="workOrderId" headerText="Work Order" style="text-align:center" visible="#{userPrefController.voucherNewInsp.workOrderId}">
+			<h:outputText value="#{voucher.workOrderId}" />
+		</p:column>
+		<p:column id="serviceOrderId" headerText="Service Order" style="text-align:center" visible="#{userPrefController.voucherNewInsp.serviceOrderId}">
+			<h:outputText value="#{voucher.serviceOrderId}" />
+		</p:column>
+		<p:column id="stationDescription" headerText="Station" style="text-align:center" visible="#{userPrefController.voucherNewInsp.stationDescription}">
+			<h:outputText value="#{voucher.stationDescription}" />
+		</p:column>
+		<p:column id="description" headerText="Description" style="text-align:center" visible="#{userPrefController.voucherNewInsp.description}">
+			<h:outputText value="#{voucher.description}" />
+		</p:column>
+		<p:column id="crew" headerText="Crew" style="text-align:center" visible="#{userPrefController.voucherNewInsp.crew}">
+			<h:outputText value="#{voucher.crew}" />
+		</p:column>
+		<p:column id="amount" headerText="Amount" style="text-align:center" visible="#{userPrefController.voucherNewInsp.amount}">
+			<h:outputText value="#{voucher.amount}">
+				<f:convertNumber type="currency" currencySymbol="$" />
+			</h:outputText>
+		</p:column>
+		<p:column id="requestor" headerText="Requestor" style="text-align:center" visible="#{userPrefController.voucherNewInsp.requestor}">
+			<h:outputText value="#{voucher.requestor}" />
+		</p:column>
+		<p:column id="createdDt" headerText="Created Date" style="text-align:center" visible="#{userPrefController.voucherNewInsp.createdDt}">
+			<h:outputText value="#{voucher.createdDt}">
+				<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+			</h:outputText>
+		</p:column>
+		<p:column id="inspectionStatusId" headerText="Inspection Status" styleClass="#{wfController.pickVoucherStyleClass(voucher)}" style="text-align:center" visible="#{userPrefController.voucherNewInsp.inspectionStatusId}">
+			<p:cellEditor disabled="#{wfController.pickVoucherDisable(voucher)}">
+				<f:facet name="output"><h:outputText value="#{voucher.inspectionStatus}" /></f:facet>
+				<f:facet name="input">
+					<p:selectOneMenu id="statusId" value="#{voucher.inspectionStatusId}" style="width: 99%;" required="true" >
+						<p:ajax event="change" listener="#{wfController.onVoucherInspectCellEdit(voucher)}" update="inspectionForm voucherInspCommentId"/>
 						<f:selectItems value="#{wfController.newInspStatuses}" var="stat" itemLabel="#{stat.status}" itemValue="#{stat.inspectionStatusId}" />
 					</p:selectOneMenu>
-			</p:column>
-			<p:column headerText="Inspection Comment" style="text-align:center" styleClass="columnBgColor">
-				<p:inputTextarea id="voucherInspCommentId" value="#{voucher.inspectionComment}" maxlength="255" autoResize="false" style="width: 99%;" 
-						required="#{voucher.inspectionStatusId eq '5'}"
-						requiredMessage="Inspection comment is required if status is 'Rejected'."/>
-			</p:column>
-		</p:dataTable>
-	</h:panelGrid>
-	<h:panelGrid columns="1" styleClass="ui-panelgrid-blank" rendered="#{wfController.inspHist}">
-		<p:dataTable id="voucherHistTbl" var="voucher" value="#{wfController.inspectedVouchers}" draggableColumns="true">
-			<f:facet name="header">
-           			Vouchers
-           	<p:panelGrid styleClass="ui-panelgrid-blank">
-				<div style="float: right">
-					<p:commandButton id="toggler" type="button" icon="fa fa-align-left" style="float: right" value="Columns" />
-					<p:columnToggler datasource="voucherHistTbl" trigger="toggler" />
-				</div>
-			</p:panelGrid>
-       		</f:facet>
-			<p:column headerText="Station" style="text-align:center">
-				<h:outputText value="#{voucher.stationDescription}" />
-			</p:column>
-			<p:column headerText="Description" style="text-align:center">
-				<h:outputText value="#{voucher.description}" />
-			</p:column>
-			<p:column headerText="Crew" style="text-align:center">
-				<h:outputText value="#{voucher.crew}" />
-			</p:column>
-			<p:column headerText="Amount" style="text-align:center">
-				<h:outputText value="#{voucher.amount}">
-					<f:convertNumber type="currency" currencySymbol="$" />
-				</h:outputText>
-			</p:column>
-			<p:column headerText="Requestor" style="text-align:center">
-				<h:outputText value="#{voucher.requestor}" />
-			</p:column>
-			<p:column headerText="Created Date" style="text-align:center">
-				<h:outputText value="#{voucher.createdDt}">
-					<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
-				</h:outputText>
-			</p:column>
-			<p:column headerText="Inspection Status" style="text-align:center">
-				<h:outputText value="#{voucher.inspectionStatus.status}" />
-			</p:column>
-			<p:column headerText="Inspection Comment" style="text-align:center">
-				<h:outputText value="#{voucher.inspectionComment}" />
-			</p:column>
-		</p:dataTable>
-	</h:panelGrid>
+				</f:facet>
+			</p:cellEditor>
+		</p:column>
+		<p:column id="inspectionComment" headerText="Inspection Comment" style="text-align:center" styleClass="#{wfController.pickVoucherStyleClass(voucher)}" visible="#{userPrefController.voucherNewInsp.inspectionComment}">
+		<p:cellEditor disabled="#{wfController.pickVoucherDisable(voucher)}">
+			<f:facet name="output"><h:outputText value="#{voucher.inspectionComment}" /></f:facet>
+			<f:facet name="input">
+			<p:inputTextarea id="voucherInspCommentId" value="#{voucher.inspectionComment}" maxlength="255" autoResize="false" style="width: 99%;" 
+					required="#{voucher.inspectionStatus eq 'Rejected'}" 
+					requiredMessage="Inspection comment is required.">
+				<p:ajax event="blur" listener="#{wfController.onVoucherInspCommentCellEdit(voucher)}" update="voucherInspCommentId inspectionForm" process="@this" />
+			</p:inputTextarea>
+			</f:facet>
+		</p:cellEditor>
+		</p:column>
+		<p:column id="invoiceStatus" headerText="Invoice Status" style="text-align:center" visible="#{userPrefController.voucherNewInsp.invoiceStatusId}">
+			<h:outputText value="#{voucher.invoiceStatus}"/>
+		</p:column>
+	</p:dataTable>
+
+	<p:dataTable id="INSPECTION_HISTORY_VOUCHER_TABLE" var="voucher" value="#{wfController.inspectedVouchers}" draggableColumns="true" rendered="#{wfController.inspHist}">
+		<f:facet name="header">
+          	<p:panelGrid styleClass="ui-panelgrid-blank">
+			<div style="float: right">
+				<p:commandLink id="toggler" style="margin-right:10px;margin-top:-3px;float: right;">
+				<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+				<p:tooltip for="toggler" value="Columns" position="top"/>
+			</p:commandLink>
+				<p:columnToggler datasource="INSPECTION_HISTORY_VOUCHER_TABLE" trigger="toggler">
+					<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+				</p:columnToggler>
+			</div>
+			<div style="right:50%;">
+				<span>Voucher(s)</span>
+			</div>
+		</p:panelGrid>
+      		</f:facet>
+		<p:column id="stationDescription" headerText="Station" style="text-align:center" visible="#{userPrefController.voucher.stationDescription}">
+			<h:outputText value="#{voucher.stationDescription}" />
+		</p:column>
+		<p:column id="description" headerText="Description" style="text-align:center" visible="#{userPrefController.voucher.description}">
+			<h:outputText value="#{voucher.description}" />
+		</p:column>
+		<p:column id="crew" headerText="Crew" style="text-align:center" visible="#{userPrefController.voucher.crew}">
+			<h:outputText value="#{voucher.crew}" />
+		</p:column>
+		<p:column id="amount" headerText="Amount" style="text-align:center" visible="#{userPrefController.voucher.amount}">
+			<h:outputText value="#{voucher.amount}">
+				<f:convertNumber type="currency" currencySymbol="$" />
+			</h:outputText>
+		</p:column>
+		<p:column id="requestor" headerText="Requestor" style="text-align:center" visible="#{userPrefController.voucher.requestor}">
+			<h:outputText value="#{voucher.requestor}" />
+		</p:column>
+		<p:column id="createdDt" headerText="Created Date" style="text-align:center" visible="#{userPrefController.voucher.createdDt}">
+			<h:outputText value="#{voucher.createdDt}">
+				<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+			</h:outputText>
+		</p:column>
+		<p:column id="inspectionStatusId" headerText="Inspection Status" style="text-align:center" visible="#{userPrefController.voucher.inspectionStatusId}">
+			<h:outputText value="#{voucher.inspectionStatus}" />
+		</p:column>
+		<p:column id="inspectionComment" headerText="Inspection Comment" style="text-align:center" visible="#{userPrefController.voucher.inspectionComment}">
+			<h:outputText value="#{voucher.inspectionComment}" />
+		</p:column>
+		<p:column id="invoiceStatus" headerText="Invoice Status" style="text-align:center" visible="#{userPrefController.voucherNewInsp.invoiceStatusId}">
+			<h:outputText value="#{voucher.invoiceStatus}"/>
+		</p:column>
+		<p:column id="adminEdit" style="text-align:center;width:30px;" rendered="#{userMBean.currentUser.isPermitted('Admin-Inspection:Edit')}" >
+			<p:commandLink action="#{wfController.unlockInspectionVoucher}" style="padding-left: 10px;" title="Edit" rendered="#{userMBean.currentUser.isPermitted('Admin-Inspection:Edit')}">
+                <i class="fa fa-wa fa-unlock fa-lg" />
+            	<f:setPropertyActionListener value="#{voucher}" target="#{wfController.selectedVoucher}" />
+            	<p:confirm header="Confirmation" message="Are you sure you want to remove this voucher from this inspection?" />
+            </p:commandLink>
+		</p:column>	
+	</p:dataTable>
+	
+	<!-- <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+    </p:confirmDialog> -->
+
 </ui:composition>

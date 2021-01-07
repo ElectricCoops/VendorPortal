@@ -1,24 +1,25 @@
 package pwr.lcec.vendor.controller;
 
 import java.io.Serializable;
+
+/*import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.ToggleSelectEvent;
 import org.primefaces.event.UnselectEvent;
-
+import pwr.lcec.vendor.controller.StreetLightController;
 import pwr.lcec.vendor.web.helper.ControllerUtil;
 import pwr.lcec.vendorportal.custom.entity.Inspection;
 import pwr.lcec.vendorportal.custom.entity.InspectionStatus;
@@ -33,14 +34,12 @@ import pwr.lcec.vendorportal.interfaces.InspectionSessionRemote;
 import pwr.lcec.vendorportal.interfaces.InvoiceSessionRemote;
 import pwr.lcec.vendorportal.interfaces.StreetLightServiceRemote;
 import pwr.lcec.vendorportal.interfaces.UserManagementRemote;
-import pwr.lcec.vendorportal.sec.entity.User;
+import pwr.lcec.vendorportal.sec.entity.User;*/
 
 public class StreetLightController implements Serializable {
-
 	private static final long serialVersionUID = 1L;
+	/*private static Logger logger = LogManager.getLogger(StreetLightController.class);
 
-	private static Logger logger = Logger.getLogger(StreetLightController.class);
-	
 	private final String INV_SUMMARY = "streetlightinvoicedetail?faces-redirect=true";
 	private final String SL_INVOICE = "SL";
 	private final String STREETLIGHT = "streetlightsearch?faces-redirect=true";
@@ -51,14 +50,18 @@ public class StreetLightController implements Serializable {
 
 	@EJB
 	private StreetLightServiceRemote streetLightService;
+
 	@EJB
 	private InvoiceSessionRemote invoiceService;
+
 	@EJB
 	private InspectionSessionRemote inspectionService;
+
 	@EJB
 	private UserManagementRemote userManagementService;
 
 	private String woNo;
+
 	private String soNo;
 	private String lcecInvNo;
 	private String vendorRefNo;
@@ -79,13 +82,10 @@ public class StreetLightController implements Serializable {
 	private List<StreetLightSearchVw> selectedInvoiceServiceOrder;
 	private Invoice invoice;
 	private Integer invoiceId;
-	
 	private String rejectedInvoiceComment;
-	
 	private List<InvoiceDetail> invoiceDetail;
 	private List<InvoiceStatus> invoiceApprovalStatus;
 	private List<InspectionStatus> filterredInspectionStatuses;
-	
 	private boolean renderSelection = false;
 	private boolean renderInspectionRsltVw = false;
 	private boolean renderSearchRsltVw = false;
@@ -95,19 +95,18 @@ public class StreetLightController implements Serializable {
 	private boolean renderInvoiceBtn = true;
 	private boolean renderBackToStreetLightBtn = true;
 	private boolean renderSearchPanel = true;
-	
 	private BigDecimal slSubTotal = new BigDecimal(0);
+
 	private BigDecimal slAmount;
-	
+
 	private Integer invNoLink;
-	
+
 	private Date startDate;
+
 	private Date endDate;
-	
 	private String ivueStatus;
-	
 	ControllerUtil util = new ControllerUtil();
-	
+
 	@PostConstruct
 	void init() {
 		findInvoiceStatus();
@@ -116,24 +115,24 @@ public class StreetLightController implements Serializable {
 
 	public String searchStreetLights() {
 		try {
-			serviceOrder = streetLightService.getServiceOrders(woNo, soNo, vendorName, util.convertDtTm(startDate),
-					util.convertDtTm(endDate), invStatus, inspectionStatusId, util.getWrkGrp(), ivueStatus);
+			this.serviceOrder = this.streetLightService.getServiceOrders(this.woNo, this.soNo, this.vendorName,
+					this.util.convertDtTm(this.startDate), this.util.convertDtTm(this.endDate), this.invStatus,
+					this.inspectionStatusId, this.util.getWrkGrp(), this.ivueStatus);
 
-			if (!util.getWrkGrp().equals(LCEC)) {
+			if (!this.util.getWrkGrp().equals(LCEC)) {
 				serviceOrder = serviceOrder.stream()
-						.filter(so -> so.getInspectionStatus().getStatus().equals("Approved")
-								|| so.getInspectionStatus().getStatus().equals("Rejected"))
+						.filter(so -> !(!so.getInspectionStatus().getStatus().equals("Approved")
+								&& !so.getInspectionStatus().getStatus().equals("Rejected")))
 						.collect(Collectors.toList());
 			}
 
-			renderInvoiceRsltVw = false;
-			renderSelection = false;
-			renderSearchRsltVw = true;
-			renderInspectionRsltVw = false;
-			renderInspectionBtn = true;
-			renderInvoiceBtn = true;
-			renderSearchPanel = true;
-
+			this.renderInvoiceRsltVw = false;
+			this.renderSelection = false;
+			this.renderSearchRsltVw = true;
+			this.renderInspectionRsltVw = false;
+			this.renderInspectionBtn = true;
+			this.renderInvoiceBtn = true;
+			this.renderSearchPanel = true;
 		} catch (ProcessException e) {
 			facesError(e.getMessage());
 			logger.error(e.getMessage());
@@ -141,47 +140,49 @@ public class StreetLightController implements Serializable {
 		}
 		return STREETLIGHT;
 	}
-	
+
 	public String createInspection() throws ProcessException {
+		this.renderInvoiceRsltVw = false;
+		this.renderSearchRsltVw = false;
+		this.renderInspectionRsltVw = true;
+		this.renderInspectionBtn = false;
+		this.renderSearchPanel = false;
 
-		renderInvoiceRsltVw = false;
-		renderSearchRsltVw = false;
-		renderInspectionRsltVw = true;
-		renderInspectionBtn = false;
-		renderSearchPanel = false;
-
-		filterredInspectionStatuses = inspectionStatuses
-				.stream().filter(item -> item.getStatus().equals("Rejected")
-						|| item.getStatus().equals("Ready for Inspection") || item.getStatus().equals("Approved"))
+		filterredInspectionStatuses = inspectionStatuses.stream()
+				.filter(item -> !(!item.getStatus().equals("Rejected")
+						&& !item.getStatus().equals("Ready for Inspection") && !item.getStatus().equals("Approved")))
 				.collect(Collectors.toList());
 
-		if (serviceOrder == null || serviceOrder.size() == 0) {
+		if (this.serviceOrder == null || this.serviceOrder.size() == 0) {
 
-			inspectionServiceOrder = streetLightService.getServiceOrders(woNo, soNo, vendorName,
-					util.convertDtTm(startDate), util.convertDtTm(endDate), invStatus, inspectionStatusId,
-					util.getWrkGrp(), ivueStatus);
+			inspectionServiceOrder = streetLightService.getServiceOrders(this.woNo, this.soNo,
+					this.vendorName, this.util.convertDtTm(this.startDate), this.util.convertDtTm(this.endDate),
+					this.invStatus, this.inspectionStatusId, this.util.getWrkGrp(), this.ivueStatus);
 
-			inspectionServiceOrder = inspectionServiceOrder.stream().filter(item -> item.getInspectionStatusId() == 2 || item.getInspectionStatusId() == 5)
+			inspectionServiceOrder = inspectionServiceOrder.stream()
+					.filter(item -> !(item.getInspectionStatusId().intValue() != 2
+							&& item.getInspectionStatusId().intValue() != 5))
 					.collect(Collectors.toList());
 		} else {
 			inspectionServiceOrder = serviceOrder.stream()
-					.filter(item -> item.getInspectionStatusId() == 2 || item.getInspectionStatusId() == 5)
+					.filter(item -> !(item.getInspectionStatusId().intValue() != 2
+							&& item.getInspectionStatusId().intValue() != 5))
 					.collect(Collectors.toList());
 		}
 		return STREETLIGHT;
 	}
-	
-	public String searchInvoiceServiceOrder(){
-		
-		renderInvoiceRsltVw = true;
-		renderSearchRsltVw = false;
-		renderInspectionRsltVw = false;
-		renderInvoiceBtn = false;
-		renderInspectionBtn = true;
-		renderSearchPanel = false;
-		
+
+	public String searchInvoiceServiceOrder() {
+		this.renderInvoiceRsltVw = true;
+		this.renderSearchRsltVw = false;
+		this.renderInspectionRsltVw = false;
+		this.renderInvoiceBtn = false;
+		this.renderInspectionBtn = true;
+		this.renderSearchPanel = false;
+
 		try {
-			invoiceServiceOrder = streetLightService.getServiceOrderForInvoice(util.getWrkGrp(), "Not Invoiced");
+			this.invoiceServiceOrder = this.streetLightService.getServiceOrderForInvoice(this.util.getWrkGrp(),
+					"Not Invoiced");
 		} catch (ProcessException e) {
 			logger.error(e);
 			facesError(e.getMessage());
@@ -189,11 +190,10 @@ public class StreetLightController implements Serializable {
 		}
 		return STREETLIGHT;
 	}
-	
-	public String updateStreetlightInspection() throws ProcessException, ValidationException, NoResultException {
 
-		User user = userManagementService.finUserByPrincipal(util.getCurrentUser());
-		
+	public String updateStreetlightInspection() throws ValidationException, ProcessException, NoResultException {
+		User user = this.userManagementService.finUserByPrincipal(this.util.getCurrentUser());
+
 		StringBuilder sb = new StringBuilder();
 		sb.append(user.getFirstName());
 		sb.append(" ");
@@ -201,35 +201,34 @@ public class StreetLightController implements Serializable {
 
 		Integer resourceId = null;
 		try {
-			resourceId = inspectionService.getResourceId(sb.toString());
-		} catch (ValidationException | NoResultException | ProcessException e) {
+			resourceId = Integer.valueOf(this.inspectionService.getResourceId(sb.toString()));
+		} catch (ValidationException | pwr.lcec.vendorportal.exception.NoResultException | ProcessException e) {
 			logger.error(e);
 			facesError(e.getMessage());
 			e.printStackTrace();
 		}
 		Inspection inspection = null;
 
-		for (StreetLightSearchVw sl : inspectionServiceOrder) {
-			if (sl.getInspectionStatusId() != 2) {
+		for (StreetLightSearchVw sl : this.inspectionServiceOrder) {
+			if (sl.getInspectionStatusId().intValue() != 2) {
 
 				inspection = new Inspection();
 
-				inspection.setInspectionDt(util.currentDtTm());
-				inspection.setInspectedBy(resourceId);
-				inspection.setInspectionStatusId(sl.getInspectionStatusId());
+				inspection.setInspectionDt(this.util.currentDtTm());
+				inspection.setInspectedBy(resourceId.intValue());
+				inspection.setInspectionStatusId(sl.getInspectionStatusId().intValue());
 				inspection.setComments(sl.getInspectedComment());
 				inspection.setServiceOrderId(sl.getServiceOrderId());
 				inspection.setWorkOrderId(sl.getServiceOrderId());
-				inspection.setInspectionType("SL");
+				inspection.setInspectionType(SL_INVOICE);
 
 				try {
-					Integer inspectionId = inspectionService.insertInspection(inspection);
-					streetLightService.updateServiceOrderInspection(inspectionId, sl.getServiceOrderId(),
-							sl.getInspectionStatusId(), sl.getInspectedComment(), util.currentDtTm(),
-							util.getCurrentUser());
+					Integer inspectionId = this.inspectionService.insertInspection(inspection);
+					this.streetLightService.updateServiceOrderInspection(inspectionId, sl.getServiceOrderId(),
+							sl.getInspectionStatusId(), sl.getInspectedComment(), this.util.currentDtTm(),
+							this.util.getCurrentUser());
 
 					facesInfo("Inspection Successful.");
-
 				} catch (Exception e) {
 					logger.error(e);
 					facesError(e.getMessage());
@@ -239,14 +238,13 @@ public class StreetLightController implements Serializable {
 		}
 		return searchStreetLights();
 	}
-	
-	public String updateStreetlightComment(StreetLightSearchVw streetLightSearchVw) {
 
+	public String updateStreetlightComment(StreetLightSearchVw streetLightSearchVw) {
 		try {
-			streetLightService.updateServiceOrderComment(streetLightSearchVw.getInspectedComment(),streetLightSearchVw.getServiceOrderId());
+			this.streetLightService.updateServiceOrderComment(streetLightSearchVw.getInspectedComment(),
+					streetLightSearchVw.getServiceOrderId());
 
 			facesInfo("Inspection Successful.");
-
 		} catch (ValidationException | ProcessException e) {
 			logger.error(e);
 			facesError(e.getMessage());
@@ -254,227 +252,222 @@ public class StreetLightController implements Serializable {
 		}
 		return searchStreetLights();
 	}
-	
+
 	public String backToSearch() {
 		System.out.println("backToSearch(): Start");
 		return STREETLIGHT;
 	}
-	
+
 	public String backToSearchFromInvoice() {
 		System.out.println("backToSearchFromInvoice(): Start");
 		return STREETLIGHT_FROM_INVOICE;
 	}
-	
-	public void invoiceSearch() throws ProcessException {
-		renderSelection = true;
-		
-		serviceOrder = serviceOrder.stream().filter(item -> item.getWorkGroup().equals(util.getWrkGrp()) && item.getInvoiceId() == 0).collect(Collectors.toList());
+
+	public void invoiceSearch() {
+		this.renderSelection = true;
+
+		serviceOrder = serviceOrder.stream().filter(
+				item -> (item.getWorkGroup().equals(this.util.getWrkGrp()) && item.getInvoiceId().intValue() == 0))
+				.collect(Collectors.toList());
 	}
-	
+
 	public void searchInvSummary() throws ProcessException {
 		List<String> so = new ArrayList<String>();
-		for(StreetLightSearchVw soId : invoiceServiceOrder) {
+		for (StreetLightSearchVw soId : this.invoiceServiceOrder) {
 			so.add(new String(soId.getServiceOrderId()));
 		}
 
-		invSummary = streetLightService.getServiceOrderSummary(so, util.getWrkGrp());
+		this.invSummary = this.streetLightService.getServiceOrderSummary(so, this.util.getWrkGrp());
 	}
 
-	public String submitSLInvoice() throws ProcessException, NoResultException, ValidationException {
-
-		//searchInvSummary();
-		
-		if ((selectedInvoiceServiceOrder.size() <= 0)) {
+	public String submitSLInvoice() throws ProcessException {
+		if (this.selectedInvoiceServiceOrder.size() <= 0) {
 			facesError("At least one Street Light item must be selected for invoice.");
 			return null;
 		}
-		
-		final String guid = util.genGUID();
-		
-		if ((selectedInvoiceServiceOrder.size() > 0)) {
-		for (StreetLightSearchVw sl : selectedInvoiceServiceOrder) {
-			try {
-				streetLightService.updateServiceOrder(guid, sl.getServiceOrderId(), 2);
-			} catch (ValidationException ex) {
-				logger.error(ex.getMessage());
-				facesError(ex.getMessage());
-				ex.printStackTrace();
+
+		String guid = this.util.genGUID();
+
+		if (this.selectedInvoiceServiceOrder.size() > 0) {
+			for (StreetLightSearchVw sl : this.selectedInvoiceServiceOrder) {
+				try {
+					this.streetLightService.updateServiceOrder(guid, sl.getServiceOrderId(), Integer.valueOf(2));
+				} catch (ValidationException ex) {
+					logger.error(ex.getMessage());
+					facesError(ex.getMessage());
+					ex.printStackTrace();
+				}
 			}
 		}
-		}
+
 		try {
-			invoiceId = invoiceService.updateSubmitInvoice(guid, util.getCurrentUser(), invRefNo, SL_INVOICE);
 			facesInfo("Invoice submitted successfully.");
 		} catch (Exception ex) {
 			facesError(ex.getMessage());
 			logger.error(ex.getMessage());
 			ex.printStackTrace();
 		}
-		
-		//util.refreshInvoiceDetails(invoiceId);
-		this.invNoLink = invoiceId;
-		
+
+		this.invNoLink = this.invoiceId;
+
 		return slInvoiceDetail();
 	}
-	
-	@SuppressWarnings("unused")
-	public String submitInvoiceApproval() throws NoResultException, ProcessException {
-		
+
+	public String submitInvoiceApproval() {
 		try {
-			for(StreetLightSearchVw sl : invSummary) {
-				
-				invoiceService.updateStreetlightInvoiceApproval(sl.getServiceOrderId(), 4, util.getCurrentUser(), util.currentDtTm(),sl.getInvoiceApprovedComments());	
+			for (StreetLightSearchVw sl : this.invSummary) {
+				this.invoiceService.updateStreetlightInvoiceApproval(sl.getServiceOrderId(), Integer.valueOf(4),
+						this.util.getCurrentUser(), this.util.currentDtTm(), sl.getInvoiceApprovedComments());
 			}
-			int output = invoiceService.updateInvoiceStatus(invNoLink, 4, SL_INVOICE, util.getCurrentUser(), util.currentDtTm(), null);
+			invoiceService.updateInvoiceStatus(this.invNoLink, Integer.valueOf(4), SL_INVOICE,
+					this.util.getCurrentUser(), this.util.currentDtTm(), null);
 			facesInfo("Invoice Approved.");
 		} catch (ProcessException | ValidationException e) {
 			logger.error(e);
 			facesError(e.getMessage());
 			e.printStackTrace();
 		}
-		util.refreshInvoiceSearch();
-		
+
 		return INVOICE_SEARCH;
 	}
-	
-	@SuppressWarnings("unused")
-	public String submitInvoiceRejected() throws NoResultException, ProcessException {
 
+	public String submitInvoiceRejected() throws ProcessException {
 		PrimeFaces.current().executeScript("PF('rejectedInvoiceDlg').hide()");
 		try {
-			for (StreetLightSearchVw sl : invSummary) {
+			for (StreetLightSearchVw sl : this.invSummary) {
 				if (sl.getInvoiceStatus().equals("Rejected")) {
-
-					invoiceService.updateStreetlightInvoiceApproval(sl.getServiceOrderId(), 3, util.getCurrentUser(),util.currentDtTm(), sl.getInvoiceApprovedComments());
+					invoiceService.updateStreetlightInvoiceApproval(sl.getServiceOrderId(), Integer.valueOf(3),
+							util.getCurrentUser(), this.util.currentDtTm(), sl.getInvoiceApprovedComments());
 				}
 			}
-			
-			int output = invoiceService.updateInvoiceStatus(invNoLink, 3, SL_INVOICE, util.getCurrentUser(), util.currentDtTm(), rejectedInvoiceComment);
+
+			invoiceService.updateInvoiceStatus(this.invNoLink, Integer.valueOf(3), SL_INVOICE,
+					util.getCurrentUser(), this.util.currentDtTm(), this.rejectedInvoiceComment);
 			facesInfo("Invoice Rejected.");
 		} catch (ValidationException e) {
 			logger.error(e);
 			facesError(e.getMessage());
 			e.printStackTrace();
 		}
-		util.refreshInvoiceSearch();
 
 		return INVOICE_SEARCH;
 	}
-	
-	public String slInvoiceDetail() throws ValidationException, ProcessException, NoResultException {
-		
+
+	public String slInvoiceDetail() {
 		searchInvoiceDetail();
-		
+
 		return INV_SUMMARY;
 	}
-	
+
 	public String findInvoiceApproval() {
-
 		searchInvoiceDetail();
-		
-		invoiceApprovalStatus = invoiceStatus.stream().filter(item -> item.getDescription().equals("Submitted") || item.getDescription().equals("Rejected") || item.getDescription().equals("Approved")).collect(Collectors.toList());
 
-		for (StreetLightSearchVw sl : invSummary) {
+		invoiceApprovalStatus = invoiceStatus.stream()
+				.filter(item -> !(!item.getDescription().equals("Submitted")
+						&& !item.getDescription().equals("Rejected") && !item.getDescription().equals("Approved")))
+				.collect(Collectors.toList());
+
+		for (StreetLightSearchVw sl : this.invSummary) {
 			if (sl.getInvoiceStatus().equals("Rejected")) {
-				disableApprovedBtn = true;
+				this.disableApprovedBtn = true;
 				return INVOICE_APPROVAL;
-			} else if (!sl.getInvoiceStatus().equals("Rejected")) {
-				disableApprovedBtn = false;
+			}
+			if (!sl.getInvoiceStatus().equals("Rejected")) {
+				this.disableApprovedBtn = false;
 			}
 		}
 		return INVOICE_APPROVAL;
 	}
-	
+
 	public String updateApprovalBtn() {
-		for (StreetLightSearchVw sl : invSummary) {
+		for (StreetLightSearchVw sl : this.invSummary) {
 			if (sl.getInvoiceStatus().equals("Rejected")) {
-				disableApprovedBtn = true;
+				this.disableApprovedBtn = true;
 				facesError("Comment required on rejected Streetlight Invoice item.");
 				return INVOICE_APPROVAL;
-			} else if (!sl.getInvoiceStatus().equals("Rejected")) {
-				disableApprovedBtn = false;
+			}
+			if (!sl.getInvoiceStatus().equals("Rejected")) {
+				this.disableApprovedBtn = false;
 			}
 		}
 		return INVOICE_APPROVAL;
 	}
-	
+
 	public void searchInvoiceDetail() {
-		
 		try {
-			invoice = invoiceService.getInvoiceById(invNoLink);
-			invoiceDetail = invoiceService.getInvoiceDetails(invNoLink);
-			invSummary= streetLightService.getServiceOrderByInvoiceId(invNoLink);
-		} catch (ValidationException | ProcessException | NoResultException e) {
+			this.invoice = this.invoiceService.getInvoiceById(this.invNoLink);
+			this.invoiceDetail = this.invoiceService.getInvoiceDetails(this.invNoLink);
+			this.invSummary = this.streetLightService.getServiceOrderByInvoiceId(this.invNoLink);
+		} catch (ValidationException | ProcessException | pwr.lcec.vendorportal.exception.NoResultException e) {
 			logger.error(e);
 			facesError(e.getMessage());
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void slInvRowSelectCheckbox(SelectEvent event) {
-		
 		BigDecimal sum = BigDecimal.ZERO;
-		if(selectedInvoiceServiceOrder.size() > 0) {
-			for(StreetLightSearchVw so : selectedInvoiceServiceOrder) {
-				
-				slAmount = so.getExtPrice();
-				
-				sum = sum.add(slAmount);
+		if (this.selectedInvoiceServiceOrder.size() > 0) {
+			for (StreetLightSearchVw so : this.selectedInvoiceServiceOrder) {
+
+				this.slAmount = so.getExtPrice();
+
+				sum = sum.add(this.slAmount);
 			}
-			slSubTotal = sum;
+			this.slSubTotal = sum;
 		}
 	}
-	
+
 	public void slInvRowUnSelectCheckbox(UnselectEvent event) {
-		
-		slAmount = ((StreetLightSearchVw)event.getObject()).getExtPrice();
-		slSubTotal = slSubTotal.subtract(slAmount);
+		this.slAmount = ((StreetLightSearchVw) event.getObject()).getExtPrice();
+		this.slSubTotal = this.slSubTotal.subtract(this.slAmount);
 	}
-	
+
 	public void slInvAllRowSelectCheckbox(ToggleSelectEvent event) {
-		
 		BigDecimal sum = BigDecimal.ZERO;
-		
-		if(selectedInvoiceServiceOrder.size() > 0) {
-			for(StreetLightSearchVw so : selectedInvoiceServiceOrder) {
-				slSubTotal = so.getExtPrice();
-				
-				sum = sum.add(slSubTotal);
+
+		if (this.selectedInvoiceServiceOrder.size() > 0) {
+			for (StreetLightSearchVw so : this.selectedInvoiceServiceOrder) {
+				this.slSubTotal = so.getExtPrice();
+
+				sum = sum.add(this.slSubTotal);
 			}
-			slSubTotal = sum;
+			this.slSubTotal = sum;
 		}
 	}
-	
+
 	public void findInvoiceStatus() {
-		invoiceStatus = invoiceService.getAllInvStatus();
-		
-		slInvoiceStatus = invoiceStatus.stream().filter(item -> item.getDescription().equals("Not Invoiced") || item.getDescription().equals("Submitted")).collect(Collectors.toList());
-		
-		invoiceStatus.sort(Comparator.comparing(InvoiceStatus::getDescription, Comparator.nullsLast(Comparator.naturalOrder())));
+		this.invoiceStatus = this.invoiceService.getAllInvStatus();
+
+		slInvoiceStatus = invoiceStatus.stream().filter(
+				item -> !(!item.getDescription().equals("Not Invoiced") && !item.getDescription().equals("Submitted")))
+				.collect(Collectors.toList());
+
+		this.invoiceStatus.sort(
+				Comparator.comparing(InvoiceStatus::getDescription, Comparator.nullsLast(Comparator.naturalOrder())));
 	}
-	
+
 	public void findInspectionStatus() {
-		inspectionStatuses = inspectionService.getInspetionStatus();
-		
-		inspectionStatuses.sort(Comparator.comparing(InspectionStatus::getStatus, Comparator.nullsLast(Comparator.naturalOrder())));
+		this.inspectionStatuses = this.inspectionService.getInspetionStatus();
+
+		this.inspectionStatuses.sort(
+				Comparator.comparing(InspectionStatus::getStatus, Comparator.nullsLast(Comparator.naturalOrder())));
 	}
 
 	private void facesError(String message) {
-
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
 		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
-	
-	private void facesInfo(String message) {
 
+	private void facesInfo(String message) {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
 		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
-	
+
 	public String getWoNo() {
-		return woNo;
+		return this.woNo;
 	}
 
 	public void setWoNo(String woNo) {
@@ -482,7 +475,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public String getSoNo() {
-		return soNo;
+		return this.soNo;
 	}
 
 	public void setSoNo(String soNo) {
@@ -490,7 +483,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public String getLcecInvNo() {
-		return lcecInvNo;
+		return this.lcecInvNo;
 	}
 
 	public void setLcecInvNo(String lcecInvNo) {
@@ -498,7 +491,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public String getVendorRefNo() {
-		return vendorRefNo;
+		return this.vendorRefNo;
 	}
 
 	public void setVendorRefNo(String vendorRefNo) {
@@ -506,7 +499,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public Integer getInvStatus() {
-		return invStatus;
+		return this.invStatus;
 	}
 
 	public void setInvStatus(Integer invStatus) {
@@ -514,7 +507,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public String getInvRefNo() {
-		return invRefNo;
+		return this.invRefNo;
 	}
 
 	public void setInvRefNo(String invRefNo) {
@@ -522,7 +515,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<InvoiceStatus> getInvoiceStatus() {
-		return invoiceStatus;
+		return this.invoiceStatus;
 	}
 
 	public void setInvoiceStatus(List<InvoiceStatus> invoiceStatus) {
@@ -530,7 +523,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<StreetLightSearchVw> getServiceOrder() {
-		return serviceOrder;
+		return this.serviceOrder;
 	}
 
 	public void setServiceOrder(List<StreetLightSearchVw> serviceOrder) {
@@ -538,7 +531,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<StreetLightSearchVw> getSelectedServiceOrder() {
-		return selectedServiceOrder;
+		return this.selectedServiceOrder;
 	}
 
 	public void setSelectedServiceOrder(List<StreetLightSearchVw> selectedServiceOrder) {
@@ -546,7 +539,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<StreetLightSearchVw> getFilteredServiceOrder() {
-		return filteredServiceOrder;
+		return this.filteredServiceOrder;
 	}
 
 	public void setFilteredServiceOrder(List<StreetLightSearchVw> filteredServiceOrder) {
@@ -554,7 +547,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<StreetLightSearchVw> getInvSummary() {
-		return invSummary;
+		return this.invSummary;
 	}
 
 	public void setInvSummary(List<StreetLightSearchVw> invSummary) {
@@ -562,7 +555,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public Integer getInvoiceId() {
-		return invoiceId;
+		return this.invoiceId;
 	}
 
 	public void setInvoiceId(Integer invoiceId) {
@@ -570,7 +563,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isRenderSelection() {
-		return renderSelection;
+		return this.renderSelection;
 	}
 
 	public void setRenderSelection(boolean renderSelection) {
@@ -578,7 +571,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public Integer getInvNoLink() {
-		return invNoLink;
+		return this.invNoLink;
 	}
 
 	public void setInvNoLink(Integer invNoLink) {
@@ -586,7 +579,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public Date getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public void setStartDate(Date startDate) {
@@ -594,7 +587,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public Date getEndDate() {
-		return endDate;
+		return this.endDate;
 	}
 
 	public void setEndDate(Date endDate) {
@@ -602,7 +595,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public String getVendorName() {
-		return vendorName;
+		return this.vendorName;
 	}
 
 	public void setVendorName(String vendorName) {
@@ -610,7 +603,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public Invoice getInvoice() {
-		return invoice;
+		return this.invoice;
 	}
 
 	public void setInvoice(Invoice invoice) {
@@ -618,7 +611,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public Integer getInspectionStatusId() {
-		return inspectionStatusId;
+		return this.inspectionStatusId;
 	}
 
 	public void setInspectionStatusId(Integer inspectionStatusId) {
@@ -626,7 +619,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<StreetLightSearchVw> getInspectionServiceOrder() {
-		return inspectionServiceOrder;
+		return this.inspectionServiceOrder;
 	}
 
 	public void setInspectionServiceOrder(List<StreetLightSearchVw> inspectionServiceOrder) {
@@ -634,7 +627,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<InspectionStatus> getInspectionStatuses() {
-		return inspectionStatuses;
+		return this.inspectionStatuses;
 	}
 
 	public void setInspectionStatuses(List<InspectionStatus> inspectionStatuses) {
@@ -642,7 +635,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isRenderInspectionRsltVw() {
-		return renderInspectionRsltVw;
+		return this.renderInspectionRsltVw;
 	}
 
 	public void setRenderInspectionRsltVw(boolean renderInspectionRsltVw) {
@@ -650,7 +643,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isRenderSearchRsltVw() {
-		return renderSearchRsltVw;
+		return this.renderSearchRsltVw;
 	}
 
 	public void setRenderSearchRsltVw(boolean renderSearchRsltVw) {
@@ -658,7 +651,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isRenderInvoiceRsltVw() {
-		return renderInvoiceRsltVw;
+		return this.renderInvoiceRsltVw;
 	}
 
 	public void setRenderInvoiceRsltVw(boolean renderInvoiceRsltVw) {
@@ -666,7 +659,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<StreetLightSearchVw> getInvoiceServiceOrder() {
-		return invoiceServiceOrder;
+		return this.invoiceServiceOrder;
 	}
 
 	public void setInvoiceServiceOrder(List<StreetLightSearchVw> invoiceServiceOrder) {
@@ -674,7 +667,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<InvoiceDetail> getInvoiceDetail() {
-		return invoiceDetail;
+		return this.invoiceDetail;
 	}
 
 	public void setInvoiceDetail(List<InvoiceDetail> invoiceDetail) {
@@ -682,7 +675,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isDisableApprovedBtn() {
-		return disableApprovedBtn;
+		return this.disableApprovedBtn;
 	}
 
 	public void setDisableApprovedBtn(boolean disableApprovedBtn) {
@@ -690,7 +683,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public String getRejectedInvoiceComment() {
-		return rejectedInvoiceComment;
+		return this.rejectedInvoiceComment;
 	}
 
 	public void setRejectedInvoiceComment(String rejectedInvoiceComment) {
@@ -698,7 +691,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<InvoiceStatus> getInvoiceApprovalStatus() {
-		return invoiceApprovalStatus;
+		return this.invoiceApprovalStatus;
 	}
 
 	public void setInvoiceApprovalStatus(List<InvoiceStatus> invoiceApprovalStatus) {
@@ -706,7 +699,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<InspectionStatus> getFilterredInspectionStatuses() {
-		return filterredInspectionStatuses;
+		return this.filterredInspectionStatuses;
 	}
 
 	public void setFilterredInspectionStatuses(List<InspectionStatus> filterredInspectionStatuses) {
@@ -714,7 +707,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isRenderInspectionBtn() {
-		return renderInspectionBtn;
+		return this.renderInspectionBtn;
 	}
 
 	public void setRenderInspectionBtn(boolean renderInspectionBtn) {
@@ -722,7 +715,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isRenderInvoiceBtn() {
-		return renderInvoiceBtn;
+		return this.renderInvoiceBtn;
 	}
 
 	public void setRenderInvoiceBtn(boolean renderInvoiceBtn) {
@@ -730,7 +723,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<InvoiceStatus> getSlInvoiceStatus() {
-		return slInvoiceStatus;
+		return this.slInvoiceStatus;
 	}
 
 	public void setSlInvoiceStatus(List<InvoiceStatus> slInvoiceStatus) {
@@ -738,7 +731,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public String getIvueStatus() {
-		return ivueStatus;
+		return this.ivueStatus;
 	}
 
 	public void setIvueStatus(String ivueStatus) {
@@ -746,7 +739,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<StreetLightSearchVw> getSelectedInvoiceServiceOrder() {
-		return selectedInvoiceServiceOrder;
+		return this.selectedInvoiceServiceOrder;
 	}
 
 	public void setSelectedInvoiceServiceOrder(List<StreetLightSearchVw> selectedInvoiceServiceOrder) {
@@ -754,7 +747,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isRenderBackToStreetLightBtn() {
-		return renderBackToStreetLightBtn;
+		return this.renderBackToStreetLightBtn;
 	}
 
 	public void setRenderBackToStreetLightBtn(boolean renderBackToStreetLightBtn) {
@@ -762,7 +755,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public boolean isRenderSearchPanel() {
-		return renderSearchPanel;
+		return this.renderSearchPanel;
 	}
 
 	public void setRenderSearchPanel(boolean renderSearchPanel) {
@@ -770,7 +763,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public List<StreetLightSearchVw> getFilteredSearchServiceOrder() {
-		return filteredSearchServiceOrder;
+		return this.filteredSearchServiceOrder;
 	}
 
 	public void setFilteredSearchServiceOrder(List<StreetLightSearchVw> filteredSearchServiceOrder) {
@@ -778,7 +771,7 @@ public class StreetLightController implements Serializable {
 	}
 
 	public BigDecimal getSlSubTotal() {
-		return slSubTotal;
+		return this.slSubTotal;
 	}
 
 	public void setSlSubTotal(BigDecimal slSubTotal) {
@@ -786,10 +779,10 @@ public class StreetLightController implements Serializable {
 	}
 
 	public BigDecimal getSlAmount() {
-		return slAmount;
+		return this.slAmount;
 	}
 
 	public void setSlAmount(BigDecimal slAmount) {
 		this.slAmount = slAmount;
-	}
+	}*/
 }

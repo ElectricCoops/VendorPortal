@@ -6,78 +6,120 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.primefaces.PrimeFaces;
-
+import pwr.lcec.vendor.controller.AdHocStakingController;
+import pwr.lcec.vendor.controller.WorkflowController;
 import pwr.lcec.vendor.web.helper.ControllerUtil;
-import pwr.lcec.vendorportal.custom.entity.AssemblyAdhocVw;
-import pwr.lcec.vendorportal.custom.entity.StakingSheet;
-import pwr.lcec.vendorportal.custom.entity.StakingSheetDetail;
-import pwr.lcec.vendorportal.custom.entity.Voucher;
-import pwr.lcec.vendorportal.exception.NoResultException;
+import pwr.lcec.vendorportal.entity.custom.AssemblyAdhocVw;
+import pwr.lcec.vendorportal.entity.custom.StakingSheet;
+import pwr.lcec.vendorportal.entity.custom.StakingSheetDetail;
+import pwr.lcec.vendorportal.entity.custom.Voucher;
+import pwr.lcec.vendorportal.entity.custom.VoucherGui;
+/*import pwr.lcec.vendorportal.exception.NoResultException;
 import pwr.lcec.vendorportal.exception.ProcessException;
-import pwr.lcec.vendorportal.exception.ValidationException;
-import pwr.lcec.vendorportal.interfaces.WorkFlowSessionRemote;
+import pwr.lcec.vendorportal.exception.ValidationException;*/
+import pwr.lcec.vendorportal.interfaces.WorkFlowLocal;
 
 public class AdHocStakingController implements Serializable {
-
 	private static final long serialVersionUID = 1L;
-
-	private static Logger logger = Logger.getLogger(AdHocStakingController.class);
+	private static Logger logger = LogManager.getLogger(AdHocStakingController.class);
+	private WorkflowController controller = (WorkflowController) FacesContext.getCurrentInstance().getApplication()
+			.evaluateExpressionGet(FacesContext.getCurrentInstance(), "#{wfController}", WorkflowController.class);
 
 	private final String ADHOC_STAKING = "adhocstaking";
 	private final String VP = "VP";
 
 	@EJB
-	private WorkFlowSessionRemote workflowService;
+	private WorkFlowLocal workflowService;
 
-	private String station;
+	private BigDecimal station;
+
 	private String stationDesc;
+
 	private String assemblyUnit;
+
 	private Integer unitQty;
+
 	private Integer asBuiltStatus;
 	private List<AssemblyAdhocVw> assemblyunits;
 	private String asBuiltQty;
 	private String asBuiltComment;
 	private String stakingsheetId;
 	private String assemblyUnitDesc;
-
 	private String cr;
 	private String transfer;
 	private String energized;
-
 	private StakingSheet stakingSheet;
 	private StakingSheetDetail stakingSheetDetail;
-	
 	private String workType;
 	private String voucherDesc;
 	private BigDecimal voucherAmt;
 	private String voucherCrew;
-
+	private VoucherGui selectedVoucher = new VoucherGui();
+	
 	ControllerUtil util = new ControllerUtil();
 
 	public String newStaking() {
-
 		return ADHOC_STAKING;
 	}
+	
+	public void openVoucherDlg() {
+		
+		station = BigDecimal.ZERO;
+		workType = "";
+		voucherDesc = "";
+		voucherAmt = BigDecimal.ZERO;
+		voucherCrew = "";
+		
+		PrimeFaces.current().ajax().update("addVoucherDiagForm");
+		PrimeFaces.current().executeScript("PF('addVoucherDlg').show();");
+		
+	}
+	
+	public void openEditVoucherDlg() {
+		
+		station = new BigDecimal(selectedVoucher.getStationDescription());
+		
+		if(selectedVoucher.getGLAccountId() == 1 && selectedVoucher.getGLAccountIdSplit() == 3) {
+			workType = "M";
+		}else if(selectedVoucher.getGLAccountId() == 1 && selectedVoucher.getGLAccountIdSplit() != 3) {
+			workType = "C";
+		}else if(selectedVoucher.getGLAccountId() == 3) {
+			workType = "R";
+		}
+		
+		voucherDesc = selectedVoucher.getDescription();
+		voucherAmt = selectedVoucher.getAmount();
+		voucherCrew = selectedVoucher.getCrew();
+		
+		PrimeFaces.current().ajax().update("editVoucherDlgForm");
+		PrimeFaces.current().executeScript("PF('editVoucherDlg').show();");
+	}
 
-	public String insertVoucher() {
+	public void insertVoucher() {
+		logger.debug(util.getWoId());
+		logger.debug(station);
+		logger.debug(workType);
+		logger.debug(voucherDesc);
+		logger.debug(voucherAmt);
+		logger.debug(voucherCrew);
+
 		Voucher voucher = new Voucher();
 		String stakingSheetId = workflowService.getStatkingSheetId(util.getWoId());
 
 		voucher.setStationDescription(station);
 		if (workType.equals("C")) {
-			voucher.setGLAccountId(1);
+			voucher.setGLAccountId(Integer.valueOf(1));
 		} else if (workType.equals("R")) {
-			voucher.setGLAccountId(3);
+			voucher.setGLAccountId(Integer.valueOf(3));
 		} else if (workType.equals("M")) {
-			voucher.setGLAccountId(1);
-			voucher.setGLAccountIdSplit(3);
+			voucher.setGLAccountId(Integer.valueOf(1));
+			voucher.setGLAccountIdSplit(Integer.valueOf(3));
 		}
 		voucher.setDescription(voucherDesc);
 		voucher.setAmount(voucherAmt);
@@ -86,58 +128,87 @@ public class AdHocStakingController implements Serializable {
 		voucher.setWorkOrderId(util.getWoId());
 		voucher.setCreatedDt(util.currentDtTm());
 		voucher.setRequestor(util.getCurrentUser());
-		voucher.setInspectionStatusId(2);
-		voucher.setInvoiceStatusId(1);
-		
+		voucher.setInspectionStatusId(Integer.valueOf(2));
+		voucher.setInvoiceStatusId(Integer.valueOf(1));
+
 		try {
 			voucher = workflowService.insertVoucher(voucher);
-		} catch (ProcessException | ValidationException e) {
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
-		PrimeFaces.current().executeScript("PF('addVoucherDlg').hide()");  
+		PrimeFaces.current().executeScript("PF('addVoucherDlg').hide()");
 		facesInfo("Voucher added successfully.");
-		
-		return updateVouchers();
+
+		controller.findVouchers();
 	}
 	
+	public void updateVoucher() {
+		logger.debug(util.getWoId());
+		logger.debug(station);
+		logger.debug(workType);
+		logger.debug(voucherDesc);
+		logger.debug(voucherAmt);
+		logger.debug(voucherCrew);
+
+		Voucher voucher = workflowService.getVoucherById(selectedVoucher.getVoucherId());
+		//String stakingSheetId = workflowService.getStatkingSheetId(util.getWoId());
+
+		voucher.setStationDescription(station);
+		if (workType.equals("C")) {
+			voucher.setGLAccountId(Integer.valueOf(1));
+		} else if (workType.equals("R")) {
+			voucher.setGLAccountId(Integer.valueOf(3));
+		} else if (workType.equals("M")) {
+			voucher.setGLAccountId(Integer.valueOf(1));
+			voucher.setGLAccountIdSplit(Integer.valueOf(3));
+		}
+		voucher.setDescription(voucherDesc);
+		voucher.setAmount(voucherAmt);
+		voucher.setCrew(voucherCrew);
+		voucher.setCreatedDt(util.currentDtTm());
+		voucher.setRequestor(util.getCurrentUser());
+		voucher.setInspectionStatusId(Integer.valueOf(2));
+		voucher.setInvoiceStatusId(Integer.valueOf(1));
+
+		try {
+			voucher = workflowService.updateVoucher(voucher);
+		} catch (Exception e) {
+			logger.error(e);
+			facesError(e.getMessage());
+		}
+		PrimeFaces.current().executeScript("PF('editVoucherDlg').hide()");
+		facesInfo("Voucher updated successfully.");
+
+		controller.findVouchers();
+	}
+
 	public String addStation() {
-		for (String exist : existingStations()) {
+		logger.debug("Inside addStation Method...");
+		for (BigDecimal exist : existingStations()) {
 			if (exist.equals(station)) {
 				facesError("Station No. " + station + " already exisit. Please select a new station number.");
 				return null;
 			}
 		}
-		try {
-			addStationOrUnit();
-		} catch (ValidationException | NoResultException | ProcessException e) {
-			logger.error(e.getMessage());
-			facesError(e.getMessage());
-		}
-		PrimeFaces.current().executeScript("PF('addStationDlg').hide()");  
+		addStationOrUnit();
+		PrimeFaces.current().executeScript("PF('addStationDlg').hide()");
 		facesInfo("Station added successfully.");
 		return updateStakingTbl();
 	}
 
 	public String addUnit() {
-		try {
-			addStationOrUnit();
-			
-		} catch (ValidationException | NoResultException | ProcessException e) {
-			logger.error(e.getMessage());
-			facesError(e.getMessage());
-		}
-		PrimeFaces.current().executeScript("PF('addUnitDlg').hide()");   
+		addStationOrUnit();
+		PrimeFaces.current().executeScript("PF('addUnitDlg').hide()");
 		facesInfo("Unit added successfully.");
 		return updateStakingTbl();
 	}
 
-	public void addStationOrUnit() throws ValidationException, NoResultException, ProcessException {
-
-		int rateGroupId = workflowService.getRateGroupId(util.getWrkGrp());
+	public void addStationOrUnit() {
+		int rateGroupId = workflowService.getRateGroupId(util.getWrkGrp()).intValue();
 		String stakingSheetId = workflowService.getStatkingSheetId(util.getWoId());
 
-		assemblyunits = workflowService.getDistinctRates(rateGroupId, energized, transfer);
+		assemblyunits = workflowService.getDistinctRates(Integer.valueOf(rateGroupId), energized, transfer, util.workEventDt());
 
 		stakingSheetDetail = new StakingSheetDetail();
 
@@ -151,46 +222,49 @@ public class AdHocStakingController implements Serializable {
 		stakingSheetDetail.setAssemblyActionCode(cr);
 		stakingSheetDetail.setAssemblyCreatedDt(util.currentDtTm());
 		stakingSheetDetail.setAssemblyModifiedDt(util.currentDtTm());
-		stakingSheetDetail.setAsBuiltQuantity(unitQty);
-		if(asBuiltStatus == null) {
-			stakingSheetDetail.setAsBuiltStatusId(1);
-		}else {
+		stakingSheetDetail.setAsBuiltQuantity(unitQty.intValue());
+		
+		if (asBuiltStatus == null) {
+			stakingSheetDetail.setAsBuiltStatusId(Integer.valueOf(1));
+		} else {
 			stakingSheetDetail.setAsBuiltStatusId(asBuiltStatus);
 		}
+		
 		stakingSheetDetail.setAsBuiltDt(util.currentDtTm());
 		stakingSheetDetail.setAsBuiltComments(asBuiltComment);
 		stakingSheetDetail.setAsBuiltBy(util.getCurrentUser());
-		if(asBuiltStatus != null && asBuiltStatus == 3) {
-			stakingSheetDetail.setCurrentInspectionDetailStatusId(2);
-		}else {
-			stakingSheetDetail.setCurrentInspectionDetailStatusId(1);
+		
+		if (asBuiltStatus != null && asBuiltStatus.intValue() == 3) {
+			stakingSheetDetail.setCurrentInspectionDetailStatusId(Integer.valueOf(2));
+		} else {
+			stakingSheetDetail.setCurrentInspectionDetailStatusId(Integer.valueOf(1));
 		}
-		stakingSheetDetail.setInvoiceStatusId(1);
+		stakingSheetDetail.setInvoiceStatusId(Integer.valueOf(1));
 
 		workflowService.insertSheetDetail(stakingSheetDetail);
+
+		try {
+			workflowService.updateAsBuiltAmount(stakingSheetDetail.getStakingSheetDetailId(), util.workEventDt());
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e);
+		}
 	}
 
 	public String updateStakingTbl() {
-		FacesContext context = FacesContext.getCurrentInstance();
-		WorkflowController stations = context.getApplication().evaluateExpressionGet(context, "#{wfController}",
-				WorkflowController.class);
-		stations.findStakingDetailByWoId();
-		stations.asBuiltEdit();
+		controller.findStakingDetailByWoId();
+		controller.asBuiltEdit();
 
 		String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
-		return viewId + "?faces-redirect=true";
+		return String.valueOf(viewId) + "?faces-redirect=true";
 	}
-	
+
 	public String updateVouchers() {
-		FacesContext context = FacesContext.getCurrentInstance();
-		WorkflowController stations = context.getApplication().evaluateExpressionGet(context, "#{wfController}",
-				WorkflowController.class);
-		stations.findStakingDetailByWoId();
-
 		String viewId = FacesContext.getCurrentInstance().getViewRoot().getViewId();
-		return viewId + "?faces-redirect=true";
+		logger.info("View ID: " + viewId);
+		return String.valueOf(viewId) + "?faces-redirect=true";
 	}
-	
+
 	public void crEvent() {
 		setCr(cr);
 	}
@@ -205,31 +279,27 @@ public class AdHocStakingController implements Serializable {
 
 	public void findAssemblyUnits() {
 		try {
-			int rateGroupId = workflowService.getRateGroupId(util.getWrkGrp());
+			int rateGroupId = workflowService.getRateGroupId(util.getWrkGrp()).intValue();
 
-			assemblyunits = workflowService.getDistinctRates(rateGroupId, energized, transfer);
-			assemblyunits = assemblyunits.stream().sorted(Comparator.comparing(AssemblyAdhocVw::getAssemblyGuid))
-					.collect(Collectors.toList());
-
-		} catch (ValidationException | NoResultException | ProcessException e) {
+			assemblyunits = workflowService.getDistinctRates(Integer.valueOf(rateGroupId), energized, transfer, util.workEventDt());
+			assemblyunits = assemblyunits.stream().sorted(Comparator.comparing(AssemblyAdhocVw::getAssemblyGuid)).collect(Collectors.toList());
+		} catch (Exception e) {
 			logger.error(e);
 			facesError(e.getMessage());
 		}
 	}
 
 	public String findAssemblyUnitDesc() {
-
 		try {
 			assemblyUnitDesc = workflowService.getDistinctRateDesc(assemblyUnit);
-		} catch (ValidationException | ProcessException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 			facesError(e.getMessage());
 		}
-		return assemblyUnitDesc;
+		return this.assemblyUnitDesc;
 	}
 
 	public String genStakingsheetDetailId() {
-
 		StringBuilder sb = new StringBuilder();
 
 		UUID uuid = UUID.randomUUID();
@@ -241,42 +311,32 @@ public class AdHocStakingController implements Serializable {
 		return sb.toString().toUpperCase();
 	}
 
-	public List<String> existingStations() {
-
-		List<String> result;
-
-		FacesContext context = FacesContext.getCurrentInstance();
-		WorkflowController stations = context.getApplication().evaluateExpressionGet(context, "#{wfController}",
-				WorkflowController.class);
-		result = stations.findDistinctStation();
-
-		return result;
+	public List<BigDecimal> existingStations() {
+		return controller.findDistinctStationGui(controller.getAsBuiltStakingSheetDetailGui());
 	}
 
 	private void facesError(String message) {
-
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
 		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 
 	private void facesInfo(String message) {
-
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, message, null));
 		facesContext.getExternalContext().getFlash().setKeepMessages(true);
 	}
 
-	public String getStation() {
-		return station;
+	public BigDecimal getStation() {
+		return this.station;
 	}
 
-	public void setStation(String station) {
+	public void setStation(BigDecimal station) {
 		this.station = station;
 	}
 
 	public String getStationDesc() {
-		return stationDesc;
+		return this.stationDesc;
 	}
 
 	public void setStationDesc(String stationDesc) {
@@ -284,7 +344,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getCr() {
-		return cr;
+		return this.cr;
 	}
 
 	public void setCr(String cr) {
@@ -292,7 +352,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public Integer getUnitQty() {
-		return unitQty;
+		return this.unitQty;
 	}
 
 	public void setUnitQty(Integer unitQty) {
@@ -300,7 +360,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public Integer getAsBuiltStatus() {
-		return asBuiltStatus;
+		return this.asBuiltStatus;
 	}
 
 	public void setAsBuiltStatus(Integer asBuiltStatus) {
@@ -308,7 +368,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public StakingSheet getStakingSheet() {
-		return stakingSheet;
+		return this.stakingSheet;
 	}
 
 	public void setStakingSheet(StakingSheet stakingSheet) {
@@ -316,7 +376,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getAsBuiltComment() {
-		return asBuiltComment;
+		return this.asBuiltComment;
 	}
 
 	public void setAsBuiltComment(String asBuiltComment) {
@@ -324,7 +384,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getAsBuiltQty() {
-		return asBuiltQty;
+		return this.asBuiltQty;
 	}
 
 	public void setAsBuiltQty(String asBuiltQty) {
@@ -332,7 +392,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public StakingSheetDetail getStakingSheetDetail() {
-		return stakingSheetDetail;
+		return this.stakingSheetDetail;
 	}
 
 	public void setStakingSheetDetail(StakingSheetDetail stakingSheetDetail) {
@@ -340,7 +400,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getStakingsheetId() {
-		return stakingsheetId;
+		return this.stakingsheetId;
 	}
 
 	public void setStakingsheetId(String stakingsheetId) {
@@ -348,7 +408,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getAssemblyUnitDesc() {
-		return assemblyUnitDesc;
+		return this.assemblyUnitDesc;
 	}
 
 	public void setAssemblyUnitDesc(String assemblyUnitDesc) {
@@ -356,7 +416,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public List<AssemblyAdhocVw> getAssemblyunits() {
-		return assemblyunits;
+		return this.assemblyunits;
 	}
 
 	public void setAssemblyunits(List<AssemblyAdhocVw> assemblyunits) {
@@ -364,7 +424,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getAssemblyUnit() {
-		return assemblyUnit;
+		return this.assemblyUnit;
 	}
 
 	public void setAssemblyUnit(String assemblyUnit) {
@@ -372,7 +432,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getEnergized() {
-		return energized;
+		return this.energized;
 	}
 
 	public void setEnergized(String energized) {
@@ -380,7 +440,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getTransfer() {
-		return transfer;
+		return this.transfer;
 	}
 
 	public void setTransfer(String transfer) {
@@ -388,7 +448,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getWorkType() {
-		return workType;
+		return this.workType;
 	}
 
 	public void setWorkType(String workType) {
@@ -396,7 +456,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getVoucherDesc() {
-		return voucherDesc;
+		return this.voucherDesc;
 	}
 
 	public void setVoucherDesc(String voucherDesc) {
@@ -404,7 +464,7 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public BigDecimal getVoucherAmt() {
-		return voucherAmt;
+		return this.voucherAmt;
 	}
 
 	public void setVoucherAmt(BigDecimal voucherAmt) {
@@ -412,10 +472,19 @@ public class AdHocStakingController implements Serializable {
 	}
 
 	public String getVoucherCrew() {
-		return voucherCrew;
+		return this.voucherCrew;
 	}
 
 	public void setVoucherCrew(String voucherCrew) {
 		this.voucherCrew = voucherCrew;
 	}
+
+	public VoucherGui getSelectedVoucher() {
+		return selectedVoucher;
+	}
+
+	public void setSelectedVoucher(VoucherGui selectedVoucher) {
+		this.selectedVoucher = selectedVoucher;
+	}
+	
 }

@@ -4,7 +4,8 @@
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:ui="http://java.sun.com/jsf/facelets"
     xmlns:p="http://primefaces.org/ui"
-    xmlns:pa="http://primefaces.org/serenity">
+    xmlns:pa="http://primefaces.org/serenity"
+    xmlns:pe="http://primefaces.org/ui/extensions">
 
     <div class="layout-topbar">
         <a href="pages/home.xhtml" class="topbar-logo">
@@ -31,7 +32,8 @@
                     <a href="#">
               		   <span class="profile-name">#{userMBean.fullname}</span>
                        <span class="profile-image-wrapper">                 
-                            <p:graphicImage name="1532.jpg" library="images" style="width:40px;border-radius: 50%;" />
+                            <!-- <p:graphicImage name="avatar.jpg" library="images" style="width:40px;border-radius: 50%;" /> -->
+                            <pe:letterAvatar value="#{userMBean.fullname}" rounded="true" backgroundColor="black" size="40px"/>
                         </span>
                     </a>
                    <ul class="animated">    

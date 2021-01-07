@@ -2,7 +2,6 @@ package pwr.lcec.vendor.controller;
 
 import java.io.Serializable;
 import java.util.List;
-
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.faces.application.FacesMessage;
@@ -12,47 +11,40 @@ import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
-
-import pwr.lcec.vendor.web.helper.Constants;
+import pwr.lcec.vendor.controller.DashboardController;
 import pwr.lcec.vendor.web.helper.ControllerUtil;
-import pwr.lcec.vendorportal.ag.entity.AGInspection;
-import pwr.lcec.vendorportal.ag.entity.AGInvoice;
-import pwr.lcec.vendorportal.ag.entity.AGStakingSheet;
-import pwr.lcec.vendorportal.ag.entity.AGStreetlight;
-import pwr.lcec.vendorportal.interfaces.DashboardServiceRemote;
+import pwr.lcec.vendorportal.entity.ag.AGInspection;
+import pwr.lcec.vendorportal.entity.ag.AGInvoice;
+import pwr.lcec.vendorportal.entity.ag.AGStakingSheet;
+import pwr.lcec.vendorportal.entity.ag.AGStreetlight;
+import pwr.lcec.vendorportal.interfaces.DashboardLocal;
+
 
 public class DashboardController implements Serializable {
-
 	private static final long serialVersionUID = 5883181727196152461L;
-
-	private final static String PIKE = "PIKE";
-	private final static String MASTEC = "MASTEC";
-	private final static String LCEC = "LCEC";
-
+	private static final String PIKE = "PIKE";
+	private static final String MASTEC = "MASTEC";
+	private static final String LCEC = "LCEC";
+	
 	@EJB
-	private DashboardServiceRemote dashboardService;
-
+	private DashboardLocal dashboardService;
+	
 	private BarChartModel stakingBarModel;
 	private BarChartModel streetlightBarModel;
 	private BarChartModel inspectionBarModel;
 	private BarChartModel invoiceBarModel;
-
 	private List<AGStakingSheet> aGStakingSheets;
 	private AGStakingSheet pikeAGStakingSheet;
 	private AGStakingSheet mastecAGStakingSheet;
-
 	private List<AGStreetlight> aGStreetlights;
 	private AGStreetlight pikeAGStreetlight;
 	private AGStreetlight mastecAGStreetlight;
-
 	private List<AGInspection> aGInspections;
 	private AGInspection pikeAGInspection;
 	private AGInspection mastecAGInspection;
-
 	private List<AGInvoice> aGInvoices;
 	private AGInvoice pikeAGInvoice;
 	private AGInvoice mastecAGInvoice;
-	
 	ControllerUtil util = new ControllerUtil();
 
 	@PostConstruct
@@ -61,7 +53,7 @@ public class DashboardController implements Serializable {
 		getStakingsheeetDetail();
 		createBarModels();
 	}
-	
+
 	public void getAggregateSync() {
 		try {
 			dashboardService.runAggregateSync();
@@ -72,7 +64,7 @@ public class DashboardController implements Serializable {
 
 	public void getStakingsheeetDetail() {
 		aGStakingSheets = dashboardService.findAllAGStakingSheet();
-		aGStreetlights = dashboardService.findAllAGStreetlight();
+		//aGStreetlights = dashboardService.findAllAGStreetlight();
 		aGInspections = dashboardService.findAllAGInspection();
 		aGInvoices = dashboardService.findAllAGInvoice();
 
@@ -84,28 +76,28 @@ public class DashboardController implements Serializable {
 				mastecAGStakingSheet = aGStakingSheet;
 			}
 		}
-		for (AGStreetlight aGStreetlight : aGStreetlights) {
+		/*for (AGStreetlight aGStreetlight : this.aGStreetlights) {
 			if (aGStreetlight.getVendorType().equals(PIKE)) {
-				pikeAGStreetlight = aGStreetlight;
+				this.pikeAGStreetlight = aGStreetlight;
 			}
 			if (aGStreetlight.getVendorType().equals(MASTEC)) {
-				mastecAGStreetlight = aGStreetlight;
+				this.mastecAGStreetlight = aGStreetlight;
 			}
-		}
-		for (AGInspection aGInspection : aGInspections) {
+		}*/
+		for (AGInspection aGInspection : this.aGInspections) {
 			if (aGInspection.getVendorType().equals(PIKE)) {
-				pikeAGInspection = aGInspection;
+				this.pikeAGInspection = aGInspection;
 			}
 			if (aGInspection.getVendorType().equals(MASTEC)) {
-				mastecAGInspection = aGInspection;
+				this.mastecAGInspection = aGInspection;
 			}
 		}
-		for (AGInvoice aGInvoice : aGInvoices) {
+		for (AGInvoice aGInvoice : this.aGInvoices) {
 			if (aGInvoice.getVendorType().equals(PIKE)) {
-				pikeAGInvoice = aGInvoice;
+				this.pikeAGInvoice = aGInvoice;
 			}
 			if (aGInvoice.getVendorType().equals(MASTEC)) {
-				mastecAGInvoice = aGInvoice;
+				this.mastecAGInvoice = aGInvoice;
 			}
 		}
 	}
@@ -115,84 +107,88 @@ public class DashboardController implements Serializable {
 
 		ChartSeries pike = new ChartSeries();
 		pike.setLabel(PIKE);
-		pike.set(Constants.AS_BUILT_NOT_STARTED, pikeAGStakingSheet.getAsBuiltNotStarted());
-		pike.set(Constants.AS_BUILT_COMP_LAST30, pikeAGStakingSheet.getAsBuiltCompleted30Days());
-		pike.set(Constants.AS_BUILT_NOT_INSP, pikeAGStakingSheet.getNotInspected());
-		pike.set(Constants.INSP_IN_PROGRESS, pikeAGStakingSheet.getInspectionInProgress());
-		pike.set(Constants.NOT_INVOICED, pikeAGStakingSheet.getNotInvoiced());
+		pike.set("As-Built Not Started", this.pikeAGStakingSheet.getAsBuiltNotStarted());
+		pike.set("As-Built Completed Last 30 Days", this.pikeAGStakingSheet.getAsBuiltCompleted30Days());
+		pike.set("As-Built Not Inspected", this.pikeAGStakingSheet.getNotInspected());
+		pike.set("Inspection In Progress", this.pikeAGStakingSheet.getInspectionInProgress());
+		pike.set("Not Invoiced", this.pikeAGStakingSheet.getNotInvoiced());
 
 		ChartSeries mastec = new ChartSeries();
 		mastec.setLabel(MASTEC);
-		mastec.set(Constants.AS_BUILT_NOT_STARTED, mastecAGStakingSheet.getAsBuiltNotStarted());
-		mastec.set(Constants.AS_BUILT_COMP_LAST30, mastecAGStakingSheet.getAsBuiltCompleted30Days());
-		mastec.set(Constants.AS_BUILT_NOT_INSP, mastecAGStakingSheet.getNotInspected());
-		mastec.set(Constants.INSP_IN_PROGRESS, mastecAGStakingSheet.getInspectionInProgress());
-		mastec.set(Constants.NOT_INVOICED, mastecAGStakingSheet.getNotInvoiced());
+		mastec.set("As-Built Not Started", this.mastecAGStakingSheet.getAsBuiltNotStarted());
+		mastec.set("As-Built Completed Last 30 Days", this.mastecAGStakingSheet.getAsBuiltCompleted30Days());
+		mastec.set("As-Built Not Inspected", this.mastecAGStakingSheet.getNotInspected());
+		mastec.set("Inspection In Progress", this.mastecAGStakingSheet.getInspectionInProgress());
+		mastec.set("Not Invoiced", this.mastecAGStakingSheet.getNotInvoiced());
 
-		if(util.getWrkGrp().equals(PIKE) || util.getWrkGrp().equals(LCEC)) {
+		model.setExtender("skinBar");
+		
+		if (util.getWrkGrp().equals(PIKE) || util.getWrkGrp().equals(LCEC)) {
 			model.addSeries(pike);
 		}
-		if(util.getWrkGrp().equals(MASTEC) || util.getWrkGrp().equals(LCEC)) {
+		if (util.getWrkGrp().equals(MASTEC) || util.getWrkGrp().equals(LCEC)) {
 			model.addSeries(mastec);
 		}
 
 		return model;
 	}
 
-	private BarChartModel initStreetlightBarModel() {
+	/*private BarChartModel initStreetlightBarModel() {
 		BarChartModel model = new BarChartModel();
 
 		ChartSeries pike = new ChartSeries();
 		pike.setLabel(PIKE);
-		pike.set(Constants.INVOICE_SUBMITTED, pikeAGStreetlight.getInvoiceSubmitted());
-		pike.set(Constants.NOT_INSPECTED, pikeAGStreetlight.getNotInspected());
-		pike.set(Constants.INSP_IN_PROGRESS, pikeAGStreetlight.getInspectionInProgress());
-		pike.set(Constants.NOT_INVOICED, pikeAGStreetlight.getNotInvoiced());
-		pike.set(Constants.INV_APPROVED, pikeAGStreetlight.getInvoiceApproved());
-		pike.set(Constants.INV_REJECTED, pikeAGStreetlight.getInvoiceRejected());
+		pike.set("Invoice Submitted", pikeAGStreetlight.getInvoiceSubmitted());
+		pike.set("Not Inspected", pikeAGStreetlight.getNotInspected());
+		pike.set("Inspection In Progress", pikeAGStreetlight.getInspectionInProgress());
+		pike.set("Not Invoiced", pikeAGStreetlight.getNotInvoiced());
+		pike.set("Invoice Approved", pikeAGStreetlight.getInvoiceApproved());
+		pike.set("Invoice Rejected", pikeAGStreetlight.getInvoiceRejected());
 
 		ChartSeries mastec = new ChartSeries();
 		mastec.setLabel(MASTEC);
-		mastec.set(Constants.INVOICE_SUBMITTED, mastecAGStreetlight.getInvoiceSubmitted());
-		mastec.set(Constants.NOT_INSPECTED, mastecAGStreetlight.getNotInspected());
-		mastec.set(Constants.INSP_IN_PROGRESS, mastecAGStreetlight.getInspectionInProgress());
-		mastec.set(Constants.NOT_INVOICED, mastecAGStreetlight.getNotInvoiced());
-		mastec.set(Constants.INV_APPROVED, mastecAGStreetlight.getInvoiceApproved());
-		mastec.set(Constants.INV_REJECTED, mastecAGStreetlight.getInvoiceRejected());
+		mastec.set("Invoice Submitted", this.mastecAGStreetlight.getInvoiceSubmitted());
+		mastec.set("Not Inspected", this.mastecAGStreetlight.getNotInspected());
+		mastec.set("Inspection In Progress", this.mastecAGStreetlight.getInspectionInProgress());
+		mastec.set("Not Invoiced", this.mastecAGStreetlight.getNotInvoiced());
+		mastec.set("Invoice Approved", this.mastecAGStreetlight.getInvoiceApproved());
+		mastec.set("Invoice Rejected", this.mastecAGStreetlight.getInvoiceRejected());
 
-		if(util.getWrkGrp().equals(PIKE) || util.getWrkGrp().equals(LCEC)) {
+		if (this.util.getWrkGrp().equals(PIKE) || this.util.getWrkGrp().equals(LCEC)) {
 			model.addSeries(pike);
 		}
-		if(util.getWrkGrp().equals(MASTEC) || util.getWrkGrp().equals(LCEC)) {
+		if (this.util.getWrkGrp().equals(MASTEC) || this.util.getWrkGrp().equals(LCEC)) {
 			model.addSeries(mastec);
 		}
 
 		return model;
-	}
+	}*/
 
 	private BarChartModel initInspectionBarModel() {
 		BarChartModel model = new BarChartModel();
 
 		ChartSeries pike = new ChartSeries();
 		pike.setLabel(PIKE);
-		pike.set(Constants.NOT_INSPECTED, pikeAGInspection.getNotInspected());
-		pike.set(Constants.INSP_READY, pikeAGInspection.getInspectionReady());
-		pike.set(Constants.INSP_IN_PROGRESS, pikeAGInspection.getInspectionInProgress());
-		pike.set(Constants.INSP_APPROVED_LAST30, pikeAGInspection.getInspectionApproved30Days());
-		pike.set(Constants.INSP_REJECTED, pikeAGInspection.getInspectionRejected());
+		pike.set("Not Inspected", this.pikeAGInspection.getNotInspected());
+		pike.set("Inspection Ready", this.pikeAGInspection.getInspectionReady());
+		pike.set("Inspection In Progress", this.pikeAGInspection.getInspectionInProgress());
+		pike.set("Inspection Approved Last 30 Days", this.pikeAGInspection.getInspectionApproved30Days());
+		pike.set("Inspection Rejected", this.pikeAGInspection.getInspectionRejected());
 
 		ChartSeries mastec = new ChartSeries();
 		mastec.setLabel(MASTEC);
-		mastec.set(Constants.NOT_INSPECTED, mastecAGInspection.getNotInspected());
-		mastec.set(Constants.INSP_READY, mastecAGInspection.getInspectionReady());
-		mastec.set(Constants.INSP_IN_PROGRESS, mastecAGInspection.getInspectionInProgress());
-		mastec.set(Constants.INSP_APPROVED_LAST30, mastecAGInspection.getInspectionApproved30Days());
-		mastec.set(Constants.INSP_REJECTED, mastecAGInspection.getInspectionRejected());
+		mastec.set("Not Inspected", this.mastecAGInspection.getNotInspected());
+		mastec.set("Inspection Ready", this.mastecAGInspection.getInspectionReady());
+		mastec.set("Inspection In Progress", this.mastecAGInspection.getInspectionInProgress());
+		mastec.set("Inspection Approved Last 30 Days", this.mastecAGInspection.getInspectionApproved30Days());
+		mastec.set("Inspection Rejected", this.mastecAGInspection.getInspectionRejected());
 
-		if(util.getWrkGrp().equals(PIKE) || util.getWrkGrp().equals(LCEC)) {
+		model.setExtender("skinBar");
+		
+		if (this.util.getWrkGrp().equals(PIKE) || this.util.getWrkGrp().equals(LCEC)) {
 			model.addSeries(pike);
 		}
-		if(util.getWrkGrp().equals(MASTEC) || util.getWrkGrp().equals(LCEC)) {
+		if (this.util.getWrkGrp().equals(MASTEC) || this.util.getWrkGrp().equals(LCEC)) {
 			model.addSeries(mastec);
 		}
 
@@ -204,22 +200,24 @@ public class DashboardController implements Serializable {
 
 		ChartSeries pike = new ChartSeries();
 		pike.setLabel(PIKE);
-		pike.set(Constants.NOT_INVOICED, pikeAGInvoice.getNotInvoiced());
-		pike.set(Constants.INVOICE_SUBMITTED, pikeAGInvoice.getInvoiceSubmitted());
-		pike.set(Constants.INV_APPROVED, pikeAGInvoice.getInvoiceApproved());
-		pike.set(Constants.INV_REJECTED, pikeAGInvoice.getInvoiceRejected());
+		pike.set("Not Invoiced", this.pikeAGInvoice.getNotInvoiced());
+		pike.set("Invoice Submitted", this.pikeAGInvoice.getInvoiceSubmitted());
+		pike.set("Invoice Approved", this.pikeAGInvoice.getInvoiceApproved());
+		pike.set("Invoice Rejected", this.pikeAGInvoice.getInvoiceRejected());
 
 		ChartSeries mastec = new ChartSeries();
 		mastec.setLabel(MASTEC);
-		mastec.set(Constants.NOT_INVOICED, mastecAGInvoice.getNotInvoiced());
-		mastec.set(Constants.INVOICE_SUBMITTED, mastecAGInvoice.getInvoiceSubmitted());
-		mastec.set(Constants.INV_APPROVED, mastecAGInvoice.getInvoiceApproved());
-		mastec.set(Constants.INV_REJECTED, mastecAGInvoice.getInvoiceRejected());
+		mastec.set("Not Invoiced", this.mastecAGInvoice.getNotInvoiced());
+		mastec.set("Invoice Submitted", this.mastecAGInvoice.getInvoiceSubmitted());
+		mastec.set("Invoice Approved", this.mastecAGInvoice.getInvoiceApproved());
+		mastec.set("Invoice Rejected", this.mastecAGInvoice.getInvoiceRejected());
 
-		if(util.getWrkGrp().equals(PIKE) || util.getWrkGrp().equals(LCEC)) {
+		model.setExtender("skinBar");
+		
+		if (this.util.getWrkGrp().equals(PIKE) || this.util.getWrkGrp().equals(LCEC)) {
 			model.addSeries(pike);
 		}
-		if(util.getWrkGrp().equals(MASTEC) || util.getWrkGrp().equals(LCEC)) {
+		if (this.util.getWrkGrp().equals(MASTEC) || this.util.getWrkGrp().equals(LCEC)) {
 			model.addSeries(mastec);
 		}
 
@@ -227,72 +225,71 @@ public class DashboardController implements Serializable {
 	}
 
 	private void createInvoiceBarModel() {
-		invoiceBarModel = initInvoiceBarModel();
+		this.invoiceBarModel = initInvoiceBarModel();
 
-		invoiceBarModel.setTitle("Invoice");
-		invoiceBarModel.setLegendPosition("ne");
+		this.invoiceBarModel.setTitle("Invoice");
+		this.invoiceBarModel.setLegendPosition("ne");
 
-		Axis xAxis = invoiceBarModel.getAxis(AxisType.X);
+		Axis xAxis = this.invoiceBarModel.getAxis(AxisType.X);
 		xAxis.setLabel("Status");
 
-		Axis yAxis = invoiceBarModel.getAxis(AxisType.Y);
+		Axis yAxis = this.invoiceBarModel.getAxis(AxisType.Y);
 		yAxis.setLabel("Count");
 	}
 
 	private void createInspectionBarModel() {
-		inspectionBarModel = initInspectionBarModel();
+		this.inspectionBarModel = initInspectionBarModel();
 
-		inspectionBarModel.setTitle("Inspection");
-		inspectionBarModel.setLegendPosition("ne");
+		this.inspectionBarModel.setTitle("Inspection");
+		this.inspectionBarModel.setLegendPosition("ne");
 
-		Axis xAxis = inspectionBarModel.getAxis(AxisType.X);
+		Axis xAxis = this.inspectionBarModel.getAxis(AxisType.X);
 		xAxis.setLabel("Status");
 
-		Axis yAxis = inspectionBarModel.getAxis(AxisType.Y);
+		Axis yAxis = this.inspectionBarModel.getAxis(AxisType.Y);
 		yAxis.setLabel("Count");
 	}
 
-	private void createStreetlightBarModel() {
-		streetlightBarModel = initStreetlightBarModel();
+	/*private void createStreetlightBarModel() {
+		this.streetlightBarModel = initStreetlightBarModel();
 
-		streetlightBarModel.setTitle("Streetlight");
-		streetlightBarModel.setLegendPosition("ne");
+		this.streetlightBarModel.setTitle("Streetlight");
+		this.streetlightBarModel.setLegendPosition("ne");
 
-		Axis xAxis = streetlightBarModel.getAxis(AxisType.X);
+		Axis xAxis = this.streetlightBarModel.getAxis(AxisType.X);
 		xAxis.setLabel("Status");
 
-		Axis yAxis = streetlightBarModel.getAxis(AxisType.Y);
+		Axis yAxis = this.streetlightBarModel.getAxis(AxisType.Y);
 		yAxis.setLabel("Count");
-	}
+	}*/
 
 	private void createBarModels() {
 		createStakingBarModel();
-		createStreetlightBarModel();
+		//createStreetlightBarModel();
 		createInspectionBarModel();
 		createInvoiceBarModel();
 	}
 
 	private void createStakingBarModel() {
-		stakingBarModel = initStakingBarModel();
+		this.stakingBarModel = initStakingBarModel();
 
-		stakingBarModel.setTitle("Stakingsheet");
-		stakingBarModel.setLegendPosition("ne");
+		this.stakingBarModel.setTitle("Stakingsheet");
+		this.stakingBarModel.setLegendPosition("ne");
 
-		Axis xAxis = stakingBarModel.getAxis(AxisType.X);
+		Axis xAxis = this.stakingBarModel.getAxis(AxisType.X);
 		xAxis.setLabel("Status");
 
-		Axis yAxis = stakingBarModel.getAxis(AxisType.Y);
+		Axis yAxis = this.stakingBarModel.getAxis(AxisType.Y);
 		yAxis.setLabel("Count");
 	}
-	
-	private void facesError(String message) {
 
+	private void facesError(String message) {
 		FacesContext.getCurrentInstance().addMessage(null,
 				new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null));
 	}
 
 	public List<AGStakingSheet> getaGStakingSheets() {
-		return aGStakingSheets;
+		return this.aGStakingSheets;
 	}
 
 	public void setaGStakingSheets(List<AGStakingSheet> aGStakingSheets) {
@@ -300,7 +297,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public AGStakingSheet getPikeAGStakingSheet() {
-		return pikeAGStakingSheet;
+		return this.pikeAGStakingSheet;
 	}
 
 	public void setPikeAGStakingSheet(AGStakingSheet pikeAGStakingSheet) {
@@ -308,7 +305,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public AGStakingSheet getMastecAGStakingSheet() {
-		return mastecAGStakingSheet;
+		return this.mastecAGStakingSheet;
 	}
 
 	public void setMastecAGStakingSheet(AGStakingSheet mastecAGStakingSheet) {
@@ -316,7 +313,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public BarChartModel getStakingBarModel() {
-		return stakingBarModel;
+		return this.stakingBarModel;
 	}
 
 	public void setStakingBarModel(BarChartModel stakingBarModel) {
@@ -324,7 +321,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public List<AGStreetlight> getaGStreetlights() {
-		return aGStreetlights;
+		return this.aGStreetlights;
 	}
 
 	public void setaGStreetlights(List<AGStreetlight> aGStreetlights) {
@@ -332,7 +329,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public AGStreetlight getPikeAGStreetlight() {
-		return pikeAGStreetlight;
+		return this.pikeAGStreetlight;
 	}
 
 	public void setPikeAGStreetlight(AGStreetlight pikeAGStreetlight) {
@@ -340,7 +337,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public AGStreetlight getMastecAGStreetlight() {
-		return mastecAGStreetlight;
+		return this.mastecAGStreetlight;
 	}
 
 	public void setMastecAGStreetlight(AGStreetlight mastecAGStreetlight) {
@@ -348,7 +345,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public BarChartModel getStreetlightBarModel() {
-		return streetlightBarModel;
+		return this.streetlightBarModel;
 	}
 
 	public void setStreetlightBarModel(BarChartModel streetlightBarModel) {
@@ -356,7 +353,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public List<AGInspection> getaGInspections() {
-		return aGInspections;
+		return this.aGInspections;
 	}
 
 	public void setaGInspections(List<AGInspection> aGInspections) {
@@ -364,7 +361,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public AGInspection getPikeAGInspection() {
-		return pikeAGInspection;
+		return this.pikeAGInspection;
 	}
 
 	public void setPikeAGInspection(AGInspection pikeAGInspection) {
@@ -372,7 +369,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public AGInspection getMastecAGInspection() {
-		return mastecAGInspection;
+		return this.mastecAGInspection;
 	}
 
 	public void setMastecAGInspection(AGInspection mastecAGInspection) {
@@ -380,7 +377,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public BarChartModel getInspectionBarModel() {
-		return inspectionBarModel;
+		return this.inspectionBarModel;
 	}
 
 	public void setInspectionBarModel(BarChartModel inspectionBarModel) {
@@ -388,7 +385,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public AGInvoice getPikeAGInvoice() {
-		return pikeAGInvoice;
+		return this.pikeAGInvoice;
 	}
 
 	public void setPikeAGInvoice(AGInvoice pikeAGInvoice) {
@@ -396,7 +393,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public AGInvoice getMastecAGInvoice() {
-		return mastecAGInvoice;
+		return this.mastecAGInvoice;
 	}
 
 	public void setMastecAGInvoice(AGInvoice mastecAGInvoice) {
@@ -404,7 +401,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public List<AGInvoice> getaGInvoices() {
-		return aGInvoices;
+		return this.aGInvoices;
 	}
 
 	public void setaGInvoices(List<AGInvoice> aGInvoices) {
@@ -412,7 +409,7 @@ public class DashboardController implements Serializable {
 	}
 
 	public BarChartModel getInvoiceBarModel() {
-		return invoiceBarModel;
+		return this.invoiceBarModel;
 	}
 
 	public void setInvoiceBarModel(BarChartModel invoiceBarModel) {

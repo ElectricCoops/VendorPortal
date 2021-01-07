@@ -360,6 +360,19 @@ body {
         background-color: $primaryColor;
     }
     
+    .ui-dataview {
+        .ui-datalist-header {
+            padding: $headerPadding;
+            
+            .ui-dataview-layout-options {
+                .ui-button-icon-only {
+                    width: 2.5em;
+                    @include border-radius(0px);
+                }
+            }
+        }
+    }
+    
     .ui-picklist {        
         .ui-picklist-list {
             padding: 0;

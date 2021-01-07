@@ -58,6 +58,18 @@ body {
             margin: 0px 12px;
         }
     }
+
+    .ui-sidebar {
+        .ui-sidebar-close {
+            &:hover {
+                padding: 1px;
+            }
+        }
+
+        .ui-button {
+            width: auto;
+        }
+    }
     
     .ui-lightbox {
         &.ui-shadow {

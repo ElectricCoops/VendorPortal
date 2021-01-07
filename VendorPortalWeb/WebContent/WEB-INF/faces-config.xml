@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<faces-config xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd"
-	version="2.2">
+<faces-config
+    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd"
+    version="2.2">
 	<application>
-		<message-bundle>pwr.lcec.vendor.web.application</message-bundle>
+		<message-bundle>resources.messages</message-bundle>
 		<locale-config>
 			<default-locale>en</default-locale>
 		</locale-config>
@@ -13,10 +14,46 @@
 		<converter-id>pfPickListConverter</converter-id>
 		<converter-class>pwr.lcec.vendor.web.convert.PicklistGenericConverter</converter-class>
 	</converter>
+	<!-- <converter>
+		<converter-id>timeConverter</converter-id>
+		<converter-class>pwr.lcec.vendor.web.convert.TimestampConverter</converter-class>
+	</converter> -->
+	<!-- <converter>
+		<converter-id>asBuiltStatusConverter</converter-id>
+		<converter-class>pwr.lcec.vendor.web.convert.AsbuiltStatusConverter</converter-class>
+	</converter>
+	<converter>
+		<converter-id>invoiceStatusConverter</converter-id>
+		<converter-class>pwr.lcec.vendor.web.convert.InvoiceStatusConverter</converter-class>
+	</converter>
+	<converter>
+		<converter-id>inspectionStatusConverter</converter-id>
+		<converter-class>pwr.lcec.vendor.web.convert.InspectionStatusConverter</converter-class>
+	</converter> -->
 	<component>
-		<component-type>org.primefaces.component.SerenityMenu</component-type>
-		<component-class>pwr.lcec.vendor.web.component.SerenityMenu</component-class>
-	</component>
+        <component-type>org.primefaces.component.SerenityMenu</component-type>
+        <component-class>org.primefaces.serenity.component.SerenityMenu</component-class>
+    </component>
+    <!-- <managed-bean>
+		<managed-bean-name>guestPreferences</managed-bean-name>
+		<managed-bean-class>org.primefaces.serenity.view.GuestPreferences</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+	</managed-bean> -->
+    <managed-bean>
+		<managed-bean-name>userMBean</managed-bean-name>
+		<managed-bean-class>pwr.lcec.vendor.controller.UserManagedBean</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+	</managed-bean>
+	<managed-bean>
+		<managed-bean-name>dashboardController</managed-bean-name>
+		<managed-bean-class>pwr.lcec.vendor.controller.DashboardController</managed-bean-class>
+		<managed-bean-scope>view</managed-bean-scope>
+	</managed-bean>
+	<managed-bean>
+		<managed-bean-name>notificationController</managed-bean-name>
+		<managed-bean-class>pwr.lcec.vendor.controller.NotificationController</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+	</managed-bean>
 	<managed-bean>
 		<managed-bean-name>invController</managed-bean-name>
 		<managed-bean-class>pwr.lcec.vendor.controller.InvoiceController</managed-bean-class>
@@ -32,54 +69,45 @@
 		<managed-bean-class>pwr.lcec.vendor.controller.WorkflowController</managed-bean-class>
 		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
-	<managed-bean>
-		<managed-bean-name>rateController</managed-bean-name>
-		<managed-bean-class>pwr.lcec.vendor.controller.RateController</managed-bean-class>
-		<managed-bean-scope>request</managed-bean-scope>
-	</managed-bean>
+	
 	<managed-bean>
 		<managed-bean-name>adHocStaking</managed-bean-name>
 		<managed-bean-class>pwr.lcec.vendor.controller.AdHocStakingController</managed-bean-class>
 		<managed-bean-scope>view</managed-bean-scope>
 	</managed-bean>
 	<managed-bean>
-		<managed-bean-name>userMBean</managed-bean-name>
-		<managed-bean-class>pwr.lcec.vendor.controller.UserManagedBean</managed-bean-class>
-		<managed-bean-scope>session</managed-bean-scope>
-	</managed-bean>
-	<managed-bean>
-		<managed-bean-name>streetLightVw</managed-bean-name>
-		<managed-bean-class>pwr.lcec.vendor.controller.StreetLightController</managed-bean-class>
-		<managed-bean-scope>session</managed-bean-scope>
-	</managed-bean>
-	<managed-bean>
 		<managed-bean-name>userReg</managed-bean-name>
 		<managed-bean-class>pwr.lcec.vendor.security.UserRegistration</managed-bean-class>
-		<managed-bean-scope>view</managed-bean-scope>
+		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
 	<managed-bean>
-		<managed-bean-name>dashboardController</managed-bean-name>
-		<managed-bean-class>pwr.lcec.vendor.controller.DashboardController</managed-bean-class>
-		<managed-bean-scope>view</managed-bean-scope>
+		<managed-bean-name>userPrefController</managed-bean-name>
+		<managed-bean-class>pwr.lcec.vendor.controller.UserPrefController</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
 	<managed-bean>
-		<managed-bean-name>notificationController</managed-bean-name>
-		<managed-bean-class>pwr.lcec.vendor.controller.NotificationController</managed-bean-class>
-		<managed-bean-scope>view</managed-bean-scope>
+		<managed-bean-name>rateMBean</managed-bean-name>
+		<managed-bean-class>pwr.lcec.vendor.controller.RateController</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
 	<managed-bean>
-		<managed-bean-name>cpController</managed-bean-name>
-		<managed-bean-class>pwr.lcec.vendor.controller.ColumnPickerController</managed-bean-class>
+		<managed-bean-name>customValidator</managed-bean-name>
+		<managed-bean-class>pwr.lcec.vendor.security.validator.CustomValidator</managed-bean-class>
+		<managed-bean-scope>request</managed-bean-scope>
+	</managed-bean>
+	<managed-bean>
+		<managed-bean-name>addWOController</managed-bean-name>
+		<managed-bean-class>pwr.lcec.vendor.controller.AddWorkOrderController</managed-bean-class>
 		<managed-bean-scope>session</managed-bean-scope>
 	</managed-bean>
 	<factory>
 		<exception-handler-factory>pwr.lcec.vendor.web.filter.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
 	</factory>
-	<render-kit>
-		<renderer>
-			<component-family>org.primefaces.component</component-family>
-			<renderer-type>org.primefaces.component.SerenityMenuRenderer</renderer-type>
-			<renderer-class>pwr.lcec.vendor.web.component.SerenityMenuRenderer</renderer-class>
-		</renderer>
-	</render-kit>
+    <render-kit>
+        <renderer>
+            <component-family>org.primefaces.component</component-family>
+            <renderer-type>org.primefaces.component.SerenityMenuRenderer</renderer-type>
+            <renderer-class>org.primefaces.serenity.component.SerenityMenuRenderer</renderer-class>
+        </renderer>
+    </render-kit>
 </faces-config>

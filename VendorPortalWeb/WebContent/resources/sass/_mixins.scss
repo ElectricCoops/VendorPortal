@@ -58,7 +58,7 @@
     background-image:     -ms-linear-gradient(left, $start-color, $end-color);
     background-image:      -o-linear-gradient(left, $start-color, $end-color);
     background-image:         linear-gradient(left, $start-color, $end-color);
-    filter:            progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$start-color}', endColorStr='#{$end-color}', gradientType='1');
+    filter:            progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$start-color}', endColorstr='#{$end-color}', gradientType='1');
 }
 
 @mixin background-gradient-top2bottom($start-color, $end-color) {
@@ -69,7 +69,7 @@
     background-image:     -ms-linear-gradient(top, $start-color, $end-color);
     background-image:      -o-linear-gradient(top, $start-color, $end-color);
     background-image:         linear-gradient(to bottom, $start-color, $end-color);
-    filter:            progid:DXImageTransform.Microsoft.gradient(startColorStr='#{$start-color}', endColorStr='#{$end-color}');
+    filter:            progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$start-color}', endColorstr='#{$end-color}');
 }
 
 @mixin transition($transition...) {
@@ -119,6 +119,14 @@
     -webkit-box-shadow: $value1, $value2, $value3;
     -moz-box-shadow: $value1, $value2, $value3;
     box-shadow: $value1, $value2, $value3;
+}
+
+@mixin translateX($val) {
+    -webkit-transform: translateX($val);
+    -moz-transform: translateX($val);
+    -o-transform: translateX($val);
+    -ms-transform: translateX($val);
+    transform: translateX($val);
 }
 
 @mixin box-sizing($box-model) {
@@ -216,4 +224,10 @@
     &:after {
         clear: both;
     }
+}
+
+@mixin flex() {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
 }

@@ -521,14 +521,11 @@ body {
                                 border: 0 none;
                                 width: 150px;
                                 padding: 6px 24px 6px 6px;
-                                border-bottom: 1px solid $topbarTextColor;
                                 @include transition(all $transitionDuration);
                                 outline: 0 none;
                                 color: $topbarTextColor;
 
                                 &:focus {
-                                    border-bottom-color: $primaryTextColor;
-
                                     label {
                                         color: $topbarTextColor;
                                     }
@@ -763,6 +760,26 @@ body {
     }
 }
 
+@media (min-width: $mobileBreakpoint + 1) {
+    .layout-wrapper {
+        .layout-main {
+            .layout-topbar {
+                .layout-topbar-menu-wrapper {
+                    .topbar-menu {
+                        > li {
+                            &.search-item {
+                                input {
+                                    background-image: linear-gradient(to bottom, #ffffff, #ffffff), linear-gradient(to bottom, desaturate(lighten($primaryColor,25%), 25%), desaturate(lighten($primaryColor,25%), 25%));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 @media (max-width: $mobileBreakpoint) {
     .layout-wrapper {
         .layout-sidebar {
@@ -908,17 +925,12 @@ body {
                                 padding: 8px 14px;
 
                                 input {
-                                    padding: 2px 2px 1px 2px;
-                                    border-color: $textSecondaryColor;
-                                    border-width: 0 0 1px 0;
-                                    border-style: solid;
+                                    padding: 2px;
                                     color: $textColor;
                                     margin-left: 28px;
                                     width: 85%;
 
                                     &:focus {
-                                        border-bottom-color: $primaryColor;
-                                        border-width: 0 0 2px 0;
                                         width: 85%;
 
                                         ~ i {
@@ -1137,10 +1149,6 @@ body {
             }
             
             .nano {
-                .sidebar-scroll-content {
-                    margin-right: 0px !important;
-                    margin-left: -17px;
-                }
 
                 .nano-pane {
                     right: auto;

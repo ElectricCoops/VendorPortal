@@ -13,6 +13,9 @@
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
             <meta name="apple-mobile-web-app-capable" content="yes" />
+            <metadata>
+				<f:event type="preRenderView" listener="#{notificationController.showNotification}" />
+			</metadata>
         </f:facet>
         <title><ui:insert name="title">LCEC Vendor Portal</ui:insert></title>
         <h:outputScript name="js/nanoscroller.js" library="serenity-layout" />
@@ -20,9 +23,25 @@
         <h:outputScript name="js/ripple.js" library="serenity-layout" />
         <h:outputScript name="vpcustom.js" library="js" />
         <ui:insert name="head"/>
+        <style type="text/css">
+			.top {
+				filter: alpha(opacity = 75); /* For IE8 and earlier */
+				z-index: 1000000 !important;
+				background-color: #ff9d9d !important;
+				color: #000000 !important;
+			}
+			
+		</style>
+		<script type="text/javascript">
+		
+			function close() {
+			   PF('bar').hide();
+			}
+		
+		</script>
     </h:head>
     
-    <f:loadBundle basename="pwr.lcec.vendor.web.resource.messages" var="msgs" />
+    <f:loadBundle basename="resources.messages" var="msgs" />
 
     <h:body>
         <div class="layout-wrapper #{guestPreferences.orientationRTL ? 'layout-rtl' : null} #{guestPreferences.horizontal ? 'layout-menu-horizontal' : null}">
@@ -37,7 +56,6 @@
                         <li>/</li>
                         <ui:insert name="breadcrumb" />
                     </ul>
-                    
                     <div class="layout-breadcrumb-options">
                     <!-- <center>
                     	<h:outputLabel value="Version 1.0.1"/>
@@ -54,6 +72,19 @@
                 
                 <ui:include src="./footer.xhtml" />
                 
+                <p:notificationBar id="bar" position="top" effect="slide" styleClass="top" widgetVar="bar" rendered="#{notificationController.showNotification}">
+                <h:form id="frmNotifiation" prependId="false">
+					<p:commandButton styleClass="ui-icon ui-icon-close" action="#{notificationController.onNotificationBarClose}" oncomplete="PF('bar').hide();"
+						style="float:right;margin-right:30px;background: transparent;border:none;" update="bar">
+						<!-- <f:setPropertyActionListener value="false" target="#{notificationController.showNotification}"></f:setPropertyActionListener> -->
+					</p:commandButton>
+					<h:outputText value="#{notificationController.alert.title}" style="font-size:24px;" />
+					<br />
+					<br />
+					<h:outputText value="#{notificationController.alert.body}" style="font-size:18px;" />
+				</h:form>	
+				</p:notificationBar>
+				
                 <div class="layout-main-mask"></div>
             </div>
         </div>

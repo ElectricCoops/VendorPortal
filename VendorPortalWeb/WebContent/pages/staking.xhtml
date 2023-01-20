@@ -1,0 +1,386 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/wosearch">Unit-Based Jobs Search</p:link></li>
+		<li>/</li>
+		<li><p:link outcome="/pages/staking">Unit-Based Jobs</p:link></li>
+	</ui:define>
+	<f:metadata>
+    	<f:event listener="#{userPrefController.findUserPrefStakingsheetDetail}" type="preRenderView" />
+	</f:metadata>
+	<ui:define name="head">
+    	<link rel="sitemap icon" type="image/x-icon" href="#{resource['images/favicon-sitemap.ico']}" />
+          
+           <style type="text/css">
+               .ui-datatable-scrollable-theadclone {
+
+				    visibility: collapse;
+				}
+               
+			    .ui-filter-column .ui-column-customfilter .custom-filter {
+			        width: 100%;
+			        
+			    }
+			    
+			    .inputNumberAddAu input{
+			    
+			    	width:99%;
+			    
+			    }
+
+           </style>
+    </ui:define>
+	
+	
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12">
+				<div class="card">
+				<p:growl id="messages" closable="true"/>
+				<h:form id="asbuiltHeaderFrm" >
+					<p:panelGrid id="pgStakingHeaderInfo" columns="3" styleClass="ui-panelgrid-blank" style="width:100%;text-align:center;">
+						<h:panelGroup style="margin-top:-30px;" >
+							<h:outputText for="woId" value="Work Order Number: " style="font-weight:bold;"/>
+							<h:outputText id="woId" value="#{wfController.woId}" />
+						</h:panelGroup>
+						
+						<h:panelGroup >
+							<h:outputText for="asBuiltStatLbl" value="Overall As-Built Status: " style="font-weight:bold;"/>
+							<h:outputText id="asBuiltStatLbl" value="#{wfController.workflow.asBuiltStatus.description}" />
+						</h:panelGroup>
+						
+						<h:panelGroup >
+							<h:outputText for="woStatusLbl" value="Work Order Status: " style="font-weight:bold;"/>
+							<h:outputText id="woStatusLbl" value="#{wfController.woStatus}" />
+						</h:panelGroup>
+
+						<h:panelGroup  >
+							<h:outputText for="soId" value="Service Order Number: " style="font-weight:bold;"/>
+							<h:outputText id="soId" value="#{wfController.soId}" />
+						</h:panelGroup>
+						
+						<h:panelGroup styleClass="md-inputfield" >
+							<h:outputText for="statLbl" value="Overall Inspection Status: " style="font-weight:bold;"/>
+							<h:outputText id="statLbl" value="#{wfController.workflow.inspectionStatus.status}" />
+						</h:panelGroup>
+						
+						<h:panelGroup styleClass="md-inputfield" >
+							<h:outputText for="woNameId" value="Work Order Name: " style="font-weight:bold;"/>
+							<h:outputText id="woNameId" value="#{wfController.woName}" />
+						</h:panelGroup>
+
+						<h:panelGroup styleClass="md-inputfield" >
+							<h:outputText for="sourceId" value="Source: " style="font-weight:bold;"/>
+							<h:outputText id="sourceId" value="#{wfController.source}" />
+						</h:panelGroup>
+						
+						<h:panelGroup styleClass="md-inputfield" >
+							<h:outputText for="invoiceStatusLbl" value="Overall Invoice Status: " style="font-weight:bold;"/>
+							<h:outputText id="invoiceStatusLbl" value="#{wfController.workflow.invoiceStatus.description}" />
+						</h:panelGroup>
+
+					</p:panelGrid>
+				</h:form>
+				<h:form id="stakingTabForm" >
+					<p:tabView id="stakingTabContainer" activeIndex="#{wfController.asBuiltActiveTab}" prependId="false">
+					
+					<p:ajax event="tabChange" listener="#{wfController.onAsBuiltTabChange}" update="stakingTabContainer" />
+					
+					<p:tab title="As-Builts" id="asBuiltTab">
+						
+						<!-- <h:form id="asBuiltForm" prependId="false"> -->
+							
+       					<p:panelGrid columns="2" layout="grid" style="width:100%;padding:0px;" styleClass="ui-panelgrid-blank">
+							<h:panelGroup>
+								<p:commandButton value="Edit" rendered="#{userMBean.currentUser.isPermitted('S-AB:Edit') and wfController.editAsBuilt}" icon="fa fa-pencil" process="@this"
+												 action="#{wfController.asBuiltEdit}" styleClass="secondary-btn" update="STAKINGSHEET_DETAIL_TABLE" style="float:left;"/>
+								<p:commandButton value="Add Station" icon="fa fa-plus" onclick="PF('addStationDlg').show();" styleClass="secondary-btn"
+												 rendered="#{wfController.renderAddStationUnit}" style=""/>
+								<p:commandButton value="Add Unit" icon="fa fa-plus" onclick="PF('addUnitDlg').show();" styleClass="secondary-btn" 
+												 rendered="#{wfController.renderAddStationUnit}" style="margin-left:-10px;float:left;"/>
+							</h:panelGroup>
+								<p:commandButton value="Exit" rendered="#{not wfController.editAsBuilt}" action="#{wfController.exitAsBuiltEditMode}" process="@this" 
+												 icon="fa fa-times" styleClass="secondary-btn" style="float:right;" />
+								
+						</p:panelGrid>
+									
+							
+							<!--  filteredValue="#{wfController.filteredStakingSheetDetail}"
+												 rowKey="#{stake.stakingSheetDetailId}" -->
+									<p:dataTable id="STAKINGSHEET_DETAIL_TABLE" widgetVar="STAKINGSHEET_DETAIL_TABLE" var="stake" value="#{wfController.asBuiltStakingSheetDetailGui}" rowKey="#{stake.stakingSheetDetailId}"
+												  editable="true" editMode="cell" draggableColumns="true" paginatorPosition="bottom" rowIndexVar="ssdIndex"
+												 paginator="true" rows="100" rowsPerPageTemplate="100,200,300" paginatorAlwaysVisible="false">
+										<f:facet name="header" >
+											<p:panelGrid styleClass="ui-panelgrid-blank">
+												<div style="float: right;margin-top:-3px;">
+													
+													<h:commandLink id="stakingsheetTblExpCSV" immediate="true" style="margin-right:10px;">
+		                								<p:graphicImage name="/images/icons/csv.png" width="24"/>
+		                								<p:dataExporter type="csv" target="STAKINGSHEET_DETAIL_TABLE" fileName="AsBuiltCSV" />
+		                								<p:tooltip id="csvToolTip" for="stakingsheetTblExpCSV" value="Export data table to CSV file" position="top"/>
+		            								</h:commandLink>
+		            								
+		        									<h:commandLink id="stakingsheetTblExpPDF" immediate="true" style="margin-right:10px;">
+		                								<p:graphicImage name="/images/icons/pdf.png" width="24"/>
+		                								<p:dataExporter type="pdf" target="STAKINGSHEET_DETAIL_TABLE" fileName="AsBuiltPDF" preProcessor="#{wfController.preProcessorStakingSheetRsltPDF}" />
+		                								<p:tooltip id="pdfTooltip" for="stakingsheetTblExpPDF" value="Export data table to PDF file" position="top"/>
+		            								</h:commandLink>
+		            								
+													<p:commandLink id="toggler" style="margin-right:10px;">
+														<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+														<p:tooltip for="toggler" value="Columns" position="top"/>
+													</p:commandLink>
+													
+													<!-- <p:commandLink id="editAsBuiltId" rendered="#{userMBean.currentUser.isPermitted('S-AB:Edit') and wfController.editAsBuilt}" action="#{wfController.asBuiltEdit}">
+						                    			<i class="fa fa-wa fa-edit fa-2x" style="color:white"/>
+						                    			<p:tooltip for="editAsBuiltId" value="Edit" position="top"/>
+						                    		</p:commandLink> -->
+						                    		
+		        									<p:columnToggler datasource="STAKINGSHEET_DETAIL_TABLE" trigger="toggler" >
+		        										<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+		        									</p:columnToggler>
+		        									
+		        								</div>
+		        								<div style="right:50%;">
+													<span>Assembly Unit(s)</span>
+												</div>
+											</p:panelGrid>
+										</f:facet>
+										
+										<!-- <p:ajax event="cellEdit" update="asBuiltQuantity asBuiltStatusId asBuiltComments" /> -->
+										<!-- <p:focus context="STAKINGSHEET_DETAIL_TABLE:asBuiltCommentId"  for="asBuiltStatusIdSelect"/> -->
+										<!-- <p:remoteCommand name="setFocus" actionListener="" /> -->
+									
+										<p:column id="stationDescription" headerText="Station" style="text-align:center" filterBy="#{stake.stationDescription}" sortBy="#{stake.stationDescription}" 
+												   visible="#{userPrefController.stakingDet.stationDescription}" filterFunction="#{wfController.filterStationFunction}">
+											<f:facet name="filter">
+								                <p:selectCheckboxMenu value="#{wfController.selectedItems}" onchange="PF('STAKINGSHEET_DETAIL_TABLE').filter()" style="width:100%;">
+								                    <f:selectItems value="#{wfController.distinctStation}" />
+								                </p:selectCheckboxMenu>
+								            </f:facet>
+											<h:outputText value="#{stake.stationDescription}" />	
+										</p:column>
+										<p:column id="assemblyActionCode" headerText="C/R" style="text-align:center" filterBy="#{stake.assemblyActionCode}" filterMatchMode="in" 
+												  sortBy="#{stake.assemblyActionCode}" visible="#{userPrefController.stakingDet.assemblyActionCode}">
+											<f:facet name="filter">
+								                <p:selectCheckboxMenu onchange="PF('STAKINGSHEET_DETAIL_TABLE').filter()" styleClass="custom-filter">
+								                    <f:selectItem itemLabel="C" itemValue="C" />
+								                    <f:selectItem itemLabel="R" itemValue="R" />
+								                </p:selectCheckboxMenu>
+								            </f:facet>
+											<h:outputText value="#{stake.assemblyActionCode}" />
+										</p:column>
+										<p:column id="assemblyQuantity" headerText="Design Qty" style="text-align:center" filterBy="#{stake.assemblyQuantity}" filterMatchMode="contains" sortBy="#{stake.assemblyQuantity}" 
+												visible="#{userPrefController.stakingDet.assemblyQuantity}" styleClass="#{stake.asBuiltStatus ne 'Not Started' and (stake.asBuiltQuantity ne stake.assemblyQuantity) ? 'inspBlGrey' : 'null'}">
+											<h:outputText value="#{stake.assemblyQuantity}" />
+										</p:column>
+										<p:column id="assemblyGuid" headerText="Unit" style="text-align:center" filterBy="#{stake.assemblyGuid}" filterMatchMode="contains" sortBy="#{stake.assemblyGuid}" 
+												visible="#{userPrefController.stakingDet.assemblyGuid}">
+											<h:outputText value="#{stake.assemblyGuid}" />
+										</p:column>
+										<p:column id="assemblyDescription" headerText="Description" style="text-align:center" filterBy="#{stake.assemblyDescription}" filterMatchMode="contains" sortBy="#{stake.assemblyDescription}" 
+												visible="#{userPrefController.stakingDet.assemblyDescription}">
+											<h:outputText value="#{stake.assemblyDescription}" />
+										</p:column>
+										<p:column id="asBuiltQuantity" headerText="As-Built Qty" visible="#{userPrefController.stakingDet.asBuiltQuantity}" style="text-align:center;" filterBy="#{stake.asBuiltQuantity}" filterMatchMode="contains" sortBy="#{stake.asBuiltQuantity}"
+												  styleClass="#{stake.asBuiltStatus ne 'Not Started' and (stake.asBuiltQuantity ne stake.assemblyQuantity) ? 'inspBlGrey' : wfController.pickAsBuiltStyleClass(stake)}" >
+											<p:cellEditor  disabled="#{wfController.editAsBuilt}">
+												<f:facet name="output" ><h:outputText value="#{stake.asBuiltQuantity}" /></f:facet>
+												<f:facet name="input">
+													<p:inputNumber minValue="0" decimalPlaces="0" value="#{stake.asBuiltQuantity}" disabled="#{wfController.asBuiltDisable}" style="width: 99%;" tabindex="0">
+														<p:ajax event="change" listener="#{wfController.onStakingDetailCellEdit(stake)}" />
+													</p:inputNumber>
+												</f:facet>
+											</p:cellEditor>
+										
+										</p:column>
+										<p:column id="asBuiltStatusId" headerText="As-Built Status" style="text-align:center" filterBy="#{stake.asBuiltStatus}" filterMatchMode="in" sortBy="#{stake.asBuiltStatus}" 
+													visible="#{userPrefController.stakingDet.asBuiltStatusId}" styleClass="#{wfController.pickAsBuiltStyleClass(stake)}">
+											<f:facet name="filter">
+								                <p:selectCheckboxMenu onchange="PF('STAKINGSHEET_DETAIL_TABLE').filter()" styleClass="custom-filter" >
+								                    <f:selectItem itemLabel="Appealed" itemValue="Appealed" />
+								                    <f:selectItem itemLabel="Completed" itemValue="Completed" />
+								                    <f:selectItem itemLabel="Rejected" itemValue="Rejected" />
+								                    <f:selectItem itemLabel="Not Started" itemValue="Not Started" />
+								                </p:selectCheckboxMenu>
+								            </f:facet>
+											<p:cellEditor disabled="#{wfController.editAsBuilt}">
+												<f:facet name="output"><h:outputText value="#{stake.asBuiltStatus}"/></f:facet>
+												<f:facet name="input">
+													<p:selectOneMenu id="asBuiltStatusIdSelect" value="#{stake.asBuiltStatusId}" tabindex="1" >
+												 		<p:ajax event="change" listener="#{wfController.onStakingDetailCellEdit(stake)}" update="messages"/>
+												 		<f:selectItems value="#{wfController.findFilteredAsBuiltStatuses(stake.asBuiltStatusId)}" var="stat" itemLabel="#{stat.description}" itemValue="#{stat.asBuiltStatusId}" />
+												 		<!-- <p:ajax event="change" listener="#{wfController.onStakingDetailCellEdit}" update="STAKINGSHEET_DETAIL_TABLE messages" oncomplete="PF('STAKINGSHEET_DETAIL_TABLE').filter()" oncomplete="PF('STAKINGSHEET_DETAIL_TABLE:0:asBuiltComments:asBuiltCommentEditId:asBuiltCommentId').focus()">
+												 			<f:setPropertyActionListener value="#{stake}" target="#{wfController.selectedStakingSheetDetail}" />
+												 		</p:ajax> -->
+													</p:selectOneMenu>
+												</f:facet>
+											</p:cellEditor>
+										</p:column>
+										<p:column id="asBuiltComments" headerText="As-Built Comment" styleClass="#{wfController.pickAsBuiltStyleClass(stake)}" style="text-align:center" 
+												  filterBy="#{stake.asBuiltComments}" filterMatchMode="contains" sortBy="#{stake.asBuiltComments}" 
+												  visible="#{userPrefController.stakingDet.asBuiltComments}">
+											<p:cellEditor id="asBuiltCommentEditId" disabled="#{wfController.editAsBuilt}">
+												<f:facet name="output"><h:outputText value="#{stake.asBuiltComments}" /></f:facet>
+												<f:facet name="input">
+													<p:inputTextarea id="asBuiltCommentId" 
+																	 value="#{stake.asBuiltComments}" 
+																	 disabled="#{wfController.asBuiltDisable}" 
+																	 maxlength="255" 
+																	 autoResize="false" 
+																	 style="width: 99%;" 
+																	 required="#{stake.asBuiltStatusId eq '6'}"
+																	 tabindex="2"
+																	 widgetVar="asBuiltCommentId">
+														<p:ajax event="change" listener="#{wfController.onStakingDetailCellEdit(stake)}" update="asBuiltComments messages" />
+													</p:inputTextarea>
+												</f:facet>
+											</p:cellEditor>
+										</p:column>
+										<p:column id="asBuiltBy" headerText="As-Built By" style="text-align:center" filterBy="#{stake.asBuiltBy}" filterMatchMode="contains" sortBy="#{stake.asBuiltBy}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.asBuiltBy}">
+											<h:outputText value="#{stake.asBuiltBy}" />
+										</p:column>
+										<p:column id="asBuiltDt" headerText="As-Built Date" style="text-align:center" filterBy="#{stake.asBuiltDt}" filterMatchMode="contains" sortBy="#{stake.asBuiltDt}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.asBuiltDt}">
+											<h:outputText value="#{stake.asBuiltDt}" >
+												<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+											</h:outputText>
+										</p:column>
+										<p:column id="currentInspectionDetailStatusId" headerText="Inspection Status" style="text-align:center" filterBy="#{stake.currentInspectionDetailStatus}" filterMatchMode="in"  sortBy="#{stake.currentInspectionDetailStatus}" 
+													visible="#{userPrefController.stakingDet.currentInspectionDetailStatusId}">
+											<f:facet name="filter">
+								                <p:selectCheckboxMenu onchange="PF('STAKINGSHEET_DETAIL_TABLE').filter()" styleClass="custom-filter">
+								                    <f:selectItem itemLabel="Approved" itemValue="Approved" />
+								                    <f:selectItem itemLabel="Ready for Inspection" itemValue="Ready for Inspection" />
+								                    <f:selectItem itemLabel="Rejected" itemValue="Rejected" />
+								                    <f:selectItem itemLabel="Not Inspected" itemValue="Not Inspected" />
+								                </p:selectCheckboxMenu>
+								            </f:facet>
+											<h:outputText value="#{stake.currentInspectionDetailStatus}" />
+										</p:column>
+										<!-- <p:column id="currentInspectedDetailBy" headerText="Inspected By" style="text-align:center" filterBy="#{stake.resource.resourceName}" filterMatchMode="contains" sortBy="#{stake.resource.resourceName}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.currentInspectedDetailBy}">
+											<h:outputText value="#{stake.resource.resourceName}" />
+										</p:column> -->
+										<p:column id="currentInspectorDetailComments" headerText="Inspection Comments" style="text-align:center" filterBy="#{stake.currentInspectorDetailComments}" filterMatchMode="contains" sortBy="#{stake.currentInspectorDetailComments}" 
+												visible="#{userPrefController.stakingDet.currentInspectorDetailComments}">
+											<h:outputText value="#{stake.currentInspectorDetailComments}" />
+										</p:column>
+										<p:column id="currentInspectionDetailDt" headerText="Inspection Date" style="text-align:center" filterBy="#{stake.currentInspectionDetailDt}" filterMatchMode="contains" sortBy="#{stake.currentInspectionDetailDt}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.currentInspectionDetailDt}">
+											<h:outputText value="#{stake.currentInspectionDetailDt}" >
+												<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+											</h:outputText>
+										</p:column>
+										<!-- <p:column id="invoicedBy" headerText="Invoiced By" style="text-align:center" filterBy="#{stake.invoice.invoicedBy}" filterMatchMode="contains" sortBy="#{stake.invoice.invoicedBy}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.invoicedBy}">
+											<h:outputText value="#{stake.invoice.invoicedBy}" />
+										</p:column> -->
+										<!-- <p:column id="invoicedDt" headerText="Invoice Date" style="text-align:center" filterBy="#{stake.invoice.invoicedDt}" filterMatchMode="contains" sortBy="#{stake.invoice.invoicedDt}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.invoicedDt}">
+											<h:outputText value="#{stake.invoice.invoicedDt}" >
+												<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+											</h:outputText>
+										</p:column> -->
+										<p:column id="invoiceStatusId" headerText="Invoice Status" style="text-align:center" filterBy="#{stake.invoiceStatus}" filterMatchMode="in" rendered="#{wfController.showAsBuiltStatus}" sortBy="#{stake.invoiceStatus}" 
+												visible="#{userPrefController.stakingDet.invoiceStatusId}">
+											<f:facet name="filter">
+								                <p:selectCheckboxMenu onchange="PF('STAKINGSHEET_DETAIL_TABLE').filter()" styleClass="custom-filter">
+								                    <f:selectItem itemLabel="Approved" itemValue="Approved" />
+								                    <f:selectItem itemLabel="Submitted" itemValue="Submitted" />
+								                    <f:selectItem itemLabel="Rejected" itemValue="Rejected" />
+								                    <f:selectItem itemLabel="Not Invoiced" itemValue="Not Invoiced" />
+								                </p:selectCheckboxMenu>
+								            </f:facet>
+											<h:outputText value="#{stake.invoiceStatus}" />
+										</p:column>		
+										<p:column id="invoiceApprovedBy" headerText="Invoice Approved By" style="text-align:center" filterBy="#{stake.invoiceApprovedBy}" filterMatchMode="contains" sortBy="#{stake.invoiceApprovedBy}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.invoiceApprovedBy}">
+											<h:outputText value="#{stake.invoiceApprovedBy}" />
+										</p:column>
+										<p:column id="invoiceApprovedComment" headerText="Invoice Approval Comment" style="text-align:center" filterBy="#{stake.invoiceApprovedComment}" filterMatchMode="contains" sortBy="#{stake.invoiceApprovedComment}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.invoiceApprovedComment}">
+											<h:outputText value="#{stake.invoiceApprovedComment}" />
+										</p:column>																
+										<p:column id="invoiceApprovedDt" headerText="Invoice Approval Date" style="text-align:center" filterBy="#{stake.invoiceApprovedDt}" filterMatchMode="contains" sortBy="#{stake.invoiceApprovedDt}" rendered="#{wfController.showAsBuiltStatus}" 
+												visible="#{userPrefController.stakingDet.invoiceApprovedDt}">
+											<h:outputText value="#{stake.invoiceApprovedDt}" >
+												<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+											</h:outputText>
+										</p:column>
+										<p:column id="energize" headerText="Energize" style="text-align:center" filterBy="#{stake.energize}" filterMatchMode="contains" sortBy="#{stake.energize}" visible="#{userPrefController.stakingDet.energize}">
+											<h:outputText value="#{stake.energize}" />
+										</p:column>			
+										<p:column id="transfer" headerText="Transfer" style="text-align:center" filterBy="#{stake.transfer}" filterMatchMode="contains" sortBy="#{stake.transfer}" visible="#{userPrefController.stakingDet.transfer}">
+											<h:outputText value="#{stake.transfer}" />
+										</p:column>	
+										<p:column id="assemblyAmount" headerText="Design Amount" style="text-align:center" filterBy="#{stake.assemblyAmount}" filterMatchMode="contains" sortBy="#{stake.assemblyAmount}" 
+												visible="#{userPrefController.stakingDet.assemblyAmount}">
+											<h:outputText value="#{stake.assemblyAmount}">
+												<f:convertNumber type="currency" currencySymbol="$" />
+											</h:outputText>
+										</p:column>			
+										<p:column id="asBuiltAmount" headerText="As-Built Amount" style="text-align:center" filterBy="#{stake.asBuiltAmount}" filterMatchMode="contains" sortBy="#{stake.asBuiltAmount}" 
+												visible="#{userPrefController.stakingDet.asBuiltAmount}">
+											<h:outputText value="#{stake.asBuiltAmount}">
+												<f:convertNumber type="currency" currencySymbol="$" />
+											</h:outputText>
+										</p:column>									
+									</p:dataTable>
+								
+        							<p:panelGrid columns="1" style="width:100%;" styleClass="ui-panelgrid-blank">
+										<p:commandButton value="Exit" rendered="#{not wfController.editAsBuilt}" action="#{wfController.exitAsBuiltEditMode}" 
+														 style="float:right;margin-top:5px;margin-right:20px;" styleClass="secondary-btn" update="STAKINGSHEET_DETAIL_TABLE" icon="fa fa-times" />
+									</p:panelGrid>
+									
+								<!-- </h:form> -->
+												
+							
+						</p:tab>
+						<p:tab title="Inspections" id="inspTab" >
+							<ui:include src="inspection.xhtml" />
+						</p:tab>
+						<p:tab title="Invoices" id="invoiceTab">
+							<ui:include src="invoice.xhtml" />
+						</p:tab>
+						<p:tab title="Vouchers" id="vouchersTab">
+							<ui:include src="stakingvoucher.xhtml" />
+						</p:tab>
+						<p:tab title="Summary" id="summaryTab">
+							<ui:include src="stakingsummary.xhtml" />
+						</p:tab>
+					</p:tabView>
+					</h:form>
+					
+					<p:dialog header="Add Assembly Unit" draggable="false" modal="true" resizable="false"
+							showHeader="true" widgetVar="addUnitDlg" minHeight="40" >
+						<!-- <h:form id="addUnitDlgForm"> -->
+							<ui:include src="unitdiag.xhtml" />
+						<!-- </h:form> -->
+					</p:dialog>
+					<p:dialog header="Add Station" draggable="false" modal="true" resizable="false"
+							showHeader="true" widgetVar="addStationDlg" minHeight="40" >
+						<!-- <h:form id="addStationDlgForm"> -->
+							<ui:include src="stationdiag.xhtml" />
+						<!-- </h:form> -->
+					</p:dialog>		
+					
+					<p:dialog header="Add New Voucher" draggable="false" modal="true" resizable="false" showHeader="true"
+						widgetVar="addVoucherDlg" minHeight="40" blockScroll="true" >
+						<ui:include src="addvoucherdiag.xhtml" />
+					</p:dialog>
+					
+					<p:dialog header="Update Voucher" draggable="false" modal="true" resizable="false" showHeader="true"
+						widgetVar="editVoucherDlg" minHeight="40" blockScroll="true" >
+						<ui:include src="editvoucherdlg.xhtml" />
+					</p:dialog>
+				</div>
+			</div>
+		</div>	
+	</ui:define>
+</ui:composition>

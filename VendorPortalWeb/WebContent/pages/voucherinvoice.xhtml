@@ -1,0 +1,95 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dataTable id="INVOICE_NEW_VOUCHER_TABLE" var="voucher" value="#{wfController.invoiceVouchers}" draggableColumns="true"
+				 selection="#{wfController.selectedInvoiceVouchers}" sortBy="#{voucher.stationDescription}" rowKey="#{voucher.voucherId}">
+		<f:facet name="header">
+           	<p:panelGrid styleClass="ui-panelgrid-blank">
+				<div style="float:right;margin-top:-3px;">
+					<h:commandLink id="voucherInvoiceTblExpCSV" style="margin-right:10px;">
+						<p:graphicImage name="/images/icons/csv.png" width="24" />
+						<p:dataExporter type="csv" target="voucherInvoiceTbl"
+							fileName="VoucherInvoiceCSV" />
+						<p:tooltip id="csvToolTip" for="voucherInvoiceTblExpCSV"
+							value="Export data table to CSV file" position="top" />
+					</h:commandLink>
+					<h:commandLink id="voucherInvoiceTblExpPDF" style="margin-right:10px;">
+						<p:graphicImage name="/images/icons/pdf.png" width="24" />
+						<p:dataExporter type="pdf" target="voucherInvoiceTbl"
+							fileName="VouchersPDF"
+							preProcessor="#{inspectionController.preProcessorPDF}" />
+						<p:tooltip id="pdfTooltip" for="voucherInvoiceTblExpPDF"
+							value="Export data table to PDF file" position="top" />
+					</h:commandLink>
+					<p:commandLink id="toggler" style="margin-right:10px;">
+						<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+						<p:tooltip for="toggler" value="Columns" position="top"/>
+					</p:commandLink>
+					<p:columnToggler datasource="INVOICE_NEW_VOUCHER_TABLE" trigger="toggler">
+						<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+					</p:columnToggler>
+				</div>
+				<div style="right:50%;">
+					<span>Available Voucher(s) for Invoicing</span>
+				</div>
+			</p:panelGrid>
+		</f:facet>
+
+		<p:ajax event="rowSelectCheckbox" listener="#{wfController.voucherInvRowSelectCheckbox}" update="newInvoiceForm" />
+		<p:ajax event="rowUnselectCheckbox" listener="#{wfController.voucherInvRowUnSelectCheckbox}" update="newInvoiceForm" />
+		<p:ajax event="toggleSelect" listener="#{wfController.voucherInvAllRowSelectCheckbox}" update="newInvoiceForm" />
+		<p:ajax event="rowSelect" listener="#{wfController.voucherInvRowSelectCheckbox}" update="newInvoiceForm" />
+		<p:ajax event="rowUnselect" listener="#{wfController.voucherInvRowSelectCheckbox}" update="newInvoiceForm" />
+
+		<p:column selectionMode="multiple"
+			style="width:16px;text-align:center" />
+		<p:column id="stationDescription" headerText="Station"
+			style="text-align:center"
+			visible="#{userPrefController.voucher.stationDescription}">
+			<h:outputText value="#{voucher.stationDescription}" />
+		</p:column>
+		<p:column id="description" headerText="Description"
+			style="text-align:center"
+			visible="#{userPrefController.voucher.description}">
+			<h:outputText value="#{voucher.description}" />
+		</p:column>
+		<p:column id="crew" headerText="Crew" style="text-align:center"
+			visible="#{userPrefController.voucher.crew}">
+			<h:outputText value="#{voucher.crew}" />
+		</p:column>
+		<p:column id="requestor" headerText="Requestor"
+			style="text-align:center"
+			visible="#{userPrefController.voucher.requestor}">
+			<h:outputText value="#{voucher.requestor}" />
+		</p:column>
+		<p:column id="createdDt" headerText="Created Date"
+			style="text-align:center"
+			visible="#{userPrefController.voucher.createdDt}">
+			<h:outputText value="#{voucher.createdDt}">
+				<f:convertDateTime pattern="MM-dd-yyyy hh:mm:ss a" />
+			</h:outputText>
+		</p:column>
+		<p:column id="amount" headerText="Amount" style="text-align:center"
+			visible="#{userPrefController.voucher.amount}">
+			<h:outputText value="#{voucher.amount}">
+				<f:convertNumber type="currency" currencySymbol="$" />
+			</h:outputText>
+		</p:column>
+		<p:columnGroup type="footer">
+			<p:row>
+				<p:column colspan="6" style="text-align:right" footerText="Total:" />
+				<p:column style="text-align:center">
+					<f:facet name="footer">
+						<h:outputText id="voucherSubTotId"
+							value="#{wfController.voucherSubTotal}">
+							<f:convertNumber type="currency" currencySymbol="$" />
+						</h:outputText>
+					</f:facet>
+				</p:column>
+			</p:row>
+		</p:columnGroup>
+	</p:dataTable>
+</ui:composition>

@@ -1,0 +1,197 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/invoicesearch">Invoice Search</p:link></li>
+	</ui:define>
+ 	<f:metadata>
+    	<f:event listener="#{userPrefController.findUserPrefInvSearch}" type="preRenderView" />
+	</f:metadata>
+	<ui:define name="content">
+	<h:form id="invSearchForm" prependId="false">
+		<div class="ui-g ui-fluid">
+			<div class="ui-g-12">
+				<div class="card">
+					<p:growl id="messages" closable="true" showDetail="true"/>
+					<p:panel id="invSearchPnl" header="Search Criteria">				
+						<p:panelGrid columns="5" styleClass="ui-panelgrid-blank ui-fluid" style="width:100%;" >
+					
+	          				<h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:inputText id="invWoId" value="#{invController.woNumber}" />
+								<label>Work Order</label>
+							</h:panelGroup>
+							<h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:inputText id="invNoId" value="#{invController.lcecRefNo}" />
+								<label>LCEC Reference</label>
+							</h:panelGroup>
+							<h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:inputText id="venRefId" value="#{invController.vendorRefNo}" />
+								<label>Vendor Reference</label>
+							</h:panelGroup>
+							<h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:selectOneMenu id="invSrchInvStatId" value="#{invController.invoiceStatus}">
+									<f:selectItem itemLabel="All" itemValue="0" noSelectionOption="true" />
+									<f:selectItem itemLabel="All" itemValue="0" noSelectionOption="true" />
+									<f:selectItems value="#{invController.findInvoiceStatus()}" var="stat" itemLabel="#{stat.description}" itemValue="#{stat.invoiceStatusId}" />
+								</p:selectOneMenu>
+								<label>Invoice Status</label>
+							</h:panelGroup>
+							<h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:selectOneMenu id="invWoTypeId" value="#{invController.woType}" >
+									<f:selectItem itemLabel="All" itemValue="All" noSelectionOption="true"/>
+									<f:selectItem itemLabel="All" itemValue="All"/>
+									<f:selectItem itemLabel="Staking" itemValue="SS" />
+									<f:selectItem itemLabel="Streetlight" itemValue="SL" />
+								</p:selectOneMenu>
+								<label>Work Order Type</label>
+							</h:panelGroup>
+						</p:panelGrid>
+						<p:panelGrid columns="2" styleClass="ui-panelgrid-blank ui-fluid" style="margin-left:30%;" >
+							<h:panelGroup styleClass="md-inputfield">
+								<p:commandButton value="Search" icon="fa fa-wa fa-search" update="invSearchForm INV_SEARCH_TABLE"
+												 action="#{invController.findInvoices}" style="width:250px;" styleClass="secondary-btn" />
+							</h:panelGroup>
+							
+							<h:panelGroup styleClass="md-inputfield">
+								<p:commandButton value="Reset" icon="fa fa-wa fa-times" update="invSearchForm INV_SEARCH_TABLE" 
+										 		 action="#{invController.resetInvoiceSearch}" style="width:250px;" styleClass="secondary-btn" >
+									<!-- <p:resetInput target="INV_SEARCH_TABLE" /> -->
+								</p:commandButton>
+							</h:panelGroup>
+						</p:panelGrid>
+					</p:panel>
+		
+				<p:dataTable id="INV_SEARCH_TABLE" var="inv" value="#{invController.invoice}" reflow="true" paginatorPosition="bottom" multiViewState="true"
+							 paginator="true" rows="50" rowsPerPageTemplate="50,75,100" draggableColumns="true" paginatorAlwaysVisible="false" widgetVar="INV_SEARCH_TABLE">
+					<f:facet name="header">
+						<p:panelGrid styleClass="ui-panelgrid-blank">
+
+        					<div style="float: right;margin-top:-3px;"> 
+        					
+        						<h:commandLink id="invoiceSearchTblExpCSV" immediate="true" style="margin-right:10px;">
+       								<p:graphicImage name="/images/icons/csv.png" width="24"/>
+       								<p:dataExporter type="csv" target="INV_SEARCH_TABLE" fileName="InvoicesCSV" />
+       								<p:tooltip id="csvToolTip" for="invoiceSearchTblExpCSV" value="Export data table to CSV file" position="top"/>
+   								</h:commandLink>
+   								
+								<h:commandLink id="invoiceSearchTblExpPDF" immediate="true" style="margin-right:10px;">
+       								<p:graphicImage name="/images/icons/pdf.png" width="24"/>
+       								<p:dataExporter type="pdf" target="INV_SEARCH_TABLE" fileName="InvoicesPDF" preProcessor="#{invController.preProcessorStakingSheetRsltPDF}" />
+       								<p:tooltip id="pdfTooltip" for="invoiceSearchTblExpPDF" value="Export data table to PDF file" position="top"/>
+   								</h:commandLink>
+        					
+           						<p:commandLink id="toggler" style="margin-right:10px;">
+									<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+									<p:tooltip for="toggler" value="Columns" position="top"/>
+								</p:commandLink>
+	        					<p:columnToggler datasource="INV_SEARCH_TABLE" trigger="toggler">
+	        						<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+	        					</p:columnToggler>
+            				</div>
+            				<div style="right:50%;">
+								<span>Invoice(s)</span>
+							</div>
+           				</p:panelGrid>
+					</f:facet>
+	        		<p:column id="action" headerText="Action" style="text-align:center"
+	        		rendered="#{userMBean.currentUser.isPermitted('INV:Approve') or userMBean.currentUser.isPermitted('SL:Approve')}" visible="#{userPrefController.invSearch.action}">
+	        			<h:commandLink action="#{wfController.findInvoiceApproval}" value="Approve" rendered="#{inv.invoiceStatus.description == 'Submitted' and inv.invoiceType == 'SS' and userMBean.currentUser.isPermitted('INV:Approve')}">
+							<f:setPropertyActionListener target="#{wfController.invoiceId}" value="#{inv.invoiceId}" />
+							<f:setPropertyActionListener target="#{wfController.woId}" value="#{inv.workOrderId}" />
+							<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="true" />
+	    					<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="false" />
+						</h:commandLink>
+						<h:commandLink action="#{streetLightVw.findInvoiceApproval}" value="Approve" rendered="#{inv.invoiceStatus.description == 'Submitted' and inv.invoiceType == 'SL' and userMBean.currentUser.isPermitted('SL:Approve')}">
+							<f:setPropertyActionListener target="#{streetLightVw.invNoLink}" value="#{inv.invoiceId}" />
+							<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="true" />
+	    					<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="false" />
+						</h:commandLink>
+	        		</p:column>
+	        		
+					<p:column id="lcecRef" headerText="LCEC Reference" style="text-align:center"  sortBy="#{inv.invoiceId}" filterBy="#{inv.invoiceId}" visible="#{userPrefController.invSearch.LCECReference}">
+						<h:commandLink action="#{wfController.findInvoiceDetail(inv.invoiceId)}" value="#{inv.invoiceId}" rendered="#{inv.invoiceType eq 'SS'}" >
+							<f:setPropertyActionListener target="#{wfController.invoiceId}" value="#{inv.invoiceId}"/>
+							<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="true" />
+		    				<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="false" />
+						</h:commandLink>
+						<h:commandLink action="#{streetLightVw.slInvoiceDetail}" value="#{inv.invoiceId}" rendered="#{inv.invoiceType eq 'SL'}">
+							<f:setPropertyActionListener target="#{streetLightVw.invNoLink}" value="#{inv.invoiceId}"/>
+							<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="true" />
+		    				<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="false" />
+		    				<f:setPropertyActionListener target="#{streetLightVw.renderBackToStreetLightBtn}" value="false" />
+						</h:commandLink>
+					</p:column>
+					
+					<p:column id="vendorReference" headerText="Vendor Reference" style="text-align:center" sortBy="#{inv.vendorReference}" filterBy="#{inv.vendorReference}" visible="#{userPrefController.invSearch.vendorReference}">
+						<h:outputText value="#{inv.vendorReference}" />
+					</p:column>
+					
+					<p:column id="invoiceDt" headerText="Invoice Date" style="text-align:center" sortBy="#{inv.invoicedDt}" filterBy="#{inv.invoicedDt}" visible="#{userPrefController.invSearch.invoiceDt}">
+						<h:outputText value="#{inv.invoicedDt}">
+							<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+						</h:outputText>
+					</p:column>
+					
+					<p:column id="invoiceStatusId" headerText="Invoice Status" style="text-align:center" sortBy="#{inv.invoiceStatus.description}" filterBy="#{inv.invoiceStatus.description}"
+						 visible="#{userPrefController.invSearch.invoiceStatusId}" filterFunction="#{invController.filterStatusFunction}">
+						<f:facet name="filter">
+			                <p:selectCheckboxMenu id="filterInvoiceStatus" value="#{invController.selectedInvoiceStatuses}" onchange="PF('INV_SEARCH_TABLE').filter()" style="width:100%;">
+			                    <f:selectItems value="#{invController.distinctStatuses}" />
+			                </p:selectCheckboxMenu>
+			            </f:facet>
+						<h:outputText value="#{inv.invoiceStatus.description}" />
+					</p:column>
+					
+					<p:column id="invoiceAmount" headerText="Invoiced Amount" style="text-align:center" sortBy="#{inv.invoiceAmount}" filterBy="#{inv.invoiceAmount}" visible="#{userPrefController.invSearch.invoiceAmount}">
+						<h:outputText value="#{inv.invoiceAmount}">
+							<f:convertNumber type="currency" currencySymbol="$" />
+						</h:outputText>
+					</p:column>
+					
+					<p:column id="workOrderId" headerText="Work Order" style="text-align:center" sortBy="#{inv.workOrderId}" filterBy="#{inv.workOrderId}" visible="#{userPrefController.invSearch.workOrderId}">
+						<h:outputText value="#{inv.workOrderId}" />
+					</p:column>
+					
+					<p:column id="vendorName" headerText="Vendor" style="text-align:center" sortBy="#{inv.vendorName}" filterBy="#{inv.vendorName}" 
+						visible="#{userPrefController.invSearch.vendorName}" filterFunction="#{invController.filterVendorFunction}">
+						
+						<f:facet name="filter">
+			                <p:selectCheckboxMenu value="#{invController.selectedVendors}" onchange="PF('INV_SEARCH_TABLE').filter()" style="width:100%;">
+			                    <f:selectItems value="#{invController.distinctVendors}" />
+			                </p:selectCheckboxMenu>
+			            </f:facet>
+						
+						<h:outputText value="#{inv.vendorName}" />
+					</p:column>
+					
+					<p:column id="invoiceType" headerText="Invoiced Type" style="text-align:center" sortBy="#{inv.invoiceType}" filterBy="#{inv.invoiceType}" visible="#{userPrefController.invSearch.invoiceType}">
+						<h:outputText value="#{inv.invoiceType}" />
+					</p:column>
+					
+					<p:column id="invoiceBy" headerText="Invoiced By" style="text-align:center" sortBy="#{inv.invoicedBy}" filterBy="#{inv.invoicedBy}" visible="#{userPrefController.invSearch.invoiceBy}">
+						<h:outputText value="#{inv.invoicedBy}" />
+					</p:column>
+					
+					<p:column id="approvedDt" headerText="Invoiced Approval Date" style="text-align:center" sortBy="#{inv.approvedDt}" filterBy="#{inv.approvedDt}" visible="#{userPrefController.invSearch.approvedDt}">
+						<h:outputText value="#{inv.approvedDt}">
+							<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+						</h:outputText>
+					</p:column>
+					
+					<p:column id="approvedBy" headerText="Invoiced Approval By" style="text-align:center" sortBy="#{inv.approvedBy}" filterBy="#{inv.approvedBy}" visible="#{userPrefController.invSearch.approvedBy}">
+						<h:outputText value="#{inv.approvedBy}" />
+					</p:column>
+				</p:dataTable>
+				<p:dialog id="newInvoiceDlgId" header="Select Work Orders for Invoice" closable="false" draggable="false"
+							modal="true" resizable="false" showHeader="true" widgetVar="newInvoiceDlg" minHeight="40">
+					<ui:include src="newinvoicediag.xhtml" />
+				</p:dialog>
+				</div>
+			</div>
+		</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

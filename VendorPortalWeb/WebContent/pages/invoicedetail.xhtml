@@ -1,0 +1,229 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<p:panelGrid rendered="#{wfController.renderBackToInvoiceTab}" >
+			<li style="margin-left:5px;margin-right:5px;"><p:link outcome="/pages/wosearch">Unit-Based Jobs Search</p:link></li>
+			<li>/</li>
+			<li style="margin-left:5px;margin-right:5px;"><p:link outcome="/pages/staking">Unit-Based Jobs</p:link></li>
+			<li>/</li>
+			<li style="margin-left:5px;"><p:link outcome="/pages/invoicedetail">Invoice Summary</p:link></li>
+		</p:panelGrid>
+		<p:panelGrid rendered="#{invController.renderBackToInvoiceSearch}" >
+			<li style="margin-left:5px;margin-right:5px;"><p:link outcome="/pages/invoicesearch">Invoice Search</p:link></li>
+			<li>/</li>
+			<li style="margin-left:5px;"><p:link outcome="/pages/invoicedetail">Invoice Summary</p:link></li>
+		</p:panelGrid>
+	</ui:define>
+	 <f:metadata>
+    	<f:event listener="#{userPrefController.findUserPrefInvoiceDetail}" type="preRenderView" />
+    	<f:event listener="#{userPrefController.findUserPrefVoucherInvoiceDetail}" type="preRenderView" />
+	</f:metadata>
+	<ui:define name="content">
+	<h:form id="invoiceDetailForm" prependId="false">
+		<div class="ui-g">
+			<div class="ui-g-12">
+				<div class="card">
+				<p:panelGrid id="page">
+				<!-- <p:panelGrid styleClass="ui-panelgrid-blank"> -->
+					<p:commandButton value="Back" icon="fa fa-arrow-circle-left" action="#{wfController.backInvoiceList}" style="float:left;" rendered="#{wfController.renderBackToInvoiceTab}" />
+					<!-- <p:button value="Back" icon="fa fa-arrow-circle-left" outcome="staking?index=2?faces-redirect=true" style="float:left;" rendered="#{wfController.renderBackToInvoiceTab}" /> -->
+					<p:button value="Back" icon="fa fa-arrow-circle-left" outcome="invoicesearch?faces-redirect=true" style="float:left;" rendered="#{invController.renderBackToInvoiceSearch}" />
+				
+					<p:commandButton value="Print" type="button" icon="ui-icon-print" style="margin-bottom: 20px;float:right">
+    					<p:printer target="invoiceDetailForm" />
+					</p:commandButton>
+				<!-- </p:panelGrid> -->
+				<p:panelGrid id="invoiceHdr" columns="6" style="width:89%;margin-top:-20px;" styleClass="ui-panelgrid-blank">
+					<p:fieldset legend="Vendor Reference" style="font-weight:bold;text-align: center;">
+						<h:outputText id="vendorRef" value="#{wfController.invoice.vendorReference}" />
+					</p:fieldset>	
+					<p:fieldset legend="LCEC Reference" style="font-weight:bold;text-align: center;">
+						<h:outputText id="lcecRef" value="#{wfController.invoice.invoiceId}" />
+					</p:fieldset>
+					<p:fieldset legend="Vendor" style="font-weight:bold;text-align: center;">
+						<h:outputText id="vendor" value="#{wfController.invoice.vendor.name}" />
+					</p:fieldset>
+					<p:fieldset legend="Invoice Status" style="font-weight:bold;text-align: center;">
+						<h:outputText id="invStatus" value="#{wfController.invoice.invoiceStatus.description}" />
+					</p:fieldset>
+					<p:fieldset legend="Invoice Amount" style="font-weight:bold;text-align: center;">
+						<h:outputText id="invAmount" value="#{wfController.invoice.invoiceAmount}" >
+							<f:convertNumber type="currency" currencySymbol="$" />
+						</h:outputText>
+					</p:fieldset>
+					<p:fieldset legend="Approved/Rejected Comment" style="font-weight:bold;text-align: center;">
+						<h:outputText id="apprRejCommentId" value="#{wfController.invoice.approvedComment}" />
+					</p:fieldset>			
+				</p:panelGrid>
+				<p:tabView id="invoiceSummaryTabContainer" prependId="false">
+					<p:tab title="LCEC" id="lcecInvSumTab" rendered="#{userMBean.currentUser.isPermitted('S-INV:L-View')}">
+							<!-- <p:panelGrid columns="1" styleClass="ui-panelgrid-blank" layout="grid"> -->
+							<p:dataTable id="lcecInvDetTbl" var="detail" value="#{wfController.invoiceDetail}" expandableRowGroups="true"
+									sortBy="#{detail.description}" rowKey="#{detail.invoiceDetailId}" draggableColumns="true">
+								<f:facet name="header">
+            						<p:panelGrid styleClass="ui-panelgrid-blank">
+			        					<div style="float: right;margin-top:-3px;"> 
+			           						<p:commandLink id="toggler" style="margin-right:10px;">
+												<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+												<p:tooltip for="toggler" value="Columns" position="top"/>
+											</p:commandLink>
+        									<p:columnToggler datasource="lcecInvDetTbl" trigger="toggler" >
+        										<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+	        								</p:columnToggler>
+        								</div>
+        								<div style="right:50%;">
+											<span>Invoice Detail(s)</span>
+										</div>
+        								</p:panelGrid>
+        						</f:facet>
+        						<p:headerRow>
+									<p:column colspan="3" >
+										<h:outputText value="#{detail.description}" />	
+									</p:column>
+								</p:headerRow>
+        						<p:column headerText="Description" style="text-align:center">
+									<h:outputText value="#{detail.description}" />
+								</p:column>					
+								<p:column headerText="GL Code" style="text-align:center">
+									<h:outputText value="#{detail.GL_Code}" />
+								</p:column>
+									<p:column headerText="Amount" style="text-align:center">
+									<h:outputText value="#{detail.amount}" >
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+					<!-- </p:panelGrid> -->
+					</p:tab>
+					<p:tab title="Vendor" id="vendorInvSumTab"  rendered="#{userMBean.currentUser.isPermitted('S-INV:V-View')}">
+					<!-- <p:panelGrid columns="1" > -->
+					<!-- <p:panelGrid id="voucherApprovalGrid" columns="1" styleClass="ui-panelgrid-blank" layout="grid" > -->
+						<p:dataTable id="INVOICE_VOUCHER_DETAIL_TABLE" var="voucher" value="#{wfController.invoiceApprovalVouchers}">
+							<f:facet name="header">
+	           					<p:panelGrid styleClass="ui-panelgrid-blank">
+	       							<div style="float: right;margin-top:-3px;"> 
+		           						<p:commandLink id="toggler" style="margin-right:10px;">
+											<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+											<p:tooltip for="toggler" value="Columns" position="top"/>
+										</p:commandLink>
+	   									<p:columnToggler datasource="INVOICE_VOUCHER_DETAIL_TABLE" trigger="toggler">
+	   										<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+	   									</p:columnToggler>
+	        						</div>
+	        						<div style="right:50%;">
+										<span>Voucher Detail(s)</span>
+									</div>
+	        					</p:panelGrid>
+				       		</f:facet>
+							<p:column id="stationDescription" headerText="Station" style="text-align:center" visible="#{userPrefController.voucher.stationDescription}">
+								<h:outputText value="#{voucher.stationDescription}" />
+							</p:column>
+							<p:column id="description" headerText="Description" style="text-align:center" visible="#{userPrefController.voucher.description}">
+								<h:outputText value="#{voucher.description}" />
+							</p:column>
+							<p:column id="crew" headerText="Crew" style="text-align:center" visible="#{userPrefController.voucher.crew}">
+								<h:outputText value="#{voucher.crew}" />
+							</p:column>
+							<p:column id="requestor" headerText="Requestor" style="text-align:center" visible="#{userPrefController.voucher.requestor}">
+								<h:outputText value="#{voucher.requestor}" />
+							</p:column>
+							<p:column id="createdDt" headerText="Created Date" style="text-align:center" visible="#{userPrefController.voucher.createdDt}">
+								<h:outputText value="#{voucher.createdDt}">
+									<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+								</h:outputText>
+							</p:column>
+							<p:column id="invoiceStatusId" headerText="Invoice Status" style="text-align:center" visible="#{userPrefController.voucher.invoiceStatusId}">
+								<h:outputText value="#{voucher.invoiceStatus}" />
+							</p:column>
+							<p:column id="approvedComment" headerText="Invoice Approval Comment" style="text-align:center" visible="#{userPrefController.voucher.approvedComment}">
+								<h:outputText value="#{voucher.approvedComment}" />
+							</p:column>
+							<p:column id="amount" headerText="Amount" style="text-align:center" visible="#{userPrefController.voucher.amount}">
+								<h:outputText value="#{voucher.amount}">
+									<f:convertNumber type="currency" currencySymbol="$" />
+								</h:outputText>
+							</p:column>
+						</p:dataTable>
+					<!-- </p:panelGrid> -->
+					<!-- <p:panelGrid columns="1" styleClass="ui-panelgrid-blank" layout="grid" > -->
+						<p:dataTable id="INVOICE_DETAIL_TABLE" var="detail" value="#{wfController.invoiceGLSummaryVw}"
+									 sortBy="#{detail.stationDescription}" rowKey="#{detail.stakingSheetDetailId}">
+							<f:facet name="header">
+								<p:panelGrid styleClass="ui-panelgrid-blank">
+	       							<div style="float: right;margin-top:-3px;"> 
+		           						<p:commandLink id="toggler" style="margin-right:10px;">
+											<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+											<p:tooltip for="toggler" value="Columns" position="top"/>
+										</p:commandLink>
+	   									<p:columnToggler datasource="INVOICE_DETAIL_TABLE" trigger="toggler">
+        									<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+        								</p:columnToggler>
+	        						</div>
+	        						<div style="right:50%;">
+										<span>Invoice Detail(s)</span>
+									</div>
+        						</p:panelGrid>
+							
+       						</f:facet>
+							<p:column id="stationDescription" headerText="Station" style="text-align:center" sortBy="#{detail.stationDescription}" filterBy="#{detail.stationDescription}" filterMatchMode="contains"
+										visible="#{userPrefController.invoiceDetail.stationDescription}">
+								<h:outputText value="#{detail.stationDescription}" />	
+							</p:column>
+       						<p:column id="assemblyActionCode" headerText="C/R" style="text-align:center" filterBy="#{detail.assemblyActionCode}" filterMatchMode="contains" sortBy="#{detail.assemblyActionCode}"
+       									visible="#{userPrefController.invoiceDetail.assemblyActionCode}">
+								<h:outputText value="#{detail.assemblyActionCode}" />
+							</p:column>
+							<p:column id="assemblyQuantity" headerText="Design Quantity" style="text-align:center" filterBy="#{detail.assemblyQuantity}" filterMatchMode="contains" sortBy="#{detail.assemblyQuantity}"
+										visible="#{userPrefController.invoiceDetail.assemblyQuantity}">
+								<h:outputText value="#{detail.assemblyQuantity}" />
+							</p:column>
+							<p:column id="assemblyGuid" headerText="Assembly Unit" style="text-align:center" filterBy="#{detail.assemblyGuid}" filterMatchMode="contains" sortBy="#{detail.assemblyGuid}"
+										visible="#{userPrefController.invoiceDetail.assemblyGuid}">
+								<h:outputText value="#{detail.assemblyGuid}" />
+							</p:column>
+							<p:column id="assemblyDescription" headerText="Unit Description" style="text-align:center" filterBy="#{detail.assemblyDescription}" filterMatchMode="contains" sortBy="#{detail.assemblyDescription}"
+										visible="#{userPrefController.invoiceDetail.assemblyDescription}">
+								<h:outputText value="#{detail.assemblyDescription}" />
+							</p:column>
+							<p:column id="asBuiltQuantity" headerText="As-Built Quantity" style="text-align:center" filterBy="#{detail.asBuiltQuantity}" filterMatchMode="contains" sortBy="#{detail.asBuiltQuantity}"
+										visible="#{userPrefController.invoiceDetail.asBuiltQuantity}">
+								<h:outputText value="#{detail.asBuiltQuantity}" />
+							</p:column>
+							<p:column id="invoiceStatus" headerText="Invoice Status" style="text-align:center" filterBy="#{detail.invoiceStatus}" filterMatchMode="contains" sortBy="#{detail.invoiceStatus}"
+										visible="#{userPrefController.invoiceDetail.invoiceStatus}">
+								<h:outputText value="#{detail.invoiceStatus}" />
+							</p:column>
+							<p:column id="invoiceApprovedComment" headerText="Invoice Approved Comment" style="text-align:center" filterBy="#{detail.invoiceApprovedComment}" filterMatchMode="contains" sortBy="#{detail.invoiceApprovedComment}"
+										visible="#{userPrefController.invoiceDetail.invoiceApprovedComment}">
+								<h:outputText value="#{detail.invoiceApprovedComment}" />
+							</p:column>
+							<p:column id="extCost" headerText="Cost" style="text-align:center" filterBy="#{detail.extCost}" filterMatchMode="contains" sortBy="#{detail.extCost}"
+										visible="#{userPrefController.invoiceDetail.extCost}">
+								<h:outputText value="#{detail.extCost}">
+									<f:convertNumber type="currency" currencySymbol="$" />
+								</h:outputText>
+							</p:column>
+							<p:column id="energize" headerText="Energize" style="text-align:center" filterBy="#{stake.energize}" filterMatchMode="contains" sortBy="#{stake.energize}" 
+										visible="#{userPrefController.invoiceDetail.energize}">
+								<h:outputText value="#{detail.energize}" />
+							</p:column>			
+							<p:column id="transfer" headerText="Trasnfer" style="text-align:center" filterBy="#{stake.transfer}" filterMatchMode="contains" sortBy="#{stake.transfer}" 
+										visible="#{userPrefController.invoiceDetail.transfer}">
+								<h:outputText value="#{detail.transfer}" />
+							</p:column>
+						</p:dataTable>
+					<!-- </p:panelGrid>
+					</p:panelGrid> -->
+					</p:tab>			
+					</p:tabView>
+					</p:panelGrid>
+				</div>
+			</div>
+		</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

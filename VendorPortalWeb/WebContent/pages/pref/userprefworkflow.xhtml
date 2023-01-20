@@ -1,0 +1,25 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:form id="userPrefWorkflowsearchForm">	
+	
+	<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+		<p:pickList id="pickList" value="#{userPrefController.userPrefWorkFlowList}" var="pref" itemLabel="#{pref}" itemValue="#{pref}">
+			<f:facet name="sourceCaption">Available</f:facet>
+			<f:facet name="targetCaption">Chosen</f:facet>
+		</p:pickList>
+	</p:panelGrid>
+	
+	<center>
+		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank">
+			<p:commandButton id="okBtnDlg" value="Save" update="messages" ajax="true" />
+			<p:commandButton id="cancelBtnDlg" value="Cancel" onclick="PF('userPrefWFDlg').hide();" />			
+		</p:panelGrid>
+	</center>
+	
+</h:form>
+
+</ui:composition>

@@ -1,0 +1,116 @@
+/***************************************/
+/*  Common Vendor Portal CSS           */
+/*									   */
+/***************************************/
+
+.inspEditDefault{
+	background-color:#fafdce;
+}
+
+.inspBlGrey{
+	background-color:#bcc9f5;
+}
+
+.inspGreen{
+	background-color:#bfdca0;
+}
+
+.inspRed{
+	background-color:#fcabad;
+}
+
+.columnBgColor {
+	/* color: #ffffff; */
+	background-color: #bfdca0;
+}
+
+.alignChart {
+	display: block;
+	margin-right: auto;
+	margin-left: auto;
+	text-align: center;
+}
+
+.panelGridCenter {
+	margin: 0 auto;
+	text-align: center;
+}
+
+.ui-notificationbar {
+	border-bottom: 1px solid #F8F7F6;
+	border-bottom: 1px solid #0A2967;
+	opacity: 0.95;
+	filter: alpha(opacity = 95); /* For IE8 and earlier */
+	z-index: 9999 !important;
+}
+
+.notificationbar {
+	border-bottom: 1px solid #F8F7F6;
+	border-bottom: 1px solid #0A2967;
+	opacity: 0.95;
+	filter: alpha(opacity = 95); /* For IE8 and earlier */
+	z-index: 9999 !important;
+}
+
+.notificationbarCloseBtn {
+	background-image: url("#{resource['serenity-layout:images/close.png']}");
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.ui-datatable-footer {
+	background: #455a64 !important;
+}
+
+.colScroll {
+	display: block;
+	width: 600px; /* Optional, depends otherwise on parent. */
+	height: 300px;
+	overflow: auto;
+	color: green;
+}
+
+.footer-text-center {
+      float: left;
+      position: relative;
+      left: 50%;
+      margin-top: 10px; }
+ .footer-text-center span {
+      float: left;
+      position: relative;
+      left: -50%; }
+.ui-datatable .ui-datatable-header {
+	background-color: #455a64;
+	height:21px;
+}
+
+.ui-datatable .ui-datatable-header span {
+	font-size:16px;
+}
+
+.ui-panel .ui-panel-titlebar {
+	background-color: #455a64;
+	height:21px;
+}
+
+/* .ui-datatable .ui-cell-editor-input{
+	background-color:#f3ec94;
+	font-color:black;
+} */
+
+.prjDefault{/* Blue default color */
+	background-color:#dfe6fb;
+}
+
+.prjYellow{
+	background-color:#fef8af;
+}
+
+.prjGreen{
+	/* background-color:#29d829; */
+	background-color: #bef0b6;
+}
+
+.prjRed{
+	background-color:#ffbfbf;
+}

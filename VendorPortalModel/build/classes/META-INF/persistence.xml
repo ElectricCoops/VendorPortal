@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="vendorPortalPU" transaction-type="JTA">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<jta-data-source>jdbc/VENDORPORTALDS</jta-data-source>
+		<class>pwr.lcec.vendorportal.entity.ag.AGInspection</class>
+		<class>pwr.lcec.vendorportal.entity.ag.AGInvoice</class>
+		<class>pwr.lcec.vendorportal.entity.ag.AGStakingSheet</class>
+		<class>pwr.lcec.vendorportal.entity.ag.AGStreetlight</class>
+		<class>pwr.lcec.vendorportal.entity.custom.AlertNotification</class>
+		<class>pwr.lcec.vendorportal.entity.custom.AsBuiltStatus</class>
+		<class>pwr.lcec.vendorportal.entity.custom.Inspection</class>
+		<class>pwr.lcec.vendorportal.entity.custom.InspectionDetail</class>
+		<class>pwr.lcec.vendorportal.entity.custom.InspectionStatus</class>
+		<class>pwr.lcec.vendorportal.entity.custom.Invoice</class>
+		<class>pwr.lcec.vendorportal.entity.custom.InvoiceDetail</class>
+		<class>pwr.lcec.vendorportal.entity.custom.InvoiceStatus</class>
+		<class>pwr.lcec.vendorportal.entity.custom.RateGroup</class>
+		<class>pwr.lcec.vendorportal.entity.custom.RateGroupPrice</class>
+		<class>pwr.lcec.vendorportal.entity.custom.RateGroupVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.Resource</class>
+		<class>pwr.lcec.vendorportal.entity.custom.ServiceOrder</class>
+		<class>pwr.lcec.vendorportal.entity.custom.StakingSheet</class>
+		<class>pwr.lcec.vendorportal.entity.custom.StakingSheetDetail</class>
+		<class>pwr.lcec.vendorportal.entity.custom.Vendor</class>
+		<class>pwr.lcec.vendorportal.entity.custom.Voucher</class>
+		<class>pwr.lcec.vendorportal.entity.custom.WorkEventStatus</class>
+		<class>pwr.lcec.vendorportal.entity.custom.WorkFlow</class>
+		<class>pwr.lcec.vendorportal.entity.custom.WorkFlowTask</class>
+		<class>pwr.lcec.vendorportal.entity.custom.WorkGroup</class>
+		<class>pwr.lcec.vendorportal.entity.custom.AsBuiltSummaryVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.AssemblyAdhocVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.InspectionDetailVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.InvoiceGLSummaryVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.InvoiceSearchVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.RateGroupPriceDistinctVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.RateGroupVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.StreetLightSearchVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.WorkFlowSearch_VW</class>
+		<class>pwr.lcec.vendorportal.entity.custom.WorkOrderAggVw</class>
+		<class>pwr.lcec.vendorportal.entity.custom.StakingSheetDetailGui</class>
+		<class>pwr.lcec.vendorportal.entity.custom.TempWMISWorkRequest</class>
+		<!-- <exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="eclipselink.target-server" value="WebLogic" />
+			<property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+			<property name="eclipselink.logging.level" value="FINEST"/>
+			<property name="eclipselink.logging.parameters" value="true" />
+		</properties>
+	</persistence-unit>
+	<persistence-unit name="VPSECPU" transaction-type="JTA">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<jta-data-source>jdbc/VPSECDS</jta-data-source> -->
+		<class>pwr.lcec.vendorportal.entity.sec.LoginAttempt</class>
+		<class>pwr.lcec.vendorportal.entity.sec.Permission</class>
+		<class>pwr.lcec.vendorportal.entity.sec.PermissionVW</class>
+		<class>pwr.lcec.vendorportal.entity.sec.PermissionVwPK</class>
+		<class>pwr.lcec.vendorportal.entity.sec.Role</class>
+		<class>pwr.lcec.vendorportal.entity.sec.RolePermission</class>
+		<class>pwr.lcec.vendorportal.entity.sec.UserRole</class>
+		<class>pwr.lcec.vendorportal.entity.sec.UserTbl</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefWorkFlowSearch</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefInspectionSearch</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefInvoiceSearch</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefStakingSheetDetail</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefInvoiceGLSummaryVw</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefVoucher</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefInspection</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefInvoice</class>
+		<class>pwr.lcec.vendorportal.entity.custom.VoucherGui</class>
+		<class>pwr.lcec.vendorportal.entity.custom.InspectionUnlock</class>
+		<class>pwr.lcec.vendorportal.entity.userpref.UserPrefProjectWorkflow</class>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="eclipselink.target-server" value="WebLogic" />
+			<property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+			<property name="eclipselink.logging.level.sql" value="FINEST" />
+			<property name="eclipselink.logging.parameters" value="true" />
+		</properties>
+	</persistence-unit>
+</persistence>

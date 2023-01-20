@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<f:metadata>
+    	<f:event listener="#{userPrefController.findUserPrefInvoiceTab}" type="preRenderView" />
+	</f:metadata>
+	<p:panelGrid columns="1"  layout="grid" styleClass="ui-panelgrid-blank"  >		
+		<p:dataTable id="invSumTbl" var="sum" value="#{wfController.workOrderAggVw}" reflow="true" style="margin-top:10px">
+			 <p:column headerText="Type" style="text-align:center">
+	        	<h:outputText value="#{sum.type}" />
+	    	</p:column>
+	    	 <p:column headerText="Cost" style="text-align:center">
+	        	<h:outputText value="#{sum.cost}" >
+	        		<f:convertNumber type="currency" currencySymbol="$" />
+	        	</h:outputText>
+	    	</p:column>
+	    	 <p:column headerText="Station" style="text-align:center">
+	        	<h:outputText value="#{sum.station}" />
+	    	</p:column>
+	    	 <p:column headerText="Unique Assembly" style="text-align:center">
+	        	<h:outputText value="#{sum.uniqueAssembly}" />
+	    	</p:column>
+	    	 <p:column headerText="Total Assembly" style="text-align:center">
+	        	<h:outputText value="#{sum.totalAssembly}" />
+	    	</p:column>
+		</p:dataTable>
+	</p:panelGrid>
+	<!-- <h:form id="crtInvBtnId" prependId="false"> -->
+	<div class="ui-g">
+		<div class="ui-g-12">
+		<p:commandButton value="Create Invoice" icon="fa fa-plus" style="float:left;display:inline-block;" ajax="false" styleClass="secondary-btn"
+						 action="#{wfController.createInvoice}" update="messages" rendered="#{userMBean.currentUser.isPermitted('S-INV:Create')}"/>
+		</div>
+	</div>
+	<!-- </h:form>
+	<h:form id="invFormId" style="display:inline-block;" prependId="false"> -->
+		<p:dataTable id="INVOICE_DETAIL_TAB" var="inv" value="#{wfController.invoices}" reflow="true" style="margin-top:10px" draggableColumns="true"
+					 paginator="true" rows="10" paginatorPosition="bottom" paginatorAlwaysVisible="false">
+			<f:facet name="header">
+				<p:panelGrid styleClass="ui-panelgrid-blank">
+					<div style="float: right;margin-top:-3px;">
+	     				<p:commandLink id="toggler" style="margin-right:10px;">
+							<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+							<p:tooltip for="toggler" value="Columns" position="top"/>
+						</p:commandLink>
+	 					<p:columnToggler datasource="INVOICE_DETAIL_TAB" trigger="toggler">
+							<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+	  					</p:columnToggler>
+	  				</div>
+	  				<div style="right:50%;">
+						<span>Invoice(s)</span>
+					</div>
+	  			</p:panelGrid>
+      		</f:facet>
+       		<p:column id="invoiceId" headerText="Action" style="text-align:center" rendered="#{userMBean.currentUser.isPermitted('INV:Approve') or userMBean.currentUser.isPermitted('SL:Approve')}"
+       						visible="#{userPrefController.invoiceTab.invoiceId}">
+       			<h:commandLink action="#{wfController.findInvoiceApproval}" value="Approve" rendered="#{(inv.invoiceStatus.description == 'Submitted') and (inv.invoiceType eq 'SS')}">
+					<f:setPropertyActionListener target="#{wfController.invoiceId}" value="#{inv.invoiceId}"/>
+					<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="false" />
+   					<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="true" />
+				</h:commandLink>
+				<h:commandLink action="#{streetLightVw.slInvoiceDetail}" value="Approve" rendered="#{(inv.invoiceStatus.description == 'Submitted') and (inv.invoiceType eq 'SL')}">
+					<f:setPropertyActionListener target="#{streetLightVw.invNoLink}" value="#{inv.invoiceId}"/>
+					<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="false" />
+   					<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="true" />
+				</h:commandLink>
+       		</p:column>
+			<p:column id="LCECReference" headerText="LCEC Reference" style="text-align:center" filterBy="#{inv.invoiceId}" filterMatchMode="contains" sortBy="#{inv.invoiceId}"
+					  visible="#{userPrefController.invoiceTab.LCECReference}">
+				<h:commandLink action="#{wfController.findInvoiceDetail(inv.invoiceId)}" value="#{inv.invoiceId}" >
+					<f:setPropertyActionListener target="#{wfController.invoiceId}" value="#{inv.invoiceId}"/>
+					<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="false" />
+	   				<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="true" />
+				</h:commandLink>
+			</p:column>
+			<p:column id="vendorReference" headerText="Vendor Reference" style="text-align:center" filterBy="#{inv.vendorReference}" filterMatchMode="contains" sortBy="#{inv.vendorReference}"
+					  visible="#{userPrefController.invoiceTab.vendorReference}">
+				<h:outputText value="#{inv.vendorReference}" />
+			</p:column>
+			<p:column id="invoicedDt" headerText="Invoice Submit Date" style="text-align:center" filterBy="#{inv.invoicedDt}" filterMatchMode="contains" sortBy="#{inv.invoicedDt}"
+						visible="#{userPrefController.invoiceTab.invoicedDt}">
+				<h:outputText value="#{inv.invoicedDt}">
+					<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+				</h:outputText>
+			</p:column>
+			<p:column id="invoiceStatusId" headerText="Invoice Status" style="text-align:center" filterBy="#{inv.invoiceStatus.description}" filterMatchMode="contains" sortBy="#{inv.invoiceStatus.description}"
+						visible="#{userPrefController.invoiceTab.invoiceStatusId}">
+				<h:outputText value="#{inv.invoiceStatus.description}" />
+			</p:column>
+			<p:column id="invoiceAmount" headerText="Invoiced Amount" style="text-align:center" filterBy="#{inv.invoiceAmount}" filterMatchMode="contains" sortBy="#{inv.invoiceAmount}"
+						visible="#{userPrefController.invoiceTab.invoiceAmount}">
+				<h:outputText value="#{inv.invoiceAmount}">
+					<f:convertNumber type="currency" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column id="designCost" headerText="Designed Cost" style="text-align:center" filterBy="#{inv.designCost}" filterMatchMode="contains" sortBy="#{inv.designCost}"
+						visible="#{userPrefController.invoiceTab.designCost}">
+				<h:outputText value="#{inv.designCost}" >
+					<f:convertNumber type="currency" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column id="designTotalStation" headerText="Designed Stations" style="text-align:center" filterBy="#{inv.designTotalStation}" filterMatchMode="contains" sortBy="#{inv.designTotalStation}"
+						visible="#{userPrefController.invoiceTab.designTotalStation}">
+				<h:outputText value="#{inv.designTotalStation}" />
+			</p:column>
+			<p:column id="designUniqueAssembly" headerText="Designed Unique Assembly Units" style="text-align:center" filterBy="#{inv.designUniqueAssembly}" filterMatchMode="contains" sortBy="#{inv.designUniqueAssembly}"
+						visible="#{userPrefController.invoiceTab.designUniqueAssembly}">
+				<h:outputText value="#{inv.designUniqueAssembly}" />
+			</p:column>
+			<p:column id="designTotalAssembly" headerText="Designed Assembly Units" style="text-align:center" filterBy="#{inv.designTotalAssembly}" filterMatchMode="contains" sortBy="#{inv.designTotalAssembly}"
+						visible="#{userPrefController.invoiceTab.designTotalAssembly}">
+				<h:outputText value="#{inv.designTotalAssembly}" />
+			</p:column>
+			<p:column id="invoiceTotalStation" headerText="Invoiced Stations" style="text-align:center" filterBy="#{inv.invoiceTotalStation}" filterMatchMode="contains" sortBy="#{inv.invoiceTotalStation}"
+						visible="#{userPrefController.invoiceTab.invoiceTotalStation}">
+				<h:outputText value="#{inv.invoiceTotalStation}" />
+			</p:column>
+			<p:column id="invoiceUniqueAssembly" headerText="Invoiced Unique Assembly Units" style="text-align:center" filterBy="#{inv.invoiceUniqueAssembly}" filterMatchMode="contains" sortBy="#{inv.invoiceUniqueAssembly}"
+						visible="#{userPrefController.invoiceTab.invoiceUniqueAssembly}">
+				<h:outputText value="#{inv.invoiceUniqueAssembly}" />
+			</p:column>
+			<p:column id="invoiceTotalAssembly" headerText="Invoiced Assembly Units" style="text-align:center" filterBy="#{inv.invoiceTotalAssembly}" filterMatchMode="contains" sortBy="#{inv.invoiceTotalAssembly}"
+						visible="#{userPrefController.invoiceTab.invoiceTotalAssembly}">
+				<h:outputText value="#{inv.invoiceTotalAssembly}" />
+			</p:column>
+		</p:dataTable>
+	<!-- </h:form> -->
+</ui:composition>

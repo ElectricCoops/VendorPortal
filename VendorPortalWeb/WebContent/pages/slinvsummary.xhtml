@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/slinvsummary">Street Light Invoice Summary</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		<h:form id="slsumform" prependId="false">
+			<div class="ui-g ui-fluid">
+				<div class="ui-g-12">
+					<div class="card">
+						<p:growl id="messages" showDetail="true" />
+						<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank">
+						<p:fieldset legend="Vendor" style="font-weight:bold;text-align: center;">
+							<h:outputText id="vendor" value="#{streetLightVw.invoice.vendor.name}" />
+						</p:fieldset>
+						<p:fieldset legend="Invoice Status" style="font-weight:bold;text-align: center;">
+							<h:outputText id="invStatus" value="#{streetLightVw.invoice.invoiceStatus.description}" />
+						</p:fieldset>			
+					</p:panelGrid>
+					<p:tabView id="slInvoiceSummaryTabContainer">
+					<p:tab title="LCEC" id="lcecSlInvSumTab">
+						<h:panelGrid columns="1" styleClass="ui-panelgrid-blank">
+							<p:dataTable id="slInvSumTbl" var="sum" value="#{streetLightVw.invSummary}"
+								expandableRowGroups="true" sortBy="#{sum.GLAccountId}">
+								<f:facet name="header">
+									Streetlight Invoice Summary
+								</f:facet>
+								<p:headerRow>
+									<p:column colspan="6">
+										<h:outputText value="#{sum.GL_Description}" />	
+									</p:column>
+								</p:headerRow>
+								<p:column headerText="Work Order">
+									<h:outputText value="#{sum.workOrderId}" />
+								</p:column>
+								<p:column headerText="Street Light No.">
+									<h:outputText value="#{sum.serviceMapLocation}" />
+								</p:column>
+								<p:column headerText="Description">
+									<h:outputText value="#{sum.GL_Description}" />
+								</p:column>
+								<p:column headerText="Quantity">
+									<h:outputText value="#{sum.quantity}" />
+								</p:column>
+								<p:column headerText="Price">
+									<h:outputText value="#{sum.fixedCost}" >
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Cost">
+									<h:outputText value="#{sum.subTotal}" >
+										<f:convertNumber type="currency" currencySymbol="$" />
+									</h:outputText>
+								</p:column>
+							</p:dataTable>
+							<p:panelGrid columns="2" styleClass="ui-panelgrid-blank" style="float:right;">
+    							<p:outputLabel for="refId" value="Grand Total:  " style="font-weight:bold;" />
+								<h:outputText id="refId" value="#{streetLightVw.grandTotal}" >
+									<f:convertNumber type="currency" currencySymbol="$" />
+								</h:outputText>
+    						</p:panelGrid>
+						</h:panelGrid>
+						</p:tab>
+						<p:tab title="Vendor" id="vendorSlInvSumTab">
+						
+						</p:tab>
+					</p:tabView>
+					<h:panelGrid styleClass="ui-panelgrid-blank"  style="margin-top:10px">
+							<p:button value="Invoices" icon="fa fa-arrow-circle-left" outcome="staking?index=2" style="float:left;" rendered="#{invController.renderBackToInvoiceTab}" />
+							<p:button value="Invoices" icon="fa fa-arrow-circle-left" outcome="invoicesearch?faces-redirect=true" style="float:left;" rendered="#{invController.renderBackToInvoiceSearch}" />
+					</h:panelGrid>
+					</div>
+				</div>
+			</div>
+		</h:form>
+	</ui:define>
+</ui:composition>

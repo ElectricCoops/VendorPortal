@@ -1,0 +1,252 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/admin/users">User Management</p:link></li>
+	</ui:define>
+	
+	<ui:define name="head">
+    	<link rel="sitemap icon" type="image/x-icon" href="#{resource['images/favicon-sitemap.ico']}" />
+    	<!-- <h:outputScript library="js" name="dragscroll.js"/> -->
+          
+           <style type="text/css">
+                              
+           </style>
+    </ui:define>
+
+	<ui:define name="content">
+		<div class="ui-g" onload="#{rateMBean.onloadRateGroupPrice()}">
+			<div class="ui-g-12">
+				<div class="card">
+					<h2>Assembly Unit Rate Management</h2>
+					
+					<h:form id="rateForm">
+						<p:growl id="messages" closable="true" />
+						
+						<p:panel id="woSearchPanel" header="Search Criteria" style="margin-bottom:10px;">				
+						<p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank ui-fluid" style="width:100%;" >
+						
+	          				<h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:inputText id="woId" value="#{rateMBean.searchRate}" />
+								<label>Assemble Unit Name</label>
+							</h:panelGroup>
+							
+							<h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:selectOneMenu id="searchMethod" value="#{rateMBean.searchMethod}">
+										<f:selectItem itemLabel="equals" itemValue="equals" />
+										<f:selectItem itemLabel="contains" itemValue="contains" />
+										<f:selectItem itemLabel="starts with" itemValue="starts" />
+										<f:selectItem itemLabel="ends with" itemValue="ends" />
+										<!-- <p:ajax event="change" listener="#{rateMBean.submitRateSearch}" update="rateTable"/> -->
+								</p:selectOneMenu>
+								<label>Search Method</label>
+							</h:panelGroup>
+							
+							<h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:selectOneMenu id="dateStart" value="#{rateMBean.searchStart}">
+										<f:selectItem itemLabel="All" itemValue="0" />
+										<f:selectItems value="#{rateMBean.startDt}"/>
+										<!-- <p:ajax event="change" listener="#{rateMBean.submitRateSearch}" update="rateTable"/> -->
+								</p:selectOneMenu>
+								<label>Start Date Range</label>
+							</h:panelGroup>
+							
+							<!-- <h:panelGroup styleClass="md-inputfield" style="margin-top:20px;">
+								<p:selectOneMenu id="dateEnd" value="#{rateMBean.searchEnd}" >
+										<f:selectItem itemLabel="All" itemValue="0" />
+										<f:selectItems value="#{rateMBean.endDt}"/>
+								</p:selectOneMenu>
+								<label>End Date Range</label>
+							</h:panelGroup> -->
+						
+						</p:panelGrid>
+							
+						<p:panelGrid columns="2" styleClass="ui-panelgrid-blank ui-fluid" >	
+							<p:commandButton value="Search" icon="fa fa-wa fa-search" update="messages,rateForm,rateTable" 
+											 action="#{rateMBean.submitRateSearch}" style="width:250px;" styleClass="secondary-btn" />
+											 
+							<p:commandButton value="Reset" icon="fa fa-wa fa-times" update="messages,rateForm,rateTable" 
+											 action="#{rateMBean.resetRateSearch}" style="width:250px;" styleClass="secondary-btn" />
+						</p:panelGrid>
+							
+					</p:panel>
+					
+					<p:dataTable id="rateTable" widgetVar="rateTable" value="#{rateMBean.rates}" var="row" 
+						paginator="true" rows="50" rowsPerPageTemplate="50,75,100" paginatorPosition="bottom" paginatorAlwaysVisible="false" rendered="#{rateMBean.showRateTable}" >
+						
+						<f:facet name="header">Search Results
+							<p:commandLink id="newAUId" style="float:right;padding-right: 10px;margin-top:-3px;" action="#{rateMBean.openDlgNewAssemblyUnit}" rendered="#{userMBean.currentUser.isPermitted('Admin-Rate:Create')}">
+                   				 <i class="fa fa-wa fa-plus fa-2x" style="color:white" />
+                   			</p:commandLink>
+                   			<p:tooltip id="newAuToolTip" for="newAUId" value="Create New Assembly Unit" position="left"/>
+						</f:facet>
+					
+						<p:column headerText="ID">
+							<h:outputText value="#{row.rateGroupPriceId}" />
+						</p:column>
+						
+						<p:column headerText="Assemble Unit">
+							<h:outputText value="#{row.assemblyGuid}" />
+						</p:column>
+						
+						<p:column headerText="Assemble Description">
+							<h:outputText value="#{row.assemblyDescription}" />
+						</p:column>
+						
+						<p:column headerText="Vendor">
+							<h:outputText value="PIKE" rendered="#{row.rateGroupId eq 4}"/>
+							<h:outputText value="MASTEC" rendered="#{row.rateGroupId eq 3}"/>
+							<h:outputText value="LCEC" rendered="#{row.rateGroupId eq 2}"/>
+							<h:outputText value="GEN" rendered="#{row.rateGroupId eq 1}"/>
+						</p:column>
+						
+						<p:column headerText="Assemble Source">
+							<h:outputText value="#{row.assemblySource}" />
+						</p:column>
+						
+						<p:column headerText="Construct Cost">
+							<h:outputText value="#{row.laborConstCost}" />
+						</p:column>
+						
+						<p:column headerText="Construct Hours">
+							<h:outputText value="#{row.laborConstHours}" />
+						</p:column>
+						
+						<p:column headerText="Retire Cost">
+							<h:outputText value="#{row.laborRetireCost}" />
+						</p:column>
+						
+						<p:column headerText="Retire Hours">
+							<h:outputText value="#{row.laborRetireHours}" />
+						</p:column>
+						
+						<p:column headerText="Start Date">
+							<h:outputText value="#{row.effectiveStartDt}" />
+						</p:column>
+						
+						<p:column headerText="End Date">
+							<h:outputText value="#{row.effectiveEndDt}" />
+						</p:column>
+						
+						<p:column style="width:60px;" rendered="#{userMBean.currentUser.isPermitted('Admin-Rate:Create')}">
+                    	
+                    		<p:commandLink action="#{rateMBean.openDlgEditAssemblyUnit}" style="padding-left: 10px;" title="Edit" rendered="#{userMBean.currentUser.isPermitted('Admin-Rate:Edit')}">
+                    			<i class="fa fa-wa fa-pencil fa-lg" />
+                    			<f:setPropertyActionListener value="#{row}" target="#{rateMBean.currentAssembly}" />
+                    		</p:commandLink>                    
+		
+                    		<p:commandLink  style="padding-left: 10px;" title="Remove" action="#{rateMBean.deleteAssemblyUnit}" update="rateForm" rendered="#{userMBean.currentUser.isPermitted('Admin-Rate:Delete')}">
+                    				<i class="fa fa-wa fa-trash-o fa-lg" />
+               						<f:setPropertyActionListener value="#{row}" target="#{rateMBean.currentAssembly}" />
+               						<p:confirm header="Confirmation" message="Are you sure you want to delete this AU?" />
+                    		</p:commandLink>
+                    	</p:column>
+					
+					</p:dataTable>
+					
+					<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+				        <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+				        <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times" />
+				    </p:confirmDialog>
+					
+					</h:form>
+					
+					<h:form id="newAuForm">
+					<p:dialog id="dlgNewAssemblyUnit" widgetVar="dlgNewAssemblyUnit" header="Create New Assembly Unit Dialog">
+					
+						<p:panelGrid columns="2" styleClass="ui-noborder">
+						
+							<p:outputLabel value="Assembly Unit" style="font-weight:bold;" />
+							<p:inputText value="#{rateMBean.currentAssembly.assemblyGuid}" />
+							
+							<p:outputLabel value="Assembly Description" style="font-weight:bold;" />
+							<p:inputText value="#{rateMBean.currentAssembly.assemblyDescription}" />
+							
+							<p:outputLabel value="Vendor" style="font-weight:bold;" />
+							<p:selectOneMenu value="#{rateMBean.currentAssembly.rateGroupId}" style="width:165px;" >
+								<f:selectItem itemLabel="Select One..." itemValue="" />
+								<f:selectItem itemLabel="GEN" itemValue="1"/>
+								<f:selectItem itemLabel="LCEC" itemValue="2"/>
+								<f:selectItem itemLabel="MASTEC" itemValue="3"/>
+								<f:selectItem itemLabel="PIKE" itemValue="4"/>
+							</p:selectOneMenu>
+							
+							<p:outputLabel value="Construct Cost" style="font-weight:bold;" />
+							<p:inputText value="#{rateMBean.currentAssembly.laborConstCost}" />
+							
+							<p:outputLabel value="Construct Hours" style="font-weight:bold;" />
+							<p:inputText value="#{rateMBean.currentAssembly.laborConstHours}" />
+							
+							<p:outputLabel value="Retire Cost"  style="font-weight:bold;"/>
+							<p:inputText value="#{rateMBean.currentAssembly.laborRetireCost}" />
+							
+							<p:outputLabel value="Retire Hours"  style="font-weight:bold;"/>
+							<p:inputText value="#{rateMBean.currentAssembly.laborRetireHours}" />
+							
+							<p:outputLabel value="Date Range Start Date" style="font-weight:bold;" />
+							<p:selectOneMenu value="#{rateMBean.currentAssembly.effectiveStartDt}" style="width:165px;" converter="timeConverter">
+								<f:selectItem itemLabel="Select One..." itemValue="" />
+								<f:selectItems value="#{rateMBean.startTimestamp}"/>
+							</p:selectOneMenu>
+							
+							<p:commandButton value="Save" action="#{rateMBean.saveNewAssemblyUnit}" update="rateForm" icon="fa fa-wa fa-save" style="width:100%" styleClass="secondary-btn" />
+							<p:commandButton value="Cancel" oncomplete="PF('dlgNewAssemblyUnit').hide();" update="rateForm" icon="fa fa-wa fa-times" style="width:100%" styleClass="secondary-btn" />
+						
+						</p:panelGrid>
+					
+					</p:dialog>
+					
+					</h:form>
+					<h:form id="editAuForm">
+					<p:dialog id="dlgEditAssemblyUnit" widgetVar="dlgEditAssemblyUnit" header="Edit Assembly Unit Dialog">
+					
+						<p:panelGrid columns="2" styleClass="ui-noborder">
+						
+							<p:outputLabel value="Assembly Unit" style="font-weight:bold;" />
+							<p:inputText value="#{rateMBean.currentAssembly.assemblyGuid}" />
+							
+							<p:outputLabel value="Assembly Description" style="font-weight:bold;" />
+							<p:inputText value="#{rateMBean.currentAssembly.assemblyDescription}" />
+							
+							<p:outputLabel value="Vendor" style="font-weight:bold;" />
+							<p:selectOneMenu value="#{rateMBean.currentAssembly.rateGroupId}" style="width:165px;" >
+								<f:selectItem itemLabel="Select One..." itemValue="" />
+								<f:selectItem itemLabel="GEN" itemValue="1"/>
+								<f:selectItem itemLabel="LCEC" itemValue="2"/>
+								<f:selectItem itemLabel="MASTEC" itemValue="3"/>
+								<f:selectItem itemLabel="PIKE" itemValue="4"/>
+							</p:selectOneMenu>
+							
+							<p:outputLabel value="Construct Cost" style="font-weight:bold;" />
+							<p:inputText value="#{rateMBean.currentAssembly.laborConstCost}" />
+							
+							<p:outputLabel value="Construct Hours" style="font-weight:bold;" />
+							<p:inputText value="#{rateMBean.currentAssembly.laborConstHours}" />
+							
+							<p:outputLabel value="Retire Cost"  style="font-weight:bold;"/>
+							<p:inputText value="#{rateMBean.currentAssembly.laborRetireCost}" />
+							
+							<p:outputLabel value="Retire Hours"  style="font-weight:bold;"/>
+							<p:inputText value="#{rateMBean.currentAssembly.laborRetireHours}" />
+							
+							<p:outputLabel value="Date Range Start Date" style="font-weight:bold;" />
+							<p:selectOneMenu value="#{rateMBean.currentAssembly.effectiveStartDt}" style="width:165px;" converter="timeConverter">
+								<f:selectItem itemLabel="Select One..." itemValue="" />
+								<f:selectItems value="#{rateMBean.startTimestamp}"/>
+							</p:selectOneMenu>
+							
+							<p:commandButton value="Save" action="#{rateMBean.updateAssemblyUnit}" update="rateForm" icon="fa fa-wa fa-save" style="width:100%" styleClass="secondary-btn" />
+							<p:commandButton value="Cancel" oncomplete="PF('dlgEditAssemblyUnit').hide();" update="rateForm" icon="fa fa-wa fa-times" style="width:100%" styleClass="secondary-btn" />
+						
+						</p:panelGrid>
+					
+					</p:dialog>
+					</h:form>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,466 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/about">Release Notes</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		<div class="ui-g ui-fluid">
+			<div class="ui-g-12">
+			<div class="card">
+				<h1>
+					<u>Release v1.3.6 - PB</u>
+				</h1>
+				<h4>December 13, 2021</h4>
+				<h4>Patched/Upgraded Dependence Libraries:</h4>
+				<ul>
+					<li><b>Log4J 2.17.0</b> - Mitigates Security Vulnerability (CVE-2021-44228)</li>
+				</ul>
+			</div>
+			<div class="card">
+				<h1>
+					<u>Release v1.3.5 - PB</u>
+				</h1>
+				<h4>November 13, 2020</h4>
+				<h4>Bug Fix(s):</h4>
+				<ul>
+					<li><b>As Built Edit</b></li>
+					<ul>
+						<li>Set default sorting to units first then by station.</li>
+						<li>Fixed the ability to tab though the editable fields on the As Built Edit page. This also fixed the paging issue that takes you back to the beginning.</li>
+						<li>Fixed issue when Edit button is pushed and there are no AU's available to edit, nothing would happen. Users should be able to add new AU's even when there are no editable AU's.</li>
+					</ul>
+				</ul>
+			</div>
+			<div class="card">
+				<h1>
+					<u>Release v1.3.4 - PB</u>
+				</h1>
+				<h4>October 30, 2020</h4>
+				<h4>Bug Fix(s):</h4>
+				<ul>
+					<li><b>As Built Assembly Unit Status</b></li>
+					<ul>
+						<li>When completing AU's the status drop down would not work from time to time.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>Invoice Rejection process</b></li>
+					<ul>
+						<li>When rejecting an AU in an Invoice, system was not update the Asbuilt status to rejected</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>Home page charts</b></li>
+					<ul>
+						<li>Updated stored procedure for Inspection chart, was not filtering properly</li>
+						<li>Added method to update the service order table so the invoice chart would populate</li>
+						<li>Had to update two sync jobs to get invoice chart to work properly</li>
+					</ul>
+				</ul>
+				<h4>Enhancement(s):</h4>
+				<ul>
+					<li><b>Notification Bar</b></li>
+					<ul>
+						<li>Changed color to light red, to stand out better.</li>
+						<li>Fixed the notification bar to show on any page not just home page.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>User Avatar</b></li>
+					<ul>
+						<li>Changed the default avatar to a letter avatar, that will show initials.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>Add, Remove, Edit Assembly Rate Prices</b> - Admin feature request</li>
+					<ul>
+						<li>If the LCEC IT Administration role is selected the user will be able to manually change prices add new prices or remove prices. No other Role can perform this action.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>Remove item from inspection.</b> - Admin feature request</li>
+					<ul>
+						<li>The most common call IT gets is related to VP is an Inspector mistakenly approved an AU and needs it reset "Unlocked".</li>
+						<li>Added functionality to Inspection review page to allow Admins to remove AU's from an Inspection.</li>
+						<li>Added functionality to Inspection review page to allow Admins to remove voucher's from an Inspection.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>Manually trigger sync for single Word Order</b> - Admin feature request</li>
+					<ul>
+						<li>Added a page for Admins only to try to pull in a WO that is not able to pull in from the normal sync job that runs every hour.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>Modify Vouchers</b></li>
+					<ul>
+						<li>Added the ability for vendors to modify a voucher only if it has not been inspected or invoiced.</li>
+					</ul>
+				</ul>
+				<h4>Patched/Upgraded Dependence Libraries:</h4>
+				<ul>
+					<li><b>PrimeFaces 8.0</b></li>
+					<li><b>Primefaces-Extensions-8.0.2</b></li>
+					<li><b>Serenity 2.1.1</b></li>
+					<li><b>Shiro 1.6.0</b></li>
+				</ul>
+			</div>
+			<div class="card">
+				<h1>
+					<u>Release v1.3.3 - PB</u>
+				</h1>
+				<h4>August 22, 2019</h4>
+				<h4>Bug Fix(s):</h4>
+				<ul>
+					<li><b>Invoice Approval Submit</b></li>
+					<ul>
+						<li>When Approving an Invoice the page should return to the invoice search page.</li>
+					</ul>
+				</ul>
+				<h4>Enhancement(s):</h4>
+				<ul>
+					<li><b>Invoice Search</b></li>
+					<ul>
+						<li>Added the ability to export to CSV, and PDF.</li>
+						<li>Make default sort Oldest to Newest.</li>
+						<li>Added drop down filters for Invoice Status, and Vendor</li>
+						<li>Added ability to persist filter preferences during session.</li>
+						<li>Added functionality to remove filters when reset is pressed.</li>
+					</ul>
+				</ul>
+			</div>
+			<div class="card">
+				<h1>
+					<u>Release v1.3.2 - PB</u>
+				</h1>
+				<h4>August 9, 2019</h4>
+				<h4>Bug Fix(s):</h4>
+				<ul>
+					<li><b>UBJ - Station Description</b></li>
+					<ul>
+						<li>Needed to update the station data type to handle values with decimal places.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>UBJ - Inspection Detail</b></li>
+					<ul>
+						<li>Enable the updates on AU rows during inspections when inspection status is rejected for columns InspectionStatus and Inspection Comment.</li>
+					</ul>
+				</ul>
+			</div>
+			<div class="card">
+				<h1>
+					<u>Release v1.3.1 - PB</u>
+				</h1>
+				<h4>July 2, 2019</h4>
+				<h4>Enhancement(s):</h4>
+				<ul>
+					<li><b>UBJ - Inspection</b></li>
+					<ul>
+						<li>Added drop down filters to columns with finite lists for new inspection page.</li>
+					</ul>
+				</ul>
+				<h4>Bug Fix(s):</h4>
+				<ul>
+					<li><b>UBJ - Add Unit</b></li>
+					<ul>
+						<li>Added filter functionality for the drop down of Assembly Unit's</li>
+					</ul>
+				</ul>
+			</div>
+			<div class="card">
+				<h1>
+					<u>Release v1.3.0 - PB</u>
+				</h1>
+				<h4>July 1, 2019</h4>
+				<h4>Enhancement(s):</h4>
+				<ul>
+					<li><b>Unit Based Job Search</b></li>
+					<ul>
+						<li>Enhanced the look of the search page</li>
+						<li>Made the search value stay so users can search then refine the search without starting over every time.</li>
+						<li>Update all functional buttons have been updated to Green to help stand out to users.</li>
+						<li>Added Reset button to search page so users can reset the search criteria.</li>
+						<li>Standardized the column picker button, with hover over tooltips.</li>
+						<li></li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>UBJ - AsBuilt Tab</b></li>
+					<ul>
+						<li>Increased the performance when loading large jobs.</li>
+						<li>Added drop down for filters for all known sets of data.</li>
+						<li>Added blue color background to both quantity values where the values are different.</li>
+						<li>Added green color to all row that are complete or appealed from vendor point of view.</li>
+						<li>Added red color to all row that are rejected from vendor point of view.</li>
+						<li>Added yellow color to all row that are ready to be completed by vendor.</li>
+						<li>Added the ability to change rows after vendor has marked completed as long as the inspector has not inspected that row.</li>
+						<li>Removed the Save button, no longer needed as all edits are saved when changed.</li>
+						<li>Change all editable columns to save to database when editing without the need to exit the edit mode to save to database.</li>
+						<li>Increased performance when adding Assembly Unit.</li>
+						<li>Standardized the column picker button, with hover over tooltips.</li>
+						<li>Added the ability to tab through the editable fields</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>UBJ - Inspection Tab</b></li>
+					<ul>
+						<li>Changed functionality to allow immediate saves to database for all changes to eliminate errors when working on large jobs.</li>
+						<li>Back button simply leave the current page</li>
+						<li>Added Cancel button - it will undo ALL Inspection changes do for the Inspection ID.</li>
+						<li>Submit Inspection is the only way to get approved AU and vouchers into the invoice area.</li>
+						<li>On Inspection list page there is now a hyperlink when an Inspection is (In Progress) which will allow you to continue to work on the same inspection in case user left for the day and didn't submit.</li>
+						<li>Editable columns will be yellow indicating that they are ready to be inspected.</li>
+						<li>Added (Show All) checkbox to provide inspectors the ability to change inspection statuses that have not been submitted for invoicing or invoice approved.</li>
+						<li>Removed the Show All/Ready for Inspection button replaced with checkbox show all.</li>
+						<li>Editable columns will be Green when an inspection is approved or appealed.</li>
+						<li>Editable Columns will be Red when an inspection status is rejected.</li>
+						<li>Quantity columns will be highlighted blue when the Design qty and asbuilt qty don't match.</li>
+						<li>Standardized the column picker button, with hover over tooltips.</li>
+						<li>Added the ability to tab through the editable fields</li>
+						<li>When returning to the inspection list the list is updated to show the latest information</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>UBJ - Voucher Tab</b></li>
+					<ul>
+						<li>Increased the performance when loading large jobs.</li>
+						<li>Standardized the column picker button, with hover over tooltips.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>User Management</b></li>
+					<ul>
+						<li>Added data grid with all users</li>
+						<li>Redesigned the Create User modules</li>
+						<li>Redesigned the Update User modules</li>
+						<li>Redesigned the Reset Password modules</li>
+						<li>Redesigned the Delete User modules</li>
+						<li>Added real-time username available validation check</li>
+						<li>Added real-time password validation check</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>Notifications</b></li>
+					<ul>
+						<li>Added data grid with all previous notifications</li>
+						<li>Added ability to re-enable a previous notification</li>
+						<li>Redesigned the create notification form.</li>
+						<li>Added the ability to disable the current notification</li>
+					</ul>
+				</ul>
+				<h4>Bug(s) Fixed:</h4>
+				<ul>
+					<li><b>Unit Based Job Search</b></li>
+					<ul>
+						<li>When navigating back to search page all search criteria and search results are gone except the one work order that was being worked on.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>UBJ - Job Header</b></li>
+					<ul>
+						<li>Job Statuses where not updating AsBuilt statuses correctly as work was being done.</li>
+						<li>Job Statuses where not updating Inspection statuses correctly as work was being done.</li>
+						<li>Job Statuses where not updating Invoice statuses correctly as work was being done.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>UBJ - Invoice</b></li>
+					<ul>
+						<li>AU Designed Cost was not using the correct rates, due to using current date instead of work order create date.</li>
+						<li>When Approving an Invoice vouchers invoice status would not get updated.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>UBJ - Voucher Tab</b></li>
+					<ul>
+						<li>When adding new vouchers nothing happened when you submit the new voucher form.</li>
+						<li>Dialog does not close when user submits form.</li>
+					</ul>
+				</ul>
+				<h4>Patched/Upgraded Dependence Libraries:</h4>
+				<ul>
+					<li><b>PrimeFaces 7.0</b></li>
+					<li><b>Serenity 2.0.0</b></li>
+					<li><b>Log4J 2.11.2</b></li>
+					<li><b>OmniFaces 2.7.1</b></li>
+					<li><b>Shiro 1.4.1</b></li>
+				</ul>
+			</div>
+			<div class="card">
+				<h1>
+					<u>Release v1.2.1 - PB</u>
+				</h1>
+				<h4>May 31, 2019</h4>
+				<h4>Enhancement(s):</h4>
+				<ul>
+					<li><b>Staking</b></li>
+					<ul>
+						<li>Updated label for Assembly Unit data table.</li>
+						<li>Corrected the bread crumb for UBJ so user can return to search page.</li>
+						<li>Enabled Vendors to be able to modify AU rows that have not yet been inspected.</li>
+					</ul>
+				</ul>
+				<ul>
+					<li><b>Inspection</b></li>
+					<ul>
+						<li>Enabled Inspectors to be able to modify AU rows that have not been invoiced.</li>
+						<li>Added the Invoice Status column in the New Inspection Detail page.</li>
+					</ul>
+				</ul>
+				<h4>Bug Fix:</h4>
+				<ul>
+					<li><b>Inspection</b></li>
+					<ul>
+						<li>Allow inspector to inspect Appealed AU's.</li>
+					</ul>
+				</ul>
+			</div>
+			<div class="card">
+					<h1>
+						<u>Release v1.2.0 - HC</u>
+					</h1>
+					<h4>May 22, 2019</h4>
+					<h4>Enhancement(s):</h4>
+					<ul>
+						<li><b>Application</b></li>
+						<ul>
+							<li>Added ability to persist user preference on all tables with a column picker.</li>
+						</ul>
+					</ul>
+					<ul>
+						<li><b>Staking</b></li>
+						<ul>
+							<li>Removed Group By Station Feature in all data tables.</li>
+						</ul>
+					</ul>
+					<ul>
+						<li><b>Inspection</b></li>
+						<ul>
+							<li>Conditional formatting of columns in Inspection data table.</li>
+						</ul>
+					</ul>
+				</div>
+				<div class="card">
+					<h1>
+						<u>Release v1.0.1 - HC</u>
+					</h1>
+					<h4>November 19, 2018</h4>
+					<h4>Enhancement(s):</h4>
+					<ul>
+						<li><b>Staking</b></li>
+						<ul>
+							<li>Added Inspection Comments column on As-Built edit table.</li>
+						</ul>
+					</ul>
+					<ul>
+						<li><b>Invoice</b></li>
+						<ul>
+							<li>Added Filters on Invoice History Data Table.</li>
+						</ul>
+					</ul>
+					<ul>
+						<li><b>Invoice Approval</b></li>
+						<ul>
+							<li>Added Inpector and Inspected Date Columns.</li>
+						</ul>
+					</ul>
+					<ul>
+						<li><b>Misc</b></li>
+						<ul>
+							<li>Moved "Back" button from bottom to top of page throughout the application.</li>
+						</ul>
+					</ul>
+					<h4>Bugs Fixed:</h4>
+					<ul>
+						<li><b>Staking</b></li>
+						<ul>
+							<li>Fixed Unable to save As-Built with Zero quantity.</li>
+						</ul>
+					</ul>
+				</div>
+				<div class="card">
+					<h1><u>Release v1.0.0 - HC</u></h1>
+					<h4>September 27, 2018</h4>
+					<h4>Features Added:</h4>
+					<ul>
+						<li><b>Dashboard</b></li>
+						<ul>
+							<li>Shows basic statistics on areas released in this version</li>
+						</ul>
+						<li><b>Staking Area</b></li>
+						<ul>
+							<li>Search</li>
+							<ul>
+								<li>Can search for work orders</li>
+							</ul>
+							<li>As-Built Tab</li>
+							<ul>
+								<li>LCEC can present a work order’s design to a vendor</li>
+								<li>Vendor can update the actual As-Built quantities and submit for inspection</li>
+							</ul>
+							<li>Inspection Tab</li>
+							<ul>
+								<li>LCEC can inspect assemble units</li>
+								<li>Vendor can review the results of those inspections</li>
+							</ul>
+							<li>Invoicing Tab</li>
+							<ul>
+								<li>Vendor can submit an invoice for payment to LCEC</li>
+								<li>LCEC can review invoice for approval or rejection</li>
+							</ul>
+							<li>Summary Tab</li>
+							<ul>
+								<li>Can see an aggregated view of all assemble units on the work order</li>
+							</ul>
+						</ul>
+						<li><b>Streetlights Area</b></li>
+						<ul>
+							<li>Search</li>
+							<ul>
+								<li>Can search for work orders</li>
+							</ul>
+							<li>Inspection Tab</li>
+							<ul>
+								<li>LCEC reviews vendor submitted paper forms and can mark the work order ready for invoicing</li>
+							</ul>
+							<li>Invoicing Tab</li>
+							<ul>
+								<li>Vendor can submit an invoice for payment to LCEC</li>
+								<li>LCEC can review invoice for approval or rejection</li>								
+							</ul>
+						</ul>
+						<li><b>Inspection Area</b></li>
+						<ul>
+							<li>Search</li>
+							<ul>
+								<li>Can look for inspections in staking and streetlights based upon the user’s criteria</li>
+								<li>Inspectors can use as centralized list of invoices to approve</li>
+							</ul>
+						</ul>
+						<li><b>Admin Area</b></li>
+							<ul>
+								<li>Used to create and manage users and their roles</li>
+							</ul>
+					</ul>
+					<h4>Known Issues:</h4>
+					<ul>
+						<li>Service orders for streetlights which require the entry of feet of cable is not supported in this release</li>
+						<li>No work order with less than 9 characters will be found in the VendorPortal</li>
+						<li>WorkOrder starting with the number “3” will not be found in VendorPortal</li>
+						<li>The Following Service Order Types will not be found in VendorPortal</li>
+						<ul>
+							<li>APT, CNMNR, CNTB, DCLAIM, DMTNC, ER, HP, PSC, OSP, TPOH</li>
+						</ul>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</ui:define>
+
+</ui:composition>

@@ -1,0 +1,125 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:form id="updateUserFrm">
+	<p:growl id="growl" showDetail="false" />
+
+        <center>
+          	<p:panelGrid id="updateUserGrid" columns="1" styleClass="ui-noborder ui-fluid" style="width:600px;">
+          		<div class="ui-g ui-fluid">
+          			<div class="ui-g-12">
+							<h:panelGroup styleClass="md-inputfield" >
+								<p:inputText id="userNameId" value="#{userReg.selectedUser.userName}" disabled="true" style="opacity: 1;filter: Alpha(Opacity=100);" />
+								<label>Username</label>
+							</h:panelGroup>
+						</div>
+          			<div class="ui-g-12">
+          				<h:panelGroup styleClass="md-inputfield" >
+							<p:inputText id="fNameId" value="#{userReg.selectedUser.firstName}" required="true" requiredMessage="First Name required."/>
+							<label>First Name</label>
+						</h:panelGroup>
+					</div>
+					<div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<p:inputText id="lNameId" value="#{userReg.selectedUser.lastName}" required="true" requiredMessage="Last Name required."/>
+							<label>Last Name</label>
+						</h:panelGroup>
+					</div>
+					<div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<p:inputMask id="phoneId" value="#{userReg.selectedUser.phone}" mask="(999) 999-9999" required="true" requiredMessage="Phone Number required."/>
+							<label>Phone Number</label>
+						</h:panelGroup>
+					</div>
+					<div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<p:selectOneMenu id="carrierId" value="#{userReg.selectedUser.phoneCarrier}" >
+		         						<f:selectItem itemLabel="" itemValue="" />
+		         						<f:selectItem itemLabel="Sprint" itemValue="Sprint" />
+		         						<f:selectItem itemLabel="T-Mobile" itemValue="T-Mobile" />
+		         						<f:selectItem itemLabel="AT&amp;T" itemValue="AT&amp;T" />
+		         						<f:selectItem itemLabel="Verizon" itemValue="Verizon" />
+		     						</p:selectOneMenu>
+							<label>Phone Carrier</label>
+						</h:panelGroup>
+					</div>
+					<div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<p:selectOneMenu id="workGroupId" value="#{userReg.selectedUser.workGroup}" required="true" requiredMessage="Work Group required.">
+		         						<f:selectItem itemLabel="" itemValue="" />
+		         						<f:selectItem itemLabel="LCEC" itemValue="LCEC" />
+		         						<f:selectItem itemLabel="PIKE" itemValue="PIKE" />
+		         						<f:selectItem itemLabel="MASTEC" itemValue="MASTEC" />
+		     						</p:selectOneMenu>
+							<label>Workgroup</label>
+						</h:panelGroup>
+					</div>
+					<div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<p:inputText id="emailId" value="#{userReg.selectedUser.email}" required="true" requiredMessage="E-Mail address is required." >
+								<p:ajax event="blur" update="growl emailId"/>
+							</p:inputText>
+							<label>E-Mail Address</label>
+						</h:panelGroup>
+					</div>
+					<!-- <div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<p:inputText id="userNameId" value="#{userReg.selectedUser.userName}" required="true" requiredMessage="Username required."
+										 validator="#{customValidator.usernameValidate}" validatorMessage="User Name Already Exists.">
+								<p:ajax event="blur" update="growl userNameId" />
+							</p:inputText>
+							<label>Username</label>
+							<p:message id="username_message" for="userNameId" />
+						</h:panelGroup>
+					</div> -->
+					<!-- <div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<p:inputText id="pwd1Create" type="password" value="#{userReg.selectedUser.password}" required="true" requiredMessage="Password Required.">
+								<p:ajax event="keyup" delay="500" listener="#{userReg.pwd1CreateListener()}" />
+							</p:inputText>
+							<label>Password</label>
+							<p:tooltip id="pwd1ToolTip" widgetVar="pwd1ToolTip" for="pwd1Create" showEvent="focus click" hideEvent="blur" position="right">
+					 			<p:panel id="tooltipPanel" style="opacity: 0.9;filter: alpha(opacity=90);font-size: 12px;background-color: #323232; border-style:none;">
+						 			<h3>Password Requirements</h3>
+									<h4 style="#{userReg.lengthStyle}">**Password length must be between 12 and 128 characters.</h4>
+									<h4 style="#{userReg.upperStyle}">**Password must contain at least one upper-case character.</h4>
+									<h4 style="#{userReg.lowerStyle}">**Password must contain at least one lower-case character.</h4>
+									<h4 style="#{userReg.digitStyle}">**Password must contain at least one digit.</h4>
+									<h4 style="#{userReg.spaceStyle}">**Password must contain no whitespace.</h4>
+								</p:panel>
+					 		</p:tooltip>
+						</h:panelGroup>
+					</div>
+					<div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<p:inputText id="pwd2Create" type="password" required="true" requiredMessage="Confirm Password Required.">
+		     					<p:ajax event="blur" listener="#{userReg.pwd2CreateListener}" update="growl pwd2Create"/>	
+		     				</p:inputText>
+							<label>Confirm Password</label>
+						</h:panelGroup>
+					</div> -->
+					<div class="ui-g-12">
+						<h:panelGroup styleClass="md-inputfield" >
+							<!-- <h:outputLabel value="Application Role"/> -->
+							<p:pickList id="roleId" converter="pfPickListConverter" value="#{userReg.updateRolesList}" var="role" itemLabel="#{role.roleName}" itemValue="#{role}"
+		  								required="true" requiredMessage="Please select Role for this user." >
+		     							<f:facet name="sourceCaption">Available</f:facet>
+										<f:facet name="targetCaption">Selected</f:facet>
+		     						</p:pickList>
+							<label style="margin-top:-20px;">Application Role</label>
+						</h:panelGroup>
+					</div>
+				</div>
+          	</p:panelGrid>
+        	<p:panelGrid id="pnlGrpSubmit" columns="2" styleClass="ui-panelgrid-blank"  >
+        				<!-- <p:captcha id="captchaId" label="Captcha" theme="blackglass" /> -->
+        		<p:commandButton value="Submit" action="#{userReg.updateUserInfo}" update="updateUserFrm" ajax="true"/>
+        		<p:commandButton id="cancelBtnDlg" value="Cancel" immediate="true" onclick="PF('updateUserDlg').hide();" />		
+        	</p:panelGrid>
+    	</center>
+	</h:form>
+	
+</ui:composition>

@@ -1,0 +1,7 @@
+<root>
+  <facet id="jst.jsf">
+    <node name="libprov">
+      <attribute name="provider-id" value="wls-system-library-provider-jsf-2.2"/>
+    </node>
+  </facet>
+</root>

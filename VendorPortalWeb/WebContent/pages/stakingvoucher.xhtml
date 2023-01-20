@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<f:metadata>
+    	<f:event listener="#{userPrefController.findUserPrefStakingVoucher}" type="preRenderView" />
+	</f:metadata>
+	<div class="ui-g">
+		<div class="ui-g-12">
+			<!-- <h:form id="addVoucherBtnForm"> -->
+				<p:commandButton value="Add Voucher" action="#{adHocStaking.openVoucherDlg}" icon="fa fa-plus" styleClass="secondary-btn"
+					style="float:left;display:inline-block;" rendered="#{userMBean.currentUser.isPermitted('S-AB:Edit')}" />
+			<!-- </h:form> -->
+		</div>
+	</div>
+	<!-- <h:form id="voucherForm" prependId="false" style="display:inline-block;"> -->
+		<p:dataTable id="STAKING_VOUCHER_TABLE" var="voucher" value="#{wfController.vouchers}" paginator="true" rows="10" rowsPerPageTemplate="10,20,50"
+					 draggableColumns="true" style="max-height: 500px;" paginatorPosition="bottom" paginatorAlwaysVisible="false">
+			<f:facet name="header">
+				<p:panelGrid styleClass="ui-panelgrid-blank">
+					<div style="float: right;margin-top:-3px;"> 
+						<p:commandLink id="toggler" style="margin-right:10px;">
+							<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+							<p:tooltip for="toggler" value="Columns" position="top"/>
+						</p:commandLink>
+		        		<p:columnToggler datasource="STAKING_VOUCHER_TABLE" trigger="toggler">
+		        			<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+		        		</p:columnToggler>
+	        		</div>
+	        		<div style="right:50%;">
+						<span>Voucher(s)</span>
+					</div>
+				</p:panelGrid>
+       		</f:facet>
+			<p:column id="stationDescription" headerText="Station" style="text-align:center" visible="#{userPrefController.voucher.stationDescription}">
+				<h:outputText value="#{voucher.stationDescription}" />
+			</p:column>
+			<p:column id="description" headerText="Description" style="text-align:center" visible="#{userPrefController.voucher.description}">
+				<h:outputText value="#{voucher.description}" />
+			</p:column>
+			<p:column id="crew" headerText="Crew" style="text-align:center" visible="#{userPrefController.voucher.crew}">
+				<h:outputText value="#{voucher.crew}" />
+			</p:column>
+			<p:column id="amount" headerText="Amount" style="text-align:center" visible="#{userPrefController.voucher.amount}">
+				<h:outputText value="#{voucher.amount}">
+					<f:convertNumber type="currency" currencySymbol="$" />
+				</h:outputText>
+			</p:column>
+			<p:column id="requestor" headerText="Requestor" style="text-align:center" visible="#{userPrefController.voucher.requestor}">
+				<h:outputText value="#{voucher.requestor}" />
+			</p:column>
+			<p:column id="createdDt" headerText="Created Date" style="text-align:center" visible="#{userPrefController.voucher.createdDt}">
+				<h:outputText value="#{voucher.createdDt}">
+					<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+				</h:outputText>
+			</p:column>
+			<p:column id="inspectionStatusId" headerText="Inspection Status" style="text-align:center" visible="#{userPrefController.voucher.inspectionStatusId}">
+				<h:outputText value="#{voucher.inspectionStatus}" />
+			</p:column>
+			<p:column id="invoiceStatusId" headerText="Invoice Status" style="text-align:center" visible="#{userPrefController.voucher.invoiceStatusId}">
+				<h:outputText value="#{voucher.invoiceStatus}" />
+			</p:column>
+			<p:column id="edit" style="text-align:center;width:30px;" >
+			<p:commandLink action="#{adHocStaking.openEditVoucherDlg}" style="padding-left: 10px;" title="Edit" rendered="#{voucher.inspectionStatusId eq '1' or voucher.inspectionStatusId eq '2'}" >
+                <i class="fa fa-wa fa-pencil fa-lg" />
+            	<f:setPropertyActionListener value="#{voucher}" target="#{adHocStaking.selectedVoucher}" />
+            </p:commandLink>
+		</p:column>	
+		</p:dataTable>
+	<!-- </h:form> -->
+	<!-- <h:form id="addVoucherDlgForm"> -->
+		<!-- <p:dialog header="Add New Voucher" draggable="false" modal="true" resizable="false" showHeader="true"
+			widgetVar="addVoucherDlg" minHeight="40" blockScroll="true" >
+			<ui:include src="addvoucherdiag.xhtml" />
+		</p:dialog> -->
+	<!-- </h:form> -->
+</ui:composition>

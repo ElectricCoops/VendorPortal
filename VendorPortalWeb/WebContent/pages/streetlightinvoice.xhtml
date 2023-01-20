@@ -1,0 +1,103 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+		<div class="ui-g">
+		<div class="ui-g-12">
+			<div class="card card-w-title">
+			<h:panelGroup id="slInvoiceGrp">
+			<div class="ui-g">
+        			<div class="ui-g-12">
+        				<p:commandButton value="Back" action="#{streetLightVw.searchStreetLights}" immediate="true" icon="fa fa-arrow-circle-left" style="float:left;display:inline-block;margin-top:5px" ajax="true">
+        					<f:setPropertyActionListener target="#{streetLightVw.renderSearchPanel}"  value="true" />
+        				</p:commandButton>				
+        			</div>
+        		</div>
+			<p:dataTable id="slInvoiceRsltTbl" var="so" value="#{streetLightVw.invoiceServiceOrder}" reflow="true" style="margin-top:20px"
+								rowKey="#{so.serviceOrderId}" filteredValue="#{streetLightVw.filteredServiceOrder}"
+								selection="#{streetLightVw.selectedInvoiceServiceOrder}"
+            					paginator="true" rows="50" rowsPerPageTemplate="50,75,100" widgetVar="serviceOrderTbl" editable="true" editMode="cell" 
+            					rendered="#{streetLightVw.renderInvoiceRsltVw}">
+            			<f:facet name="header">
+        					<p:outputPanel style="display:block; text-align:right">
+                				<h:outputText value="Search all fields:" />
+                				<p:inputText id="globalFilter" onkeyup="PF('serviceOrderTbl').filter()" style="width:150px" />
+           					 </p:outputPanel>
+    					</f:facet>
+    					
+    					<p:ajax event="rowSelectCheckbox" listener="#{streetLightVw.slInvRowSelectCheckbox}" update="stLightInvoiceForm" />
+        				<p:ajax event="rowUnselectCheckbox" listener="#{streetLightVw.slInvRowUnSelectCheckbox}" update="stLightInvoiceForm" />
+        				<p:ajax event="toggleSelect" listener="#{streetLightVw.slInvAllRowSelectCheckbox}" update="stLightInvoiceForm" />
+        				<p:ajax event="rowSelect" listener="#{streetLightVw.slInvRowSelectCheckbox}" update="stLightInvoiceForm" />
+        				<p:ajax event="rowUnselect" listener="#{streetLightVw.slInvRowSelectCheckbox}" update="stLightInvoiceForm" />
+        
+						<p:column selectionMode="multiple" style="width:16px;text-align:center" />
+    					<p:column headerText="Work Order" style="text-align:center" filterBy="#{so.workOrderId}" filterMatchMode="contains" sortBy="#{so.workOrderId}">
+        					<h:outputText value="#{so.workOrderId}" />
+    					</p:column>
+    					<p:column headerText="Service Order" style="text-align:center" filterBy="#{so.serviceOrderId}" filterMatchMode="contains" sortBy="#{so.serviceOrderId}">
+        					<h:outputText value="#{so.serviceOrderId}" />
+    					</p:column>
+    					<p:column headerText="iVUE Status" style="text-align:center" filterBy="#{so.soStatCode}" filterMatchMode="contains" sortBy="#{so.soStatCode}">
+        					<h:outputText value="#{so.soStatCode}" />
+    					</p:column>
+    					<p:column headerText="Street Light No." style="text-align:center" filterBy="#{so.serviceMapLocation}" filterMatchMode="contains" sortBy="#{so.serviceMapLocation}">
+        					<h:outputText value="#{so.serviceMapLocation}" />
+    					</p:column>
+    					<p:column headerText="Completed Date" style="text-align:center" filterBy="#{so.soCloseDt}" filterMatchMode="contains" sortBy="#{so.soCloseDt}">
+    						<h:outputText value="#{so.soCloseDt}" >
+    							<f:convertDateTime pattern = "MM-dd-yyyy" />
+    						</h:outputText>
+    					</p:column>
+    					<p:column headerText="Qty" style="text-align:center" filterBy="$#{so.quantity}" filterMatchMode="contains" sortBy="$#{so.quantity}">
+        					<h:outputText value="#{so.quantity}" />
+    					</p:column>
+    					<p:column headerText="Unit Price" style="text-align:center" filterBy="#{so.fixedCost}" filterMatchMode="contains" sortBy="$#{so.fixedCost}">
+        					<h:outputText value="$#{so.fixedCost}">
+        						<f:convertNumber type="currency" currencySymbol="$" />
+        					</h:outputText>
+    					</p:column>
+    					<p:column headerText="Extended Price" style="text-align:center" filterBy="#{so.extPrice}" filterMatchMode="contains" sortBy="#{so.extPrice}">
+        					<h:outputText value="#{so.extPrice}">
+        						 <f:convertNumber currencySymbol="$" type="currency" />
+        					</h:outputText>
+    					</p:column>
+						<p:columnGroup type="footer">
+							<p:row>
+								<p:column colspan="8" style="text-align:right"
+									footerText="Total:" />
+								<p:column style="text-align:center">
+									<f:facet name="footer">
+										<h:outputText id="slSubTotId" value="#{streetLightVw.slSubTotal}">
+											<f:convertNumber type="currency" currencySymbol="$" />
+										</h:outputText>
+									</f:facet>
+								</p:column>
+							</p:row>
+						</p:columnGroup>
+					</p:dataTable>
+    			<div class="ui-g">
+        			<div class="ui-g-12">
+        			<h:panelGrid style="float:right;">
+        			<p:panelGrid columns="3" styleClass="ui-panelgrid-blank" style="float:right;">
+    					<p:outputLabel for="refId" value="Vendor Reference Code:  " style="font-weight:bold;" />
+						<p:inputText id="refId" value="#{streetLightVw.invRefNo}" required="true" requiredMessage="Vendor Reference Code is required" />
+        				<p:commandButton value="Submit Invoice" action="#{streetLightVw.submitSLInvoice}" update="slInvoiceGrp,messages" style="float:right;display:inline-block;margin-top:5px">
+        					<f:setPropertyActionListener target="#{invController.renderBackToInvoiceSearch}"  value="false" />
+    						<f:setPropertyActionListener target="#{wfController.renderBackToInvoiceTab}" value="false" />
+    						<f:setPropertyActionListener target="#{streetLightVw.renderBackToStreetLightBtn}" value="true" />
+        				</p:commandButton>	
+        			</p:panelGrid>	
+        			<h:panelGrid styleClass="ui-panelgrid-blank" style="float:right;">
+    						<p>Note: <i>Select checkbox on the left for items to be invoiced and enter a Vendor Reference Code before submitting invoice.</i></p>	
+    				</h:panelGrid>
+    				</h:panelGrid>			
+        			</div>
+        		</div>
+    		</h:panelGroup>
+    		</div>
+    		</div>
+    		</div>
+</ui:composition>

@@ -1,0 +1,91 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<f:metadata>
+    	<f:event listener="#{userPrefController.findUserPrefInspectionTab}" type="preRenderView" />
+	</f:metadata>
+	<p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank">
+		<p:fieldset legend="Unit Rows Passed" style="font-weight:bold;text-align: center;">
+			<h:outputText id="inspPassId" value="#{wfController.inspPassed}" />
+		</p:fieldset>
+		<p:fieldset legend="Unit Rows Rejected" style="font-weight:bold;text-align: center;">
+			<h:outputText id="unitRejId" value="#{wfController.unitsRejected}" />
+		</p:fieldset>
+		<p:fieldset legend="Unit Rows Not Inspected" style="font-weight:bold;text-align: center;">
+			<h:outputText id="notInspId" value="#{wfController.notInspected}" />
+		</p:fieldset>
+		<p:fieldset legend="Total Unit Rows" style="font-weight:bold;text-align: center;">
+			<h:outputText id="totUnitsId" value="#{wfController.totalUnits}" />
+		</p:fieldset>
+	</p:panelGrid>
+	<!-- <h:form id="inspBtn" prependId="false"> -->
+	<div class="ui-g">
+		<div class="ui-g-12">
+		<p:commandButton value="New Inspection" icon="fa fa-plus" style="float:left;display:inline-block;"  ajax="false"
+			action="#{wfController.newInspection}"  update="messages" rendered="#{userMBean.currentUser.isPermitted('S-INS:Edit')}" styleClass="secondary-btn">
+			<f:setPropertyActionListener target="#{wfController.renderBackToInspSearch}"  value="false" />
+    		<f:setPropertyActionListener target="#{wfController.renderBackToInspTab}" value="true" />
+    		<f:setPropertyActionListener target="#{wfController.cancelInspOnBack}" value="true" />
+		</p:commandButton>
+		</div>
+	</div>
+	<!-- </h:form>
+	<h:form id="inspFormId" style="display:inline-block;" prependId="false"> -->
+		<p:dataTable id="INSPECTION_HISTORY_TAB" var="insp" value="#{wfController.inspections}" reflow="true" style="margin-top:10px" draggableColumns="true"
+					 paginator="true" rows="10" paginatorPosition="bottom" paginatorAlwaysVisible="false">
+			<f:facet name="header">
+				<p:panelGrid styleClass="ui-panelgrid-blank">
+					<div style="float: right;margin-top:-3px;">
+			    		<p:commandLink id="toggler" style="margin-right:10px;">
+							<i class="fa fa-wa fa-align-left fa-2x" style="color:white" />
+							<p:tooltip for="toggler" value="Columns" position="top"/>
+						</p:commandLink>
+						<p:columnToggler datasource="INSPECTION_HISTORY_TAB" trigger="toggler">
+							<p:ajax event="toggle" listener="#{userPrefController.woSrchToggleEvent}" />
+						</p:columnToggler>
+					</div>
+					<div style="right:50%;">
+						<span>Inspection(s)</span>
+					</div>
+				</p:panelGrid>
+    		</f:facet>
+    		
+			<p:column id="inspectionDt" headerText="Inspection Date" style="text-align:center" filterBy="#{insp.inspectionDt}" filterMatchMode="contains" sortBy="#{insp.inspectionDt}"
+						visible="#{userPrefController.inspTab.inspectionDt}">
+				<h:commandLink action="#{wfController.findInspectionById}" >
+					<h:outputText value="#{insp.inspectionDt}">
+	    				<f:convertDateTime pattern = "MM-dd-yyyy hh:mm:ss a" />
+	    			</h:outputText>
+					<f:setPropertyActionListener target="#{wfController.inspectionId}" value="#{insp.inspectionId}" />
+					<f:setPropertyActionListener target="#{wfController.inspectionDt}" value="#{insp.inspectionDt}" />
+					<f:setPropertyActionListener target="#{wfController.renderBackToInspTab}" value="true" />
+					<f:setPropertyActionListener target="#{wfController.renderBackToInspSearch}"  value="false" />
+					<f:setPropertyActionListener target="#{wfController.cancelInspOnBack}" value="false" />
+				</h:commandLink>
+			</p:column>
+			<p:column id="inspectedBy" headerText="Inspector" style="text-align:center" filterBy="#{insp.resource.resourceName}" filterMatchMode="contains" sortBy="#{insp.resource.resourceName}"
+						visible="#{userPrefController.inspTab.inspectedBy}">
+				<h:outputText value="#{insp.resource.resourceName}" />
+			</p:column>
+			<p:column id="inspectionStatusId" headerText="Inspection Status" style="text-align:center" filterBy="#{insp.inspectionStatus.status}" filterMatchMode="contains" sortBy="#{insp.inspectionStatus.status}"
+						visible="#{userPrefController.inspTab.inspectionStatusId}">
+				<h:commandLink rendered="#{insp.inspectionStatus.status eq 'In Progress'}" action="#{wfController.continueInProgressInspection}">
+					<h:outputText value="#{insp.inspectionStatus.status}" />
+					<f:setPropertyActionListener target="#{wfController.cancelInspOnBack}" value="true" />
+					<f:setPropertyActionListener target="#{wfController.inspectionId}" value="#{insp.inspectionId}" />
+					<f:setPropertyActionListener target="#{wfController.renderBackToInspSearch}"  value="false" />
+    				<f:setPropertyActionListener target="#{wfController.renderBackToInspTab}" value="true" />
+				</h:commandLink>
+				
+				<h:outputText value="#{insp.inspectionStatus.status}" rendered="#{insp.inspectionStatus.status ne 'In Progress'}"/>
+			</p:column>
+			<p:column id="comments" headerText="Comments" style="text-align:center" filterBy="#{insp.comments}" filterMatchMode="contains" sortBy="#{insp.comments}"
+						visible="#{userPrefController.inspTab.comments}">
+				<h:outputText value="#{insp.comments}" />
+			</p:column>
+		</p:dataTable>
+	<!-- </h:form> -->
+</ui:composition>

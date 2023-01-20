@@ -1,0 +1,22 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+    
+    <f:loadBundle basename="resources.messages" var="msgs" />
+    
+    <div class="layout-footer clearfix">
+        <a href="home.xhtml">
+            <p:graphicImage name="lcec-blue.png" library="images" />
+        </a>
+        <span class="footer-text-center">
+        	<h:link outcome="/pages/about" value="v#{msgs.current_version}"/>
+        </span>
+        <span class="footer-text-right">
+            <span class="ui-icon ui-icon-copyright"></span> 
+            <span>2021 LCEC All Rights Reserved</span>
+        </span>
+    </div>
+</ui:composition>

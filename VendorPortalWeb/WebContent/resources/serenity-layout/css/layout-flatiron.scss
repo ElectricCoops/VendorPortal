@@ -1,0 +1,74 @@
+/* Sidebar */
+$sidebarLogoBgColor:transparent;
+$sidebarBgColor:#566e87;
+$darkSidebarBgColor:#202d35;
+$menuBgImageLight:'bg-flatiron-light.png';
+$menuBgImageDark:'bg-flatiron-dark.png';
+$horizontalMenuBgImageLight:'bg-flatiron-light-horizontal.png';
+$horizontalMenuBgImageDark:'bg-flatiron-dark-horizontal.png';
+$horizontalMenuBgColor:#415c7c;
+$horizontalDarkMenuBgColor:#1a2532;
+
+/* Primary */
+$primaryColor:#607D8B;
+$primaryDarkColor:#455A64;
+$primaryLightColor:#90A4AE;
+$primaryLightestColor:#ECEFF1;
+$primaryTextColor:#ffffff;
+
+/* Accent */
+$accentColor:#4CAF50;
+$accentLightColor:#81C784;
+$accentTextColor:#ffffff;
+
+/* Topbar */
+$topbarTextColor:#ECEFF1;
+$topbarIconColor:#ECEFF1;
+
+/* Submenu */
+$submenuBgColor:rgba(0,0,0,0.2);
+$darkSubmenuBgColor:rgba(255,255,255,0.15);
+$horizontalSubmenuBgColor:#415c7c;
+$horizontalDarkSubmenuBgColor:#1a2532;
+$horizontalSubmenuitemHoverBgColor:#1e282c;
+$horizontalSubmenuitemDarkHoverBgColor:rgba(255,255,255,0.3);
+$horizontalSubmenuitemDarkHoverTextColor:#ffffff;
+$horizontalMenuActiveTextColor:#ffffff;
+$horizontalMenuActiveHoverTextColor:#ffffff;
+$horizontalDarkMenuActiveTextColor:#ffffff;
+$horizontalDarkMenuActiveHoverTextColor:#ffffff;
+
+/* Default MenuItem */
+$menuitemTextColor:#ffffff;
+$menuitemIconTextColor:#ffffff;
+
+/* Hover MenuItem */
+$menuitemHoverBgColor:#1e282c;
+$menuitemHoverTextColor:#ffffff;
+$menuitemHoverIconTextColor:#ffffff;
+
+/* Active MenuItem */
+$menuitemActiveBgColor:#4CAF50;
+$menuitemActiveTextColor:#ffffff;
+$menuitemActiveIconTextColor:#ffffff;
+$subMenuitemActiveTextColor:#81C784;
+$subMenuitemActiveIconTextColor:#81C784;
+
+
+/* Dark Default MenuItem */
+$darkMenuitemTextColor:#dee0e3;
+$darkMenuitemIconTextColor:#dee0e3;
+
+/* Dark Hover MenuItem */
+$darkMenuitemHoverBgColor:#566e87;
+$darkMenuitemHoverTextColor:#ffffff;
+$darkMenuitemHoverIconTextColor:#ffffff;
+
+/* Dark Active MenuItem */
+$darkMenuitemActiveBgColor:#4CAF50;
+$darkMenuitemActiveTextColor:#212121;
+$darkMenuitemActiveIconTextColor:#212121;
+$darksubMenuitemActiveTextColor:#81C784;
+$darksubMenuitemActiveIconTextColor:#81C784;
+
+@import '../../sass/layout/_layout';

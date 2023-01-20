@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="breadcrumb">
+		<li><p:link outcome="/pages/searchuser">Search User</p:link></li>
+	</ui:define>
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12">
+				<div class="card card-w-title">
+					<h2>Search User</h2>
+					<p:growl id="messages" showDetail="true"/>
+					<p:panel header="User Lookup" style="margin-bottom:10px;">
+						<h:form id="userSearchForm">
+							<p:panelGrid columns="8"  layout="grid" styleClass="ui-panelgrid-blank"  >
+								<p:outputLabel for="fNameId" value="First Name:" style="font-weight:bold" />
+								<p:inputText id="fNameId" value="" />
+								<p:outputLabel for="lNameId" value="Last Name:" style="font-weight:bold" />
+								<p:inputText id="lNameId" value="" />
+								<p:button value="Search" style="display:inline-block;margin-top:5px;margin-right:5px" />
+							</p:panelGrid>
+						</h:form>
+					</p:panel>
+				</div>
+			</div>
+			<div class="ui-g-12">
+            	<div class="card card-w-title">
+            		<h2>User List</h2>
+            		<p:dataTable id="userSearchRsltTbl" var="user" value="" reflow="true">
+            			<f:facet name="header">
+        						Users
+    					</f:facet>
+    					<p:column headerText="First Name">
+        					<h:outputText value="" />
+    					</p:column>
+    					<p:column headerText="Last Name">
+        					<h:outputText value="" />
+    					</p:column>
+    					<p:column headerText="Company">
+        					<h:outputText value="" />
+    					</p:column>
+    					<p:column headerText="Supervisor">
+        					<h:outputText value="" />
+    					</p:column>
+    					<p:column headerText="E-Mail">
+        					<h:outputText value="" />
+    					</p:column>
+    					<p:column headerText="Status">
+        					<h:outputText value="" />
+    					</p:column>
+    				</p:dataTable>
+            	</div>
+            </div>
+		</div>
+	</ui:define>
+</ui:composition>

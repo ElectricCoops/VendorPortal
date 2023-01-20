@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:of="http://omnifaces.org/functions">
+
+    <h:head>
+    	<link rel="sitemap icon" type="image/x-icon" href="#{resource['images/favicon.ico']}" />
+        <f:facet name="first">
+            <meta http-equiv="cache-control" content="max-age=0" />
+    		<meta http-equiv="cache-control" content="no-cache" />
+    		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <title>LCEC Vendor Portal Login</title>
+        <h:outputScript name="js/layout.js" library="serenity-layout" />
+        <h:outputScript name="js/ripple.js" library="serenity-layout" />
+    </h:head>
+
+    <h:body styleClass="login-body">
+    <h:form id="loginForm" prependId="false">
+    <input type="hidden" name="javax&#46;faces&#46;ViewState" value="631669508271731252&#58;4668721254263228340" />
+        <div class="login-panel ui-fluid">
+            <div class="login-panel-header">
+               <p:graphicImage name="images/logo-slim.png" library="serenity-layout" style="width:300px;" />
+            </div>
+            <div class="login-panel-content">
+                <div class="ui-g">
+                <p:growl id="messages" />
+                    <div class="ui-g-12">
+                        <h1>LCEC Vendor Portal</h1>
+                    </div>
+                    <div class="ui-g-12">
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText value="#{userMBean.user.userName}" required="true" requiredMessage="Username is required." a:autofocus="true" autocomplete="off" />
+                            <label>Username</label>
+                        </h:panelGroup>
+                    </div>
+                    <div class="ui-g-12">
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:password value="#{userMBean.user.password}" feedback="false" required="true" requiredMessage="Password is required." autocomplete="off" />
+                            <label>Password</label>
+                        </h:panelGroup>
+                    </div>
+                    <div class="ui-g-12">
+                        <p:commandButton action="#{userMBean.doLogin}" value="Sign In" icon="ui-icon-person" update="messages,loginForm"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h:outputStylesheet name="css/layout-#{guestPreferences.layout}.css" library="serenity-layout" />
+        </h:form>
+    </h:body>
+
+</html>

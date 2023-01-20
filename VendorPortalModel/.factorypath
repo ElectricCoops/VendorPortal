@@ -1,5 +1,0 @@
-<factorypath>
-    <factorypathentry kind="PLUGIN" id="oracle.eclipse.tools.weblogic" enabled="false" runInBatchMode="false"/>
-    <factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="E:\opt\lib\eclipselink-2.7.1.v20171221-bd47e8f\eclipselink\jlib\jpa\org.eclipse.persistence.jpa.modelgen_2.7.1.v20171221-bd47e8f.jar" enabled="false" runInBatchMode="false"/>
-</factorypath>
